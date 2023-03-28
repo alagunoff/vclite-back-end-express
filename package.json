@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "name": "vclite-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js -L"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "4.18.2",
+    "pg": "8.10.0",
+    "sequelize": "6.30.0"
+  },
+  "devDependencies": {
+    "nodemon": "2.0.22"
+  }
+}

@@ -1,0 +1,35 @@
+version: "3.9"
+services:
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_NAME=db
+      - DB_USERNAME=oleg
+      - DB_PASSWORD=oleg
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/vclite
+    command: npm run dev
+  db:
+    image: postgres:15.2
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=oleg
+      - POSTGRES_PASSWORD=oleg
+    ports:
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4:6.21
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=oleg@oleg.com
+      - PGADMIN_DEFAULT_PASSWORD=oleg
+    ports:
+      - 5050:80
+volumes:
+  db:
