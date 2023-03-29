@@ -1,8 +1,27 @@
+
+const fs = require('fs');
+
 const User = require('../models/user');
 
-// CRUD Controllers
+exports.create_user = (req, res) => {
+  // const image_extension = req.body.image.split(';')[0].split('/')[1];
+  // const image_path = 
 
-//get all users
+  User.create({
+    username: req.body.username,
+    password: req.body.password,
+    first_name: req.body.first_name,
+    last_name: req.body.last_name,
+    // image: req.body.username,
+  })
+    .then(() => {
+      res.status(201).end();
+    })
+    .catch(err => {
+      console.log(err);
+    });
+}
+
 exports.getUsers = (req, res, next) => {
   User.findAll()
     .then(users => {
@@ -11,7 +30,6 @@ exports.getUsers = (req, res, next) => {
     .catch(err => console.log(err));
 }
 
-//get user by id
 exports.getUser = (req, res, next) => {
   const userId = req.params.userId;
   User.findByPk(userId)
@@ -24,27 +42,6 @@ exports.getUser = (req, res, next) => {
     .catch(err => console.log(err));
 }
 
-//create user
-exports.createUser = (req, res, next) => {
-  const name = req.body.name;
-  const email = req.body.email;
-  User.create({
-    name: name,
-    email: email
-  })
-    .then(result => {
-      console.log('Created User');
-      res.status(201).json({
-        message: 'User created successfully!',
-        user: result
-      });
-    })
-    .catch(err => {
-      console.log(err);
-    });
-}
-
-//update user
 exports.updateUser = (req, res, next) => {
   const userId = req.params.userId;
   const updatedName = req.body.name;
@@ -64,7 +61,6 @@ exports.updateUser = (req, res, next) => {
     .catch(err => console.log(err));
 }
 
-//delete user
 exports.deleteUser = (req, res, next) => {
   const userId = req.params.userId;
   User.findByPk(userId)
