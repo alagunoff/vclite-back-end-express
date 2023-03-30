@@ -1,23 +1,32 @@
-const { saveUserImageOnDisk, transformErrorsArrayToObject } = require('../shared/utils');
+const { checkIfValueIsBase64Image, saveUserImageOnDisk, transformErrorsArrayToObject } = require('../shared/utils');
 const User = require('../models/user');
 
 exports.create_user = async (req, res) => {
-  const image_path = await saveUserImageOnDisk(req.body.username, req.body.image)
-
-  User.create({
+  const user = User.build({
     username: req.body.username,
     password: req.body.password,
     first_name: req.body.first_name,
     last_name: req.body.last_name,
-    image: image_path,
     is_admin: req.body.is_admin,
   })
-    .then(() => {
-      res.status(201).end();
-    })
-    .catch((error) => {
-      res.status(400).json(transformErrorsArrayToObject(error.errors));
-    });
+
+  try {
+    await user.validate();
+
+    if ('image' in req.body) {
+      if (checkIfValueIsBase64Image(req.body.image)) {
+        user.image = await saveUserImageOnDisk(user.username, req.body.image);
+      } else {
+        res.status(400).json({ message: 'must be base64' })
+      }
+    }
+
+    await user.save()
+
+    res.status(201).end()
+  } catch (error) {
+    res.status(400).json(transformErrorsArrayToObject(error.errors));
+  }
 }
 
 exports.getUsers = (req, res, next) => {

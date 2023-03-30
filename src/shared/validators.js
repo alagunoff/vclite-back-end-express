@@ -10,7 +10,8 @@ function isBoolean(value) {
   }
 }
 
+
 module.exports = {
   isString,
-  isBoolean
+  isBoolean,
 }
