@@ -1,24 +1,22 @@
-
-const fs = require('fs');
-
+const { saveUserImageOnDisk, transformErrorsArrayToObject } = require('../shared/utils');
 const User = require('../models/user');
 
-exports.create_user = (req, res) => {
-  // const image_extension = req.body.image.split(';')[0].split('/')[1];
-  // const image_path = 
+exports.create_user = async (req, res) => {
+  const image_path = await saveUserImageOnDisk(req.body.username, req.body.image)
 
   User.create({
     username: req.body.username,
     password: req.body.password,
     first_name: req.body.first_name,
     last_name: req.body.last_name,
-    // image: req.body.username,
+    image: image_path,
+    is_admin: req.body.is_admin,
   })
     .then(() => {
       res.status(201).end();
     })
-    .catch(err => {
-      console.log(err);
+    .catch((error) => {
+      res.status(400).json(transformErrorsArrayToObject(error.errors));
     });
 }
 

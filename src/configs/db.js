@@ -7,8 +7,10 @@ const db = new Sequelize(
     {
         host: process.env.DB_HOST,
         dialect: 'postgres',
-        logging: false, 
+        logging: false,
     }
 );
+
+db.sync({ alter: true })
 
 module.exports = db;
