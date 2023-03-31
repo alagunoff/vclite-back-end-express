@@ -1,13 +1,13 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize')
 
-const db = require('../configs/db');
-const validators = require('../shared/validators');
+const db = require('../configs/db')
+const validators = require('../shared/validators')
 
 const User = db.define('user', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    autoIncrement: true,
+    autoIncrement: true
   },
   username: {
     type: DataTypes.STRING,
@@ -46,7 +46,7 @@ const User = db.define('user', {
     }
   },
   image: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING
   },
   is_admin: {
     type: DataTypes.BOOLEAN,
@@ -57,7 +57,7 @@ const User = db.define('user', {
   }
 }, {
   updatedAt: false,
-  createdAt: 'created_at',
-});
+  createdAt: 'created_at'
+})
 
-module.exports = User;
+module.exports = User

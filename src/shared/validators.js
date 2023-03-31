@@ -1,17 +1,16 @@
-function isString(value) {
+function isString (value) {
   if (typeof value !== 'string') {
-    throw new Error("must be string");
+    throw new Error('must be string')
   }
 }
 
-function isBoolean(value) {
+function isBoolean (value) {
   if (typeof value !== 'boolean') {
-    throw new Error("must be boolean");
+    throw new Error('must be boolean')
   }
 }
-
 
 module.exports = {
   isString,
-  isBoolean,
+  isBoolean
 }
