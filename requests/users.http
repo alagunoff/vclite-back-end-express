@@ -9,4 +9,4 @@ content-type: application/json
 ###
 
 GET http://localhost:3000/users
-authorization: JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEzLCJpYXQiOjE2ODAyNTU1MTJ9.7gxIl68kmE5luaH5mvxuoq81Yqw5zNJBf3xldW2J1ng
+authorization: JWT eyJhbGciOiJIUzI1NiJ9.MTE3.nxZzHYfcAdSO5PQjVJlmxc1PeJgxc056QvLwSw18jTI
