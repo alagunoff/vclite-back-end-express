@@ -1,5 +1,5 @@
 const path = require('path')
-const base64 = require('node-base64-image')
+const fs = require('fs')
 
 function transformErrorsArrayToObject (errors) {
   const result = {}
@@ -15,12 +15,12 @@ function getBase64ImageExtension (base64Image) {
   return base64Image.split(';')[0].split('/')[1]
 }
 
-async function saveUserImageOnDisk (username, base64Image) {
-  const imageExtension = getBase64ImageExtension(base64Image)
+function saveUserImageOnDisk (username, base64Image) {
+  const imagePath = path.join(__dirname, `../../static/images/users/${username}.${getBase64ImageExtension(base64Image)}`)
 
-  await base64.decode(base64Image, { fname: path.join(__dirname, `../../static/images/users/${username}`), ext: imageExtension })
+  fs.writeFileSync(imagePath, Buffer.from(base64Image, 'base64'))
 
-  return `static/images/users/${username}.${imageExtension}`
+  return imagePath
 }
 
 module.exports = {

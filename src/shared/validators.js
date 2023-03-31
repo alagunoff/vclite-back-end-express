@@ -5,13 +5,13 @@ function isString (value) {
 }
 
 function isNotEmptyString (value) {
-  if (isString(value) && value.length) {
-    throw new Error('must not be empty string')
+  if (isString(value) || !value.length) {
+    throw new Error('cannot be empty')
   }
 }
 
 function isBase64Image (value) {
-  if (typeof value === 'string' && value.startsWith('data:image/')) {
+  if (typeof value !== 'string' || !value.startsWith('data:image/')) {
     throw new Error('must be base64 image')
   }
 }
