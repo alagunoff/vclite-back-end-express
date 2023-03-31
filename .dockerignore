@@ -1,3 +1,9 @@
-.vscode
-node_modules
-npm-debug.log
+/.git/
+/.husky/
+/.vscode/
+/node_modules/
+/requests/
+/.eslintrc.js
+/.gitignore
+/docker-compose.yml
+/Dockerfile
