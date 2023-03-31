@@ -20,7 +20,7 @@ const User = db.define('user', {
       notNull: {
         msg: 'cannot be empty'
       },
-      isString: validators.isString
+      isNotEmptyString: validators.isNotEmptyString
     }
   },
   password: {
@@ -30,23 +30,26 @@ const User = db.define('user', {
       notNull: {
         msg: 'cannot be empty'
       },
-      isString: validators.isString
+      isNotEmptyString: validators.isNotEmptyString
     }
   },
   first_name: {
     type: DataTypes.STRING,
     validate: {
-      isString: validators.isString
+      isNotEmptyString: validators.isNotEmptyString
     }
   },
   last_name: {
     type: DataTypes.STRING,
     validate: {
-      isString: validators.isString
+      isNotEmptyString: validators.isNotEmptyString
     }
   },
   image: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    validate: {
+      isBase64Image: validators.isBase64Image
+    }
   },
   is_admin: {
     type: DataTypes.BOOLEAN,

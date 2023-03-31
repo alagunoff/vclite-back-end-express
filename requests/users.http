@@ -1,0 +1,12 @@
+POST http://localhost:3000/users
+content-type: application/json
+
+{
+  "username": "oleg",
+  "password": "oleg"
+}
+
+###
+
+GET http://localhost:3000/users
+authorization: JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEzLCJpYXQiOjE2ODAyNTU1MTJ9.7gxIl68kmE5luaH5mvxuoq81Yqw5zNJBf3xldW2J1ng

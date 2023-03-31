@@ -1,6 +1,7 @@
+require('dotenv').config()
 const express = require('express')
 
-const usersRouter = require('./routers/users')
+const usersRouter = require('./src/routers/users')
 
 const app = express()
 app.listen(3000)

@@ -1,4 +1,7 @@
-const { checkIfValueIsBase64Image, saveUserImageOnDisk, transformErrorsArrayToObject } = require('../shared/utils')
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
+
+const { saveUserImageOnDisk, transformErrorsArrayToObject } = require('../shared/utils')
 const User = require('../models/user')
 
 async function createUser (req, res) {
@@ -7,35 +10,36 @@ async function createUser (req, res) {
     password: req.body.password,
     first_name: req.body.first_name,
     last_name: req.body.last_name,
+    image: req.body.image,
     is_admin: req.body.is_admin
   })
 
   try {
     await user.validate()
 
+    user.password = bcrypt.hashSync(user.password)
+
     if ('image' in req.body) {
-      if (checkIfValueIsBase64Image(req.body.image)) {
-        user.image = await saveUserImageOnDisk(user.username, req.body.image)
-      } else {
-        res.status(400).json({ message: 'must be base64' })
+      try {
+        user.image = await saveUserImageOnDisk(user.username, user.image)
+      } catch {
+        res.status(500).end()
       }
     }
 
     await user.save({ validate: false })
 
-    res.status(201).end()
+    res.status(201).send(jwt.sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET))
   } catch (error) {
     res.status(400).json(transformErrorsArrayToObject(error.errors))
   }
 }
 
-// exports.getUsers = (req, res, next) => {
-//   User.findAll()
-//     .then(users => {
-//       res.status(200).json({ users: users });
-//     })
-//     .catch(err => console.log(err));
-// }
+async function getUser (req, res) {
+  const user = await User.findByPk(req.userId)
+
+  res.json(user)
+}
 
 // exports.getUser = (req, res, next) => {
 //   const userId = req.params.userId;
@@ -88,5 +92,6 @@ async function createUser (req, res) {
 // }
 
 module.exports = {
-  createUser
+  createUser,
+  getUser
 }

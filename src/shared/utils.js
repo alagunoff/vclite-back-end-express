@@ -11,10 +11,6 @@ function transformErrorsArrayToObject (errors) {
   return result
 }
 
-function checkIfValueIsBase64Image (value) {
-  return typeof value === 'string' && value.startsWith('data:image/')
-}
-
 function getBase64ImageExtension (base64Image) {
   return base64Image.split(';')[0].split('/')[1]
 }
@@ -29,6 +25,5 @@ async function saveUserImageOnDisk (username, base64Image) {
 
 module.exports = {
   transformErrorsArrayToObject,
-  checkIfValueIsBase64Image,
   saveUserImageOnDisk
 }
