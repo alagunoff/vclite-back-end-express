@@ -2,7 +2,11 @@
   "private": true,
   "scripts": {
     "dev": "nodemon index.js -L",
-    "eslint:fix": "eslint . --fix"
+    "eslint:fix": "eslint . --fix",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.{js}": "npm run eslint:fix"
   },
   "devDependencies": {
     "eslint": "8.37.0",
