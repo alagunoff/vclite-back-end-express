@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs')
 const { saveUserImageOnDisk, transformErrorsArrayToObject } = require('../shared/utils')
 const User = require('../models/user')
 
-async function createUser(req, res) {
+async function createUser (req, res) {
   const user = User.build({
     username: req.body.username,
     password: req.body.password,
@@ -35,7 +35,7 @@ async function createUser(req, res) {
   }
 }
 
-async function getUser(req, res) {
+async function getUser (req, res) {
   res.json(await User.findByPk(req.userId))
 }
 

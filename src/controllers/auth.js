@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs')
 
 const User = require('../models/user')
 
-async function login(req, res) {
+async function login (req, res) {
   const user = await User.findOne({ where: { username: req.body.username } })
 
   if (user) {
