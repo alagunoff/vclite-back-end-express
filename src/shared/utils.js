@@ -11,16 +11,14 @@ function transformErrorsArrayToObject (errors) {
   return result
 }
 
-function getBase64ImageExtension (base64Image) {
-  return base64Image.split(';')[0].split('/')[1]
-}
-
-function saveUserImageOnDisk (username, base64Image) {
-  const imagePath = path.join(__dirname, `../../static/images/users/${username}.${getBase64ImageExtension(base64Image)}`)
+function saveUserImageOnDisk (user) {
+  const [mimeType, base64Image] = user.image.slice(5).split(';base64,')
+  const imageExtension = mimeType.split('/')[1]
+  const imagePath = path.join(__dirname, `../../static/images/users/${user.username}.${imageExtension}`)
 
   fs.writeFileSync(imagePath, Buffer.from(base64Image, 'base64'))
 
-  return imagePath
+  return `http://localhost:3000/static/images/users/${user.username}.${imageExtension}`
 }
 
 module.exports = {

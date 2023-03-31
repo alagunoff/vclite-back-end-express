@@ -6,6 +6,7 @@ const usersRouter = require('./src/routers/users')
 
 const app = express()
 app.listen(3000)
+app.use('/static', express.static('static'))
 app.use(express.json())
 app.use('/auth', authRouter)
 app.use('/users', usersRouter)

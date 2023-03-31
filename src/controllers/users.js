@@ -19,12 +19,8 @@ async function createUser (req, res) {
 
     user.password = bcrypt.hashSync(user.password)
 
-    if ('image' in req.body) {
-      try {
-        user.image = await saveUserImageOnDisk(user.username, user.image)
-      } catch {
-        res.status(500).end()
-      }
+    if (user.image) {
+      user.image = saveUserImageOnDisk(user)
     }
 
     await user.save({ validate: false })

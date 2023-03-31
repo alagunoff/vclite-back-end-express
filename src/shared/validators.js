@@ -1,18 +1,12 @@
-function isString (value) {
-  if (typeof value !== 'string') {
-    throw new Error('must be string')
-  }
-}
-
 function isNotEmptyString (value) {
-  if (isString(value) || !value.length) {
-    throw new Error('cannot be empty')
+  if (typeof value !== 'string' || !value.length) {
+    throw new Error('must be not empty string')
   }
 }
 
 function isBase64Image (value) {
-  if (typeof value !== 'string' || !value.startsWith('data:image/')) {
-    throw new Error('must be base64 image')
+  if (typeof value !== 'string' || !/^data:image\/(jpe?g|png);base64,/.test(value)) {
+    throw new Error('must be base64 image in data URL format with MIME type')
   }
 }
 
@@ -23,7 +17,6 @@ function isBoolean (value) {
 }
 
 module.exports = {
-  isString,
   isNotEmptyString,
   isBase64Image,
   isBoolean

@@ -18,7 +18,7 @@ const User = db.define('user', {
     },
     validate: {
       notNull: {
-        msg: 'cannot be empty'
+        msg: 'required'
       },
       isNotEmptyString: validators.isNotEmptyString
     }
@@ -28,7 +28,7 @@ const User = db.define('user', {
     allowNull: false,
     validate: {
       notNull: {
-        msg: 'cannot be empty'
+        msg: 'required'
       },
       isNotEmptyString: validators.isNotEmptyString
     }
