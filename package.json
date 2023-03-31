@@ -1,8 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "dev": "nodemon index.js -L",
-    "eslint:fix": "eslint . --fix"
+    "dev": "nodemon index.js -L"
   },
   "devDependencies": {
     "eslint": "8.37.0",
@@ -10,6 +9,8 @@
     "eslint-plugin-import": "2.27.5",
     "eslint-plugin-n": "15.7.0",
     "eslint-plugin-promise": "6.1.1",
+    "husky": "8.0.3",
+    "lint-staged": "13.2.0",
     "nodemon": "2.0.22"
   },
   "dependencies": {
@@ -20,5 +21,8 @@
     "node-base64-image": "2.0.4",
     "pg": "8.10.0",
     "sequelize": "6.30.0"
+  },
+  "lint-staged": {
+    "*.{js}": "eslint . --fix"
   }
 }
