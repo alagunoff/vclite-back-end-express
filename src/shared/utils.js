@@ -1,14 +1,12 @@
 const path = require('path')
 const fs = require('fs')
 
-function transformErrorsArrayToObject (errors) {
-  const result = {}
+function createErrorsObject (error) {
+  return error.errors.reduce((errors, { path, message }) => {
+    errors[path] = message
 
-  errors.forEach(({ path, message }) => {
-    result[path] = message
-  })
-
-  return result
+    return errors
+  }, {})
 }
 
 function saveUserImageOnDisk (user) {
@@ -22,6 +20,6 @@ function saveUserImageOnDisk (user) {
 }
 
 module.exports = {
-  transformErrorsArrayToObject,
+  createErrorsObject,
   saveUserImageOnDisk
 }

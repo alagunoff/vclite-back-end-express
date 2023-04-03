@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 
-const { saveUserImageOnDisk, transformErrorsArrayToObject } = require('../shared/utils')
+const { saveUserImageOnDisk, createErrorsObject } = require('../shared/utils')
 const User = require('../models/user')
 
 async function createUser (req, res) {
@@ -24,7 +24,7 @@ async function createUser (req, res) {
     await user.save({ validate: false })
     res.status(201).send(jwt.sign(user.id, process.env.JWT_SECRET_KEY))
   } catch (error) {
-    res.status(400).json(transformErrorsArrayToObject(error.errors))
+    res.status(400).json(createErrorsObject(error))
   }
 }
 
