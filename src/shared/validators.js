@@ -10,14 +10,7 @@ function isBase64Image (value) {
   }
 }
 
-function isBoolean (value) {
-  if (typeof value !== 'boolean') {
-    throw new Error('must be boolean')
-  }
-}
-
 module.exports = {
   isNotEmptyString,
-  isBase64Image,
-  isBoolean
+  isBase64Image
 }

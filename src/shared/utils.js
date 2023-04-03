@@ -18,7 +18,7 @@ function saveUserImageOnDisk (user) {
 
   fs.writeFileSync(imagePath, Buffer.from(base64Image, 'base64'))
 
-  return `http://localhost:3000/static/images/users/${user.username}.${imageExtension}`
+  return `${user.username}.${imageExtension}`
 }
 
 module.exports = {

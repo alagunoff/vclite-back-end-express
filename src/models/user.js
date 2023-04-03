@@ -1,5 +1,7 @@
 const { DataTypes } = require('sequelize')
 const bcrypt = require('bcryptjs')
+const fs = require('fs')
+const path = require('path')
 
 const db = require('../configs/db')
 const validators = require('../shared/validators')
@@ -54,10 +56,7 @@ const User = db.define('user', {
   },
   is_admin: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false,
-    validate: {
-      isBoolean: validators.isBoolean
-    }
+    defaultValue: false
   }
 }, {
   updatedAt: false,
@@ -65,6 +64,11 @@ const User = db.define('user', {
   hooks: {
     beforeCreate (user) {
       user.password = bcrypt.hashSync(user.password)
+    },
+    afterDestroy (user) {
+      if (user.image) {
+        fs.unlinkSync(path.join(__dirname, `../../static/images/users/${user.image}`))
+      }
     }
   }
 })

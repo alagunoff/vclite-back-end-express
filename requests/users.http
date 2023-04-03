@@ -10,4 +10,9 @@ content-type: application/json
 ###
 
 GET http://localhost:3000/users
-authorization: JWT eyJhbGciOiJIUzI1NiJ9.MTU0.YRrd38C7IDPwARWot47i_VzulK3UabB6iZ9WZEFQxJ4
+authorization: JWT eyJhbGciOiJIUzI1NiJ9.MTcz.eHIT6VHgltQ38xZ91EaVIc422B8bDhHr5QAWfuZdUJg
+
+###
+
+DELETE http://localhost:3000/users/174
+authorization: JWT eyJhbGciOiJIUzI1NiJ9.MTY3.2pZdKmroJx0seRqomcbzPhcLudqYg21idhVuk8lnxHU

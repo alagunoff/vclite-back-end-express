@@ -9,25 +9,21 @@ async function createUser (req, res) {
     password: req.body.password,
     first_name: req.body.first_name,
     last_name: req.body.last_name,
-    image: req.body.image,
-    is_admin: req.body.is_admin
+    image: req.body.image
   })
 
   try {
     await user.validate()
 
     if (user.image) {
-      await user.save({ validate: false, fields: ['username', 'password', 'first_name', 'last_name', 'is_admin'] })
+      await user.save({ fields: ['username', 'password', 'first_name', 'last_name'], validate: false })
       user.image = req.body.image
       user.image = saveUserImageOnDisk(user)
-      await user.save({ validate: false })
-    } else {
-      await user.save({ validate: false })
     }
 
+    await user.save({ validate: false })
     res.status(201).send(jwt.sign(user.id, process.env.JWT_SECRET_KEY))
   } catch (error) {
-    console.log(error)
     res.status(400).json(transformErrorsArrayToObject(error.errors))
   }
 }
@@ -35,68 +31,30 @@ async function createUser (req, res) {
 async function getUser (req, res) {
   const user = await User.findByPk(req.userId)
 
-  res.json({
-    id: user.id,
-    username: user.username,
-    first_name: user.first_name,
-    last_name: user.last_name,
-    image: user.image,
-    is_admin: user.is_admin,
-    created_at: user.created_at
-  })
+  if (user) {
+    res.json({
+      id: user.id,
+      username: user.username,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      image: user.image && `http://localhost:3000/static/images/users/${user.image}`,
+      is_admin: user.is_admin,
+      created_at: user.created_at
+    })
+  } else {
+    res.status(404).end()
+  }
 }
 
-// exports.getUser = (req, res, next) => {
-//   const userId = req.params.userId;
-//   User.findByPk(userId)
-//     .then(user => {
-//       if (!user) {
-//         return res.status(404).json({ message: 'User not found!' });
-//       }
-//       res.status(200).json({ user: user });
-//     })
-//     .catch(err => console.log(err));
-// }
+async function deleteUser (req, res) {
+  const user = await User.findByPk(req.params.id)
+  await user.destroy()
 
-// exports.updateUser = (req, res, next) => {
-//   const userId = req.params.userId;
-//   const updatedName = req.body.name;
-//   const updatedEmail = req.body.email;
-//   User.findByPk(userId)
-//     .then(user => {
-//       if (!user) {
-//         return res.status(404).json({ message: 'User not found!' });
-//       }
-//       user.name = updatedName;
-//       user.email = updatedEmail;
-//       return user.save();
-//     })
-//     .then(result => {
-//       res.status(200).json({ message: 'User updated!', user: result });
-//     })
-//     .catch(err => console.log(err));
-// }
-
-// exports.deleteUser = (req, res, next) => {
-//   const userId = req.params.userId;
-//   User.findByPk(userId)
-//     .then(user => {
-//       if (!user) {
-//         return res.status(404).json({ message: 'User not found!' });
-//       }
-//       return User.destroy({
-//         where: {
-//           id: userId
-//         }
-//       });
-//     })
-//     .then(result => {
-//       res.status(200).json({ message: 'User deleted!' });
-//     })
-//     .catch(err => console.log(err));
-// }
+  res.status(204).end()
+}
 
 module.exports = {
   createUser,
-  getUser
+  getUser,
+  deleteUser
 }
