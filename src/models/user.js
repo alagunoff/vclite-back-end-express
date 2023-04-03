@@ -1,4 +1,5 @@
 const { DataTypes } = require('sequelize')
+const bcrypt = require('bcryptjs')
 
 const db = require('../configs/db')
 const validators = require('../shared/validators')
@@ -60,7 +61,12 @@ const User = db.define('user', {
   }
 }, {
   updatedAt: false,
-  createdAt: 'created_at'
+  createdAt: 'created_at',
+  hooks: {
+    beforeCreate (user) {
+      user.password = bcrypt.hashSync(user.password)
+    }
+  }
 })
 
 module.exports = User

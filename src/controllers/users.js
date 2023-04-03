@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken')
-const bcrypt = require('bcryptjs')
 
 const { saveUserImageOnDisk, transformErrorsArrayToObject } = require('../shared/utils')
 const User = require('../models/user')
@@ -17,22 +16,34 @@ async function createUser (req, res) {
   try {
     await user.validate()
 
-    user.password = bcrypt.hashSync(user.password)
-
     if (user.image) {
+      await user.save({ validate: false, fields: ['username', 'password', 'first_name', 'last_name', 'is_admin'] })
+      user.image = req.body.image
       user.image = saveUserImageOnDisk(user)
+      await user.save({ validate: false })
+    } else {
+      await user.save({ validate: false })
     }
-
-    await user.save({ validate: false })
 
     res.status(201).send(jwt.sign(user.id, process.env.JWT_SECRET_KEY))
   } catch (error) {
+    console.log(error)
     res.status(400).json(transformErrorsArrayToObject(error.errors))
   }
 }
 
 async function getUser (req, res) {
-  res.json(await User.findByPk(req.userId))
+  const user = await User.findByPk(req.userId)
+
+  res.json({
+    id: user.id,
+    username: user.username,
+    first_name: user.first_name,
+    last_name: user.last_name,
+    image: user.image,
+    is_admin: user.is_admin,
+    created_at: user.created_at
+  })
 }
 
 // exports.getUser = (req, res, next) => {
