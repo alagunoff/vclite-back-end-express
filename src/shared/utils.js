@@ -9,7 +9,7 @@ function createErrorsObject (error) {
   }, {})
 }
 
-function saveUserImageOnDisk (user) {
+function saveUserImageToStaticFiles (user) {
   const [mimeType, base64Image] = user.image.slice(5).split(';base64,')
   const imageExtension = mimeType.split('/')[1]
   const imagePath = path.join(__dirname, `../../static/images/users/${user.username}.${imageExtension}`)
@@ -21,5 +21,5 @@ function saveUserImageOnDisk (user) {
 
 module.exports = {
   createErrorsObject,
-  saveUserImageOnDisk
+  saveUserImageToStaticFiles
 }

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 
-const { saveUserImageOnDisk, createErrorsObject } = require('../shared/utils')
+const { saveUserImageToStaticFiles, createErrorsObject } = require('../shared/utils')
 const User = require('../models/user')
 
 async function createUser (req, res) {
@@ -17,11 +17,13 @@ async function createUser (req, res) {
 
     if (user.image) {
       await user.save({ fields: ['username', 'password', 'first_name', 'last_name'], validate: false })
+
       user.image = req.body.image
-      user.image = saveUserImageOnDisk(user)
+      user.image = saveUserImageToStaticFiles(user)
     }
 
     await user.save({ validate: false })
+
     res.status(201).send(jwt.sign(user.id, process.env.JWT_SECRET_KEY))
   } catch (error) {
     res.status(400).json(createErrorsObject(error))
@@ -48,9 +50,14 @@ async function getUser (req, res) {
 
 async function deleteUser (req, res) {
   const user = await User.findByPk(req.params.id)
-  await user.destroy()
 
-  res.status(204).end()
+  if (user) {
+    await user.destroy()
+
+    res.status(204).end()
+  } else {
+    res.status(404).end()
+  }
 }
 
 module.exports = {
