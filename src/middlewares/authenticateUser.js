@@ -1,20 +1,20 @@
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 
-function authenticateUser (responseStatus = 401) {
+function authenticateUser(responseStatus = 401) {
   return function (req, res, next) {
-    if (req.headers.authorization?.startsWith('JWT ')) {
-      const token = req.headers.authorization.slice(4)
+    if (req.headers.authorization?.startsWith("JWT ")) {
+      const token = req.headers.authorization.slice(4);
 
       try {
-        req.userId = jwt.verify(token, process.env.JWT_SECRET_KEY)
-        next()
+        req.authenticatedUserId = jwt.verify(token, process.env.JWT_SECRET_KEY);
+        next();
       } catch {
-        res.status(responseStatus).end()
+        res.status(responseStatus).end();
       }
     } else {
-      res.status(responseStatus).end()
+      res.status(responseStatus).end();
     }
-  }
+  };
 }
 
-module.exports = authenticateUser
+module.exports = authenticateUser;

@@ -1,67 +1,75 @@
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 
-const { saveUserImageToStaticFiles, createErrorsObject } = require('../shared/utils')
-const User = require('../models/user')
+const {
+  saveUserImageToStaticFiles,
+  createErrorsObject,
+} = require("../shared/utils");
+const User = require("../models/user");
 
-async function createUser (req, res) {
+async function createUser(req, res) {
   const user = User.build({
     username: req.body.username,
     password: req.body.password,
-    first_name: req.body.first_name,
-    last_name: req.body.last_name,
-    image: req.body.image
-  })
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    image: req.body.image,
+  });
 
   try {
-    await user.validate()
+    await user.validate();
 
     if (user.image) {
-      await user.save({ fields: ['username', 'password', 'first_name', 'last_name'], validate: false })
+      await user.save({
+        fields: ["username", "password", "firstName", "lastName"],
+        validate: false,
+      });
 
-      user.image = req.body.image
-      user.image = saveUserImageToStaticFiles(user)
+      user.image = req.body.image;
+      user.image = saveUserImageToStaticFiles(user);
     }
 
-    await user.save({ validate: false })
+    await user.save({ validate: false });
 
-    res.status(201).send(jwt.sign(user.id, process.env.JWT_SECRET_KEY))
+    res.status(201).send(jwt.sign(user.id, process.env.JWT_SECRET_KEY));
   } catch (error) {
-    res.status(400).json(createErrorsObject(error))
+    res.status(400).json(createErrorsObject(error));
   }
 }
 
-async function getUser (req, res) {
-  const user = await User.findByPk(req.userId)
+async function getUser(req, res) {
+  const authenticatedUser = await User.findByPk(req.authenticatedUserId);
 
-  if (user) {
+  if (authenticatedUser) {
     res.json({
-      id: user.id,
-      username: user.username,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      image: user.image && `http://localhost:3000/static/images/users/${user.image}`,
-      is_admin: user.is_admin,
-      created_at: user.created_at
-    })
+      id: authenticatedUser.id,
+      username: authenticatedUser.username,
+      firstName: authenticatedUser.firstName,
+      lastName: authenticatedUser.lastName,
+      image:
+        authenticatedUser.image &&
+        `http://localhost:3000/static/images/users/${authenticatedUser.image}`,
+      isAdmin: authenticatedUser.isAdmin,
+      createdAt: authenticatedUser.createdAt,
+    });
   } else {
-    res.status(404).end()
+    res.status(404).end();
   }
 }
 
-async function deleteUser (req, res) {
-  const user = await User.findByPk(req.params.id)
+async function deleteUser(req, res) {
+  const userToDelete = await User.findByPk(req.params.id);
 
-  if (user) {
-    await user.destroy()
+  if (userToDelete) {
+    await userToDelete.destroy();
 
-    res.status(204).end()
+    res.status(204).end();
   } else {
-    res.status(404).end()
+    res.status(404).end();
   }
 }
 
 module.exports = {
   createUser,
   getUser,
-  deleteUser
-}
+  deleteUser,
+};

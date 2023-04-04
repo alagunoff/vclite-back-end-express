@@ -1,13 +1,13 @@
-const User = require('../models/user')
+const User = require("../models/user");
 
-async function isAdmin (req, res, next) {
-  const user = await User.findByPk(req.userId)
+async function isAdmin(req, res, next) {
+  const authenticatedUser = await User.findByPk(req.authenticatedUserId);
 
-  if (user?.is_admin) {
-    next()
+  if (authenticatedUser?.isAdmin) {
+    next();
   } else {
-    res.status(404).end()
+    res.status(404).end();
   }
 }
 
-module.exports = isAdmin
+module.exports = isAdmin;

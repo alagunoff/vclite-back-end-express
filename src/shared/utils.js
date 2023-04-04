@@ -38,8 +38,8 @@ function createPaginationParameters(itemsNumber, pageNumber) {
 function createPaginatedResponse(rows, count, limit) {
   return {
     items: rows,
-    total_items_number: count,
-    total_pages_number: count && limit ? Math.ceil(count / limit) : 1,
+    totalItemsNumber: count,
+    totalPagesNumber: count && limit ? Math.ceil(count / limit) : 1,
   };
 }
 

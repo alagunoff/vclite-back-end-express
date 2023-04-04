@@ -17,16 +17,16 @@ async function createTag(req, res) {
 
 async function getTags(req, res) {
   const { limit, offset } = createPaginationParameters(
-    req.query.items_number,
-    req.query.page_number
+    req.query.itemsNumber,
+    req.query.pageNumber
   );
 
   try {
     const { rows, count } = await Tag.findAndCountAll({ limit, offset });
 
     res.json(createPaginatedResponse(rows, count, limit));
-  } catch (error) {
-    res.status(500).json(error.message);
+  } catch {
+    res.status(500).end();
   }
 }
 
@@ -54,8 +54,8 @@ async function deleteTag(req, res) {
       await tagToDelete.destroy();
 
       res.status(204).end();
-    } catch (error) {
-      res.status(400).json(createErrorsObject(error));
+    } catch {
+      res.status(500).end();
     }
   } else {
     res.status(404).end();
