@@ -28,6 +28,7 @@ const Category = db.define(
   },
   {
     timestamps: false,
+    hierarchy: true,
   }
 );
 

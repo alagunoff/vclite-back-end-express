@@ -1,4 +1,5 @@
 const { Sequelize } = require("sequelize");
+require("sequelize-hierarchy-v6")(Sequelize);
 
 const db = new Sequelize(
   process.env.DB_NAME,

@@ -5,11 +5,14 @@ const {
   createPaginationParameters,
   createPaginatedResponse,
 } = require("../shared/utils");
-const Tag = require("../models/tag");
+const Category = require("../models/category");
 
-async function createTag(req, res) {
+async function createCategory(req, res) {
   try {
-    await Tag.create({ tag: req.body.tag });
+    await Category.create({
+      category: req.body.category,
+      parentCategoryId: req.body.parentCategoryId,
+    });
 
     res.status(201).end();
   } catch (error) {
@@ -21,14 +24,18 @@ async function createTag(req, res) {
   }
 }
 
-async function getTags(req, res) {
+async function getCategories(req, res) {
   const { limit, offset } = createPaginationParameters(
     req.query.itemsNumber,
     req.query.pageNumber
   );
 
   try {
-    const { rows, count } = await Tag.findAndCountAll({ limit, offset });
+    const { rows, count } = await Category.findAndCountAll({
+      limit,
+      offset,
+      hierarchy: true,
+    });
 
     res.json(createPaginatedResponse(rows, count, limit));
   } catch {
@@ -36,12 +43,12 @@ async function getTags(req, res) {
   }
 }
 
-async function updateTag(req, res) {
-  const tagToUpdate = await Tag.findByPk(req.params.id);
+async function updateCategory(req, res) {
+  const categoryToUpdate = await Category.findByPk(req.params.id);
 
-  if (tagToUpdate) {
+  if (categoryToUpdate) {
     try {
-      await tagToUpdate.update({ tag: req.body.tag });
+      await categoryToUpdate.update({ category: req.body.category });
 
       res.status(204).end();
     } catch (error) {
@@ -56,12 +63,12 @@ async function updateTag(req, res) {
   }
 }
 
-async function deleteTag(req, res) {
-  const tagToDelete = await Tag.findByPk(req.params.id);
+async function deleteCategory(req, res) {
+  const categoryToDelete = await Category.findByPk(req.params.id);
 
-  if (tagToDelete) {
+  if (categoryToDelete) {
     try {
-      await tagToDelete.destroy();
+      await categoryToDelete.destroy();
 
       res.status(204).end();
     } catch {
@@ -73,8 +80,8 @@ async function deleteTag(req, res) {
 }
 
 module.exports = {
-  createTag,
-  getTags,
-  updateTag,
-  deleteTag,
+  createCategory,
+  getCategories,
+  updateCategory,
+  deleteCategory,
 };
