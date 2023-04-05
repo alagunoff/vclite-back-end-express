@@ -35,7 +35,12 @@ function deleteImageFromStaticFiles(folderName, imageFileNameWithExtension) {
   );
 }
 
+function getImageUrl(folderName, imageFileNameWithExtension) {
+  return `http://localhost:3000/static/images/${folderName}/${imageFileNameWithExtension}`;
+}
+
 module.exports = {
   saveImageToStaticFiles,
   deleteImageFromStaticFiles,
+  getImageUrl,
 };

@@ -6,7 +6,10 @@ const {
   createPaginatedResponse,
 } = require("../shared/utils/pagination");
 const { setSubcategories } = require("../shared/utils/categories");
-const { saveImageToStaticFiles } = require("../shared/utils/images");
+const {
+  saveImageToStaticFiles,
+  getImageUrl,
+} = require("../shared/utils/images");
 const News = require("../models/news");
 const Author = require("../models/author");
 const Category = require("../models/category");
@@ -77,6 +80,10 @@ async function getNews(req, res) {
 
     for (const newsItem of news) {
       await setSubcategories(newsItem.category);
+
+      if (newsItem.mainImage) {
+        newsItem.mainImage = getImageUrl("news", newsItem.mainImage);
+      }
     }
 
     res.json(createPaginatedResponse(news, news.length, limit));
