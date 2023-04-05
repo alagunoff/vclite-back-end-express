@@ -14,6 +14,7 @@ const News = require("../models/news");
 const Author = require("../models/author");
 const Category = require("../models/category");
 const Tag = require("../models/tag");
+const Comment = require("../models/comment");
 
 async function createNews(req, res) {
   const createdNews = News.build({
@@ -74,6 +75,12 @@ async function getNews(req, res) {
         {
           model: Tag,
           through: { attributes: [] },
+        },
+        {
+          model: Comment,
+          attributes: {
+            exclude: ["newsId"],
+          },
         },
       ],
     });
