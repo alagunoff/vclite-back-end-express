@@ -1,10 +1,11 @@
 const { ValidationError } = require("sequelize");
 
+const { createErrorsObject } = require("../shared/utils/errors");
 const {
-  createErrorsObject,
   createPaginationParameters,
   createPaginatedResponse,
-} = require("../shared/utils");
+} = require("../shared/utils/pagination");
+const { addSubcategories } = require("../shared/utils/categories");
 const Category = require("../models/category");
 
 async function createCategory(req, res) {
@@ -31,14 +32,21 @@ async function getCategories(req, res) {
   );
 
   try {
-    const { rows, count } = await Category.findAndCountAll({
+    const categories = await Category.findAll({
       limit,
       offset,
-      hierarchy: true,
+      where: {
+        parentCategoryId: null,
+      },
     });
 
-    res.json(createPaginatedResponse(rows, count, limit));
-  } catch {
+    for (const category of categories) {
+      await addSubcategories(category);
+    }
+
+    res.json(createPaginatedResponse(categories, categories.length, limit));
+  } catch (error) {
+    console.log(error);
     res.status(500).end();
   }
 }

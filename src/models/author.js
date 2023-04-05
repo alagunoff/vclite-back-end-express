@@ -24,13 +24,14 @@ const Author = db.define(
   }
 );
 
-User.hasOne(Author, {
-  onDelete: "CASCADE",
-});
 Author.belongsTo(User, {
+  as: "user",
   foreignKey: {
     allowNull: false,
   },
+});
+User.hasOne(Author, {
+  onDelete: "CASCADE",
 });
 
 module.exports = Author;

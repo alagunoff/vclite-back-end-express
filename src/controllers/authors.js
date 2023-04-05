@@ -1,10 +1,10 @@
 const { ValidationError } = require("sequelize");
 
+const { createErrorsObject } = require("../shared/utils/errors");
 const {
-  createErrorsObject,
   createPaginationParameters,
   createPaginatedResponse,
-} = require("../shared/utils");
+} = require("../shared/utils/pagination");
 const Author = require("../models/author");
 
 async function createAuthor(req, res) {

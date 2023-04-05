@@ -1,9 +1,7 @@
 const jwt = require("jsonwebtoken");
 
-const {
-  saveUserImageToStaticFiles,
-  createErrorsObject,
-} = require("../shared/utils");
+const { createErrorsObject } = require("../shared/utils/errors");
+const { saveUserImageToStaticFiles } = require("../shared/utils/users");
 const User = require("../models/user");
 
 async function createUser(req, res) {
@@ -37,20 +35,18 @@ async function createUser(req, res) {
 }
 
 async function getUser(req, res) {
-  const authenticatedUser = await User.findByPk(req.authenticatedUserId);
+  const authenticatedUser = await User.findByPk(req.authenticatedUserId, {
+    attributes: {
+      exclude: ["password"],
+    },
+  });
 
   if (authenticatedUser) {
-    res.json({
-      id: authenticatedUser.id,
-      username: authenticatedUser.username,
-      firstName: authenticatedUser.firstName,
-      lastName: authenticatedUser.lastName,
-      image:
-        authenticatedUser.image &&
-        `http://localhost:3000/static/images/users/${authenticatedUser.image}`,
-      isAdmin: authenticatedUser.isAdmin,
-      createdAt: authenticatedUser.createdAt,
-    });
+    if (authenticatedUser.image) {
+      authenticatedUser.image = `http://localhost:3000/static/images/users/${authenticatedUser.image}`;
+    }
+
+    res.json(authenticatedUser);
   } else {
     res.status(404).end();
   }

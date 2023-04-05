@@ -31,7 +31,6 @@
     "jsonwebtoken": "9.0.0",
     "pg": "8.10.0",
     "prettier": "2.8.7",
-    "sequelize": "6.30.0",
-    "sequelize-hierarchy-v6": "2.1.9"
+    "sequelize": "6.30.0"
   }
 }

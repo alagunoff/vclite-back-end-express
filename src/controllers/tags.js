@@ -1,10 +1,10 @@
 const { ValidationError } = require("sequelize");
 
+const { createErrorsObject } = require("../shared/utils/errors");
 const {
-  createErrorsObject,
   createPaginationParameters,
   createPaginatedResponse,
-} = require("../shared/utils");
+} = require("../shared/utils/pagination");
 const Tag = require("../models/tag");
 
 async function createTag(req, res) {
