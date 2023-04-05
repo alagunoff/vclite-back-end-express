@@ -2,19 +2,23 @@ const { DataTypes } = require("sequelize");
 
 const db = require("../configs/db");
 const validators = require("../shared/validators");
-const User = require("./user");
+const News = require("./news");
 
-const Author = db.define(
-  "author",
+const Comment = db.define(
+  "comment",
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    description: {
+    comment: {
       type: DataTypes.STRING,
+      allowNull: false,
       validate: {
+        notNull: {
+          msg: "required",
+        },
         isNotEmptyString: validators.isNotEmptyString,
       },
     },
@@ -24,13 +28,13 @@ const Author = db.define(
   }
 );
 
-Author.belongsTo(User, {
+Comment.belongsTo(News, {
   foreignKey: {
     allowNull: false,
   },
 });
-User.hasOne(Author, {
+News.hasMany(Comment, {
   onDelete: "CASCADE",
 });
 
-module.exports = Author;
+module.exports = Comment;
