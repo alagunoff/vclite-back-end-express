@@ -9,7 +9,7 @@ function isBase64Image(value) {
     typeof value !== "string" ||
     !/^data:image\/(jpe?g|png);base64,/.test(value)
   ) {
-    throw new Error("must be base64 image in data URL format with MIME type");
+    throw new Error("must be base64 image in data URL format with mediatype");
   }
 }
 

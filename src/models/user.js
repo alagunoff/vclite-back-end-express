@@ -1,9 +1,8 @@
 const { DataTypes } = require("sequelize");
 const bcrypt = require("bcryptjs");
-const fs = require("fs");
-const path = require("path");
 
 const db = require("../configs/db");
+const { deleteImageFromStaticFiles } = require("../shared/utils/images");
 const validators = require("../shared/validators");
 
 const User = db.define(
@@ -69,9 +68,7 @@ const User = db.define(
       },
       afterDestroy(user) {
         if (user.image) {
-          fs.unlinkSync(
-            path.join(__dirname, `../../static/images/users/${user.image}`)
-          );
+          deleteImageFromStaticFiles("users", user.image);
         }
       },
     },

@@ -1,7 +1,8 @@
+const { ValidationError } = require("sequelize");
 const jwt = require("jsonwebtoken");
 
 const { createErrorsObject } = require("../shared/utils/errors");
-const { saveUserImageToStaticFiles } = require("../shared/utils/users");
+const { saveImageToStaticFiles } = require("../shared/utils/images");
 const User = require("../models/user");
 
 async function createUser(req, res) {
@@ -16,21 +17,30 @@ async function createUser(req, res) {
   try {
     await user.validate();
 
-    if (user.image) {
+    if (req.body.image) {
       await user.save({
         fields: ["username", "password", "firstName", "lastName"],
         validate: false,
       });
 
-      user.image = req.body.image;
-      user.image = saveUserImageToStaticFiles(user);
+      user.image = saveImageToStaticFiles(
+        req.body.image,
+        "users",
+        user.username
+      );
     }
 
     await user.save({ validate: false });
 
     res.status(201).send(jwt.sign(user.id, process.env.JWT_SECRET_KEY));
   } catch (error) {
-    res.status(400).json(createErrorsObject(error));
+    console.log(error);
+
+    if (error instanceof ValidationError) {
+      res.status(400).json(createErrorsObject(error));
+    } else {
+      res.status(500).end();
+    }
   }
 }
 

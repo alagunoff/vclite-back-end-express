@@ -5,7 +5,7 @@ const {
   createPaginationParameters,
   createPaginatedResponse,
 } = require("../shared/utils/pagination");
-const { addSubcategories } = require("../shared/utils/categories");
+const { setSubcategories } = require("../shared/utils/categories");
 const Category = require("../models/category");
 
 async function createCategory(req, res) {
@@ -41,7 +41,7 @@ async function getCategories(req, res) {
     });
 
     for (const category of categories) {
-      await addSubcategories(category);
+      await setSubcategories(category);
     }
 
     res.json(createPaginatedResponse(categories, categories.length, limit));

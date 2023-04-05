@@ -5,29 +5,48 @@ const {
   createPaginationParameters,
   createPaginatedResponse,
 } = require("../shared/utils/pagination");
-const { addSubcategories } = require("../shared/utils/categories");
+const { setSubcategories } = require("../shared/utils/categories");
+const { saveImageToStaticFiles } = require("../shared/utils/images");
 const News = require("../models/news");
 const Author = require("../models/author");
 const Category = require("../models/category");
 const Tag = require("../models/tag");
 
 async function createNews(req, res) {
+  const createdNews = News.build({
+    title: req.body.title,
+    content: req.body.content,
+    authorId: req.body.authorId,
+    categoryId: req.body.categoryId,
+    mainImage: req.body.mainImage,
+  });
+
   try {
-    const createdNews = await News.create({
-      title: req.body.title,
-      content: req.body.content,
-      authorId: req.body.authorId,
-      categoryId: req.body.categoryId,
-      tagsIds: req.body.tagsIds,
-    });
+    await createdNews.validate();
+
+    if (req.body.mainImage) {
+      await createdNews.save({
+        fields: ["title", "content", "authorId", "categoryId"],
+        validate: false,
+      });
+
+      createdNews.mainImage = saveImageToStaticFiles(
+        req.body.mainImage,
+        "news",
+        `${createdNews.id}-main`
+      );
+    }
+
     await createdNews.setTags(req.body.tagsIds);
+    await createdNews.save({ validate: false });
 
     res.status(201).end();
   } catch (error) {
+    console.log(error);
+
     if (error instanceof ValidationError) {
       res.status(400).json(createErrorsObject(error));
     } else {
-      console.log(error);
       res.status(500).end();
     }
   }
@@ -57,17 +76,37 @@ async function getNews(req, res) {
     });
 
     for (const newsItem of news) {
-      await addSubcategories(newsItem.category);
+      await setSubcategories(newsItem.category);
     }
 
     res.json(createPaginatedResponse(news, news.length, limit));
   } catch (error) {
     console.log(error);
+
     res.status(500).end();
+  }
+}
+
+async function deleteNews(req, res) {
+  const newsToDelete = await News.findByPk(req.params.id);
+
+  if (newsToDelete) {
+    try {
+      await newsToDelete.destroy();
+
+      res.status(204).end();
+    } catch (error) {
+      console.log(error);
+
+      res.status(500).end();
+    }
+  } else {
+    res.status(404).end();
   }
 }
 
 module.exports = {
   createNews,
   getNews,
+  deleteNews,
 };
