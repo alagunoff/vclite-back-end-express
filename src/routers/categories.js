@@ -7,8 +7,7 @@ const {
   updateCategory,
   deleteCategory,
 } = require("../controllers/categories");
-const authenticateUser = require("../middlewares/authenticateUser");
-const isAdmin = require("../middlewares/isAdmin");
+const { authenticateUser, isAdmin } = require("../middlewares/auth");
 
 router.post("", [authenticateUser(404), isAdmin], createCategory);
 router.get("", getCategories);

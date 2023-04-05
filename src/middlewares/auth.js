@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 
+const User = require("../models/user");
+
 function authenticateUser(responseStatus = 401) {
   return function (req, res, next) {
     if (req.headers.authorization?.startsWith("JWT ")) {
@@ -8,7 +10,9 @@ function authenticateUser(responseStatus = 401) {
       try {
         req.authenticatedUserId = jwt.verify(token, process.env.JWT_SECRET_KEY);
         next();
-      } catch {
+      } catch (error) {
+        console.log(error);
+
         res.status(responseStatus).end();
       }
     } else {
@@ -17,4 +21,17 @@ function authenticateUser(responseStatus = 401) {
   };
 }
 
-module.exports = authenticateUser;
+async function isAdmin(req, res, next) {
+  const authenticatedUser = await User.findByPk(req.authenticatedUserId);
+
+  if (authenticatedUser?.isAdmin) {
+    next();
+  } else {
+    res.status(404).end();
+  }
+}
+
+module.exports = {
+  authenticateUser,
+  isAdmin,
+};

@@ -2,8 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const { createUser, getUser, deleteUser } = require("../controllers/users");
-const authenticateUser = require("../middlewares/authenticateUser");
-const isAdmin = require("../middlewares/isAdmin");
+const { authenticateUser, isAdmin } = require("../middlewares/auth");
 
 router.post("", createUser);
 router.get("", authenticateUser(), getUser);

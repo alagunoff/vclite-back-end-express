@@ -6,8 +6,7 @@ const {
   getComments,
   deleteComments,
 } = require("../controllers/comments");
-const authenticateUser = require("../middlewares/authenticateUser");
-const isAdmin = require("../middlewares/isAdmin");
+const { authenticateUser, isAdmin } = require("../middlewares/auth");
 
 router.post("", createComment);
 router.get("", getComments);

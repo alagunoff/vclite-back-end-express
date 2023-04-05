@@ -7,8 +7,7 @@ const {
   updateAuthor,
   deleteAuthor,
 } = require("../controllers/authors");
-const authenticateUser = require("../middlewares/authenticateUser");
-const isAdmin = require("../middlewares/isAdmin");
+const { authenticateUser, isAdmin } = require("../middlewares/auth");
 
 router.post("", [authenticateUser(404), isAdmin], createAuthor);
 router.get("", [authenticateUser(404), isAdmin], getAuthors);
