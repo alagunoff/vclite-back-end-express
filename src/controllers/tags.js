@@ -13,6 +13,8 @@ async function createTag(req, res) {
 
     res.status(201).end();
   } catch (error) {
+    console.log(error);
+
     if (error instanceof ValidationError) {
       res.status(400).json(createErrorsObject(error));
     } else {
@@ -22,53 +24,70 @@ async function createTag(req, res) {
 }
 
 async function getTags(req, res) {
-  const { limit, offset } = createPaginationParameters(
-    req.query.itemsNumber,
-    req.query.pageNumber
-  );
-
   try {
-    const { rows, count } = await Tag.findAndCountAll({ limit, offset });
+    const { limit, offset } = createPaginationParameters(
+      req.query.itemsNumber,
+      req.query.pageNumber
+    );
+    const tags = await Tag.findAll({ limit, offset });
 
-    res.json(createPaginatedResponse(rows, count, limit));
-  } catch {
+    res.json(createPaginatedResponse(tags, tags.length, limit));
+  } catch (error) {
+    console.log(error);
+
     res.status(500).end();
   }
 }
 
 async function updateTag(req, res) {
-  const tagToUpdate = await Tag.findByPk(req.params.id);
+  try {
+    const tagToUpdate = await Tag.findByPk(req.params.id);
 
-  if (tagToUpdate) {
-    try {
-      await tagToUpdate.update({ tag: req.body.tag });
+    if (tagToUpdate) {
+      try {
+        await tagToUpdate.update({ tag: req.body.tag });
 
-      res.status(204).end();
-    } catch (error) {
-      if (error instanceof ValidationError) {
-        res.status(400).json(createErrorsObject(error));
-      } else {
-        res.status(500).end();
+        res.status(204).end();
+      } catch (error) {
+        console.log(error);
+
+        if (error instanceof ValidationError) {
+          res.status(400).json(createErrorsObject(error));
+        } else {
+          res.status(500).end();
+        }
       }
+    } else {
+      res.status(404).end();
     }
-  } else {
-    res.status(404).end();
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).end();
   }
 }
 
 async function deleteTag(req, res) {
-  const tagToDelete = await Tag.findByPk(req.params.id);
+  try {
+    const tagToDelete = await Tag.findByPk(req.params.id);
 
-  if (tagToDelete) {
-    try {
-      await tagToDelete.destroy();
+    if (tagToDelete) {
+      try {
+        await tagToDelete.destroy();
 
-      res.status(204).end();
-    } catch {
-      res.status(500).end();
+        res.status(204).end();
+      } catch (error) {
+        console.log(error);
+
+        res.status(500).end();
+      }
+    } else {
+      res.status(404).end();
     }
-  } else {
-    res.status(404).end();
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).end();
   }
 }
 
