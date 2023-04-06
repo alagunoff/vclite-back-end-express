@@ -7,6 +7,9 @@ const {
 } = require("../shared/utils/pagination");
 const { setSubcategories } = require("../shared/utils/categories");
 const { saveImageToStaticFiles } = require("../shared/utils/images");
+const {
+  transformStringToLowercasedKebabString,
+} = require("../shared/utils/strings");
 const Post = require("../models/post");
 const Author = require("../models/author");
 const Category = require("../models/category");
@@ -33,11 +36,15 @@ async function createPost(req, res) {
         });
 
         await createdPostExtraImage.validate();
+        await createdPostExtraImage.save({
+          validate: false,
+          fields: ["postId"],
+        });
 
         createdPostExtraImage.image = saveImageToStaticFiles(
           extraImage,
-          "posts",
-          `${createdPost.id}-extra-${createdPostExtraImage.id}`
+          `posts/${transformStringToLowercasedKebabString(createdPost.title)}`,
+          `extra-${createdPostExtraImage.id}`
         );
 
         await createdPostExtraImage.save({ validate: false });

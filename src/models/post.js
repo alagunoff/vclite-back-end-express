@@ -5,10 +5,14 @@ const {
   saveImageToStaticFiles,
   deleteImageFromStaticFiles,
 } = require("../shared/utils/images");
+const {
+  transformStringToLowercasedKebabString,
+} = require("../shared/utils/strings");
 const validators = require("../shared/validators");
 const Author = require("./author");
 const Category = require("./category");
 const Tag = require("./tag");
+const PostExtraImage = require("./postExtraImage");
 
 const Post = db.define(
   "post",
@@ -57,13 +61,13 @@ const Post = db.define(
         if (post.image) {
           post.image = saveImageToStaticFiles(
             post.image,
-            `posts/${post.title
-              .split(" ")
-              .map((word) => word.toLowerCase())
-              .join("-")}`,
+            `posts/${transformStringToLowercasedKebabString(post.title)}`,
             "main"
           );
         }
+      },
+      async beforeDestroy(post) {
+        await PostExtraImage.destroy({ where: { postId: post.id } });
       },
       afterDestroy(post) {
         if (post.image) {
@@ -90,5 +94,8 @@ Category.hasMany(Post);
 
 Post.belongsToMany(Tag, { through: "PostsTags" });
 Tag.belongsToMany(Post, { through: "PostsTags" });
+
+Post.hasMany(PostExtraImage);
+PostExtraImage.belongsTo(Post);
 
 module.exports = Post;
