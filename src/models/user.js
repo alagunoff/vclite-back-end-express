@@ -2,7 +2,10 @@ const { DataTypes } = require("sequelize");
 const bcrypt = require("bcryptjs");
 
 const db = require("../configs/db");
-const { deleteImageFromStaticFiles } = require("../shared/utils/images");
+const {
+  saveImageToStaticFiles,
+  deleteImageFromStaticFiles,
+} = require("../shared/utils/images");
 const validators = require("../shared/validators");
 
 const User = db.define(
@@ -16,15 +19,16 @@ const User = db.define(
     username: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: {
-        arg: true,
-        msg: "already taken",
-      },
       validate: {
         notNull: {
           msg: "required",
         },
         isNotEmptyString: validators.isNotEmptyString,
+        isUnique(value) {
+          if (User.findOne({ where: { username: value } })) {
+            throw Error("already taken");
+          }
+        },
       },
     },
     password: {
@@ -65,6 +69,14 @@ const User = db.define(
     hooks: {
       beforeCreate(user) {
         user.password = bcrypt.hashSync(user.password);
+
+        if (user.image) {
+          user.image = saveImageToStaticFiles(
+            user.image,
+            "users",
+            user.username
+          );
+        }
       },
       afterDestroy(user) {
         if (user.image) {

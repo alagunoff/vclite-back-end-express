@@ -2,40 +2,14 @@ const { ValidationError } = require("sequelize");
 const jwt = require("jsonwebtoken");
 
 const { createErrorsObject } = require("../shared/utils/errors");
-const {
-  saveImageToStaticFiles,
-  getImageUrl,
-} = require("../shared/utils/images");
+const { getImageUrl } = require("../shared/utils/images");
 const User = require("../models/user");
 
 async function createUser(req, res) {
-  const user = User.build({
-    username: req.body.username,
-    password: req.body.password,
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    image: req.body.image,
-  });
-
   try {
-    await user.validate();
+    const createdUser = await User.create(req.body);
 
-    if (req.body.image) {
-      await user.save({
-        fields: ["username", "password", "firstName", "lastName"],
-        validate: false,
-      });
-
-      user.image = saveImageToStaticFiles(
-        req.body.image,
-        "users",
-        user.username
-      );
-    }
-
-    await user.save({ validate: false });
-
-    res.status(201).send(jwt.sign(user.id, process.env.JWT_SECRET_KEY));
+    res.status(201).send(jwt.sign(createdUser.id, process.env.JWT_SECRET_KEY));
   } catch (error) {
     console.log(error);
 
@@ -48,32 +22,50 @@ async function createUser(req, res) {
 }
 
 async function getUser(req, res) {
-  const authenticatedUser = await User.findByPk(req.authenticatedUserId, {
-    attributes: {
-      exclude: ["password"],
-    },
-  });
+  try {
+    const authenticatedUser = await User.findByPk(req.authenticatedUserId, {
+      attributes: {
+        exclude: ["password"],
+      },
+    });
 
-  if (authenticatedUser) {
-    if (authenticatedUser.image) {
-      authenticatedUser.image = getImageUrl("users", authenticatedUser.image);
+    if (authenticatedUser) {
+      if (authenticatedUser.image) {
+        authenticatedUser.image = getImageUrl("users", authenticatedUser.image);
+      }
+
+      res.json(authenticatedUser);
+    } else {
+      res.status(404).end();
     }
+  } catch (error) {
+    console.log(error);
 
-    res.json(authenticatedUser);
-  } else {
-    res.status(404).end();
+    res.status(500).end();
   }
 }
 
 async function deleteUser(req, res) {
-  const userToDelete = await User.findByPk(req.params.id);
+  try {
+    const userToDelete = await User.findByPk(req.params.id);
 
-  if (userToDelete) {
-    await userToDelete.destroy();
+    if (userToDelete) {
+      try {
+        await userToDelete.destroy();
 
-    res.status(204).end();
-  } else {
-    res.status(404).end();
+        res.status(204).end();
+      } catch (error) {
+        console.log(error);
+
+        res.status(500).end();
+      }
+    } else {
+      res.status(404).end();
+    }
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).end();
   }
 }
 

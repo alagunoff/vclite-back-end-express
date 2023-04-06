@@ -15,34 +15,54 @@ const Author = require("../models/author");
 const Category = require("../models/category");
 const Tag = require("../models/tag");
 const Comment = require("../models/comment");
+const PostExtraImage = require("../models/postExtraImage");
 
 async function createPost(req, res) {
-  const createdPost = Post.build({
+  const builtPost = Post.build({
     title: req.body.title,
     content: req.body.content,
     authorId: req.body.authorId,
     categoryId: req.body.categoryId,
-    mainImage: req.body.mainImage,
+    image: req.body.image,
   });
 
   try {
-    await createdPost.validate();
+    await builtPost.validate();
 
-    if (req.body.mainImage) {
-      await createdPost.save({
+    if (req.body.image) {
+      await builtPost.save({
         fields: ["title", "content", "authorId", "categoryId"],
         validate: false,
       });
 
-      createdPost.mainImage = saveImageToStaticFiles(
-        req.body.mainImage,
+      builtPost.image = saveImageToStaticFiles(
+        req.body.image,
         "posts",
-        `${createdPost.id}-main`
+        `${builtPost.id}-main`
       );
     }
 
-    await createdPost.setTags(req.body.tagsIds);
-    await createdPost.save({ validate: false });
+    if (Array.isArray(req.body.extraImages)) {
+      for (const extraImage of req.body.extraImages) {
+        const builtPostExtraImage = PostExtraImage.build({
+          image: extraImage,
+          postId: builtPost.id,
+        });
+
+        await builtPostExtraImage.validate();
+
+        builtPostExtraImage.image = saveImageToStaticFiles(
+          extraImage,
+          "posts",
+          `${builtPost.id}-extra-${builtPostExtraImage.id}`
+        );
+
+        await builtPostExtraImage.save({ validate: false });
+      }
+    }
+
+    await builtPost.setTags(req.body.tagsIds);
+    await builtPost.save({ validate: false });
 
     res.status(201).end();
   } catch (error) {
@@ -88,8 +108,8 @@ async function getPosts(req, res) {
     for (const post of posts) {
       await setSubcategories(post.category);
 
-      if (post.mainImage) {
-        post.mainImage = getImageUrl("posts", post.mainImage);
+      if (post.image) {
+        post.image = getImageUrl("posts", post.image);
       }
     }
 

@@ -8,7 +8,7 @@ const Category = require("./category");
 const Tag = require("./tag");
 
 const Post = db.define(
-  "posts",
+  "post",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -18,6 +18,10 @@ const Post = db.define(
     title: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: {
+        arg: true,
+        msg: "already taken",
+      },
       validate: {
         notNull: {
           msg: "required",
@@ -35,7 +39,7 @@ const Post = db.define(
         isNotEmptyString: validators.isNotEmptyString,
       },
     },
-    mainImage: {
+    image: {
       type: DataTypes.STRING,
       validate: {
         isBase64ImageDataUrl: validators.isBase64ImageDataUrl,
@@ -46,8 +50,8 @@ const Post = db.define(
     updatedAt: false,
     hooks: {
       afterDestroy(news) {
-        if (news.mainImage) {
-          deleteImageFromStaticFiles("posts", news.mainImage);
+        if (news.image) {
+          deleteImageFromStaticFiles("posts", news.image);
         }
       },
     },
@@ -68,7 +72,7 @@ Post.belongsTo(Category, {
 });
 Category.hasMany(Post);
 
-Post.belongsToMany(Tag, { through: "posts_tags" });
-Tag.belongsToMany(Post, { through: "posts_tags" });
+Post.belongsToMany(Tag, { through: "PostsTags" });
+Tag.belongsToMany(Post, { through: "PostsTags" });
 
 module.exports = Post;
