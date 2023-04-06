@@ -2,7 +2,6 @@ const { ValidationError } = require("sequelize");
 const jwt = require("jsonwebtoken");
 
 const { createErrorsObject } = require("../shared/utils/errors");
-const { getImageUrl } = require("../shared/utils/images");
 const User = require("../models/user");
 
 async function createUser(req, res) {
@@ -30,10 +29,6 @@ async function getUser(req, res) {
     });
 
     if (authenticatedUser) {
-      if (authenticatedUser.image) {
-        authenticatedUser.image = getImageUrl("users", authenticatedUser.image);
-      }
-
       res.json(authenticatedUser);
     } else {
       res.status(404).end();

@@ -6,10 +6,7 @@ const {
   createPaginatedResponse,
 } = require("../shared/utils/pagination");
 const { setSubcategories } = require("../shared/utils/categories");
-const {
-  saveImageToStaticFiles,
-  getImageUrl,
-} = require("../shared/utils/images");
+const { saveImageToStaticFiles } = require("../shared/utils/images");
 const Post = require("../models/post");
 const Author = require("../models/author");
 const Category = require("../models/category");
@@ -18,51 +15,28 @@ const Comment = require("../models/comment");
 const PostExtraImage = require("../models/postExtraImage");
 
 async function createPost(req, res) {
-  const builtPost = Post.build({
-    title: req.body.title,
-    content: req.body.content,
-    authorId: req.body.authorId,
-    categoryId: req.body.categoryId,
-    image: req.body.image,
-  });
-
   try {
-    await builtPost.validate();
-
-    if (req.body.image) {
-      await builtPost.save({
-        fields: ["title", "content", "authorId", "categoryId"],
-        validate: false,
-      });
-
-      builtPost.image = saveImageToStaticFiles(
-        req.body.image,
-        "posts",
-        `${builtPost.id}-main`
-      );
-    }
+    const createdPost = await Post.create(req.body);
+    await createdPost.setTags(req.body.tagsIds);
 
     if (Array.isArray(req.body.extraImages)) {
       for (const extraImage of req.body.extraImages) {
-        const builtPostExtraImage = PostExtraImage.build({
+        const createdPostExtraImage = PostExtraImage.build({
           image: extraImage,
-          postId: builtPost.id,
+          postId: createdPost.id,
         });
 
-        await builtPostExtraImage.validate();
+        await createdPostExtraImage.validate();
 
-        builtPostExtraImage.image = saveImageToStaticFiles(
+        createdPostExtraImage.image = saveImageToStaticFiles(
           extraImage,
           "posts",
-          `${builtPost.id}-extra-${builtPostExtraImage.id}`
+          `${createdPost.id}-extra-${createdPostExtraImage.id}`
         );
 
-        await builtPostExtraImage.save({ validate: false });
+        await createdPostExtraImage.save({ validate: false });
       }
     }
-
-    await builtPost.setTags(req.body.tagsIds);
-    await builtPost.save({ validate: false });
 
     res.status(201).end();
   } catch (error) {
@@ -107,10 +81,6 @@ async function getPosts(req, res) {
 
     for (const post of posts) {
       await setSubcategories(post.category);
-
-      if (post.image) {
-        post.image = getImageUrl("posts", post.image);
-      }
     }
 
     res.json(createPaginatedResponse(posts, posts.length, limit));

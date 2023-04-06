@@ -24,8 +24,8 @@ const User = db.define(
           msg: "required",
         },
         isNotEmptyString: validators.isNotEmptyString,
-        isUnique(value) {
-          if (User.findOne({ where: { username: value } })) {
+        async isUnique(value) {
+          if (await User.findOne({ where: { username: value } })) {
             throw Error("already taken");
           }
         },
@@ -80,7 +80,7 @@ const User = db.define(
       },
       afterDestroy(user) {
         if (user.image) {
-          deleteImageFromStaticFiles("users", user.image);
+          deleteImageFromStaticFiles(user.image);
         }
       },
     },
