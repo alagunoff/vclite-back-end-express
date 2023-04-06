@@ -6,7 +6,13 @@ const User = require("../models/user");
 
 async function createUser(req, res) {
   try {
-    const createdUser = await User.create(req.body);
+    const createdUser = await User.create({
+      username: req.body.username,
+      password: req.body.password,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      image: req.body.image,
+    });
 
     res.status(201).send(jwt.sign(createdUser.id, process.env.JWT_SECRET_KEY));
   } catch (error) {

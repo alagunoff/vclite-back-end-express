@@ -16,7 +16,13 @@ const PostExtraImage = require("../models/postExtraImage");
 
 async function createPost(req, res) {
   try {
-    const createdPost = await Post.create(req.body);
+    const createdPost = await Post.create({
+      title: req.body.title,
+      content: req.body.content,
+      authorId: req.body.authorId,
+      categoryId: req.body.categoryId,
+      image: req.body.image,
+    });
     await createdPost.setTags(req.body.tagsIds);
 
     if (Array.isArray(req.body.extraImages)) {
@@ -51,12 +57,11 @@ async function createPost(req, res) {
 }
 
 async function getPosts(req, res) {
-  const { limit, offset } = createPaginationParameters(
-    req.query.itemsNumber,
-    req.query.pageNumber
-  );
-
   try {
+    const { limit, offset } = createPaginationParameters(
+      req.query.itemsNumber,
+      req.query.pageNumber
+    );
     const posts = await Post.findAll({
       limit,
       offset,

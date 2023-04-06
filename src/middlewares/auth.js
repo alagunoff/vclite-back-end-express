@@ -22,11 +22,17 @@ function authenticateUser(responseStatus = 401) {
 }
 
 async function isAdmin(req, res, next) {
-  const authenticatedUser = await User.findByPk(req.authenticatedUserId);
+  try {
+    const authenticatedUser = await User.findByPk(req.authenticatedUserId);
 
-  if (authenticatedUser?.isAdmin) {
-    next();
-  } else {
+    if (authenticatedUser?.isAdmin) {
+      next();
+    } else {
+      res.status(404).end();
+    }
+  } catch (error) {
+    console.log(error);
+
     res.status(404).end();
   }
 }
