@@ -10,14 +10,14 @@ const {
   saveImageToStaticFiles,
   getImageUrl,
 } = require("../shared/utils/images");
-const News = require("../models/news");
+const Post = require("../models/post");
 const Author = require("../models/author");
 const Category = require("../models/category");
 const Tag = require("../models/tag");
 const Comment = require("../models/comment");
 
-async function createNews(req, res) {
-  const createdNews = News.build({
+async function createPost(req, res) {
+  const createdPost = Post.build({
     title: req.body.title,
     content: req.body.content,
     authorId: req.body.authorId,
@@ -26,23 +26,23 @@ async function createNews(req, res) {
   });
 
   try {
-    await createdNews.validate();
+    await createdPost.validate();
 
     if (req.body.mainImage) {
-      await createdNews.save({
+      await createdPost.save({
         fields: ["title", "content", "authorId", "categoryId"],
         validate: false,
       });
 
-      createdNews.mainImage = saveImageToStaticFiles(
+      createdPost.mainImage = saveImageToStaticFiles(
         req.body.mainImage,
-        "news",
-        `${createdNews.id}-main`
+        "posts",
+        `${createdPost.id}-main`
       );
     }
 
-    await createdNews.setTags(req.body.tagsIds);
-    await createdNews.save({ validate: false });
+    await createdPost.setTags(req.body.tagsIds);
+    await createdPost.save({ validate: false });
 
     res.status(201).end();
   } catch (error) {
@@ -56,14 +56,14 @@ async function createNews(req, res) {
   }
 }
 
-async function getNews(req, res) {
+async function getPosts(req, res) {
   const { limit, offset } = createPaginationParameters(
     req.query.itemsNumber,
     req.query.pageNumber
   );
 
   try {
-    const news = await News.findAll({
+    const posts = await Post.findAll({
       limit,
       offset,
       attributes: {
@@ -85,15 +85,15 @@ async function getNews(req, res) {
       ],
     });
 
-    for (const newsItem of news) {
-      await setSubcategories(newsItem.category);
+    for (const post of posts) {
+      await setSubcategories(post.category);
 
-      if (newsItem.mainImage) {
-        newsItem.mainImage = getImageUrl("news", newsItem.mainImage);
+      if (post.mainImage) {
+        post.mainImage = getImageUrl("posts", post.mainImage);
       }
     }
 
-    res.json(createPaginatedResponse(news, news.length, limit));
+    res.json(createPaginatedResponse(posts, posts.length, limit));
   } catch (error) {
     console.log(error);
 
@@ -101,12 +101,12 @@ async function getNews(req, res) {
   }
 }
 
-async function deleteNews(req, res) {
-  const newsToDelete = await News.findByPk(req.params.id);
+async function deletePost(req, res) {
+  const postToDelete = await Post.findByPk(req.params.id);
 
-  if (newsToDelete) {
+  if (postToDelete) {
     try {
-      await newsToDelete.destroy();
+      await postToDelete.destroy();
 
       res.status(204).end();
     } catch (error) {
@@ -120,7 +120,7 @@ async function deleteNews(req, res) {
 }
 
 module.exports = {
-  createNews,
-  getNews,
-  deleteNews,
+  createPost,
+  getPosts,
+  deletePost,
 };

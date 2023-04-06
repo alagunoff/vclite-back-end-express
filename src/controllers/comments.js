@@ -11,7 +11,7 @@ async function createComment(req, res) {
   try {
     await Comment.create({
       comment: req.body.comment,
-      newsId: req.params.newsId,
+      postId: req.params.postId,
     });
 
     res.status(201).end();
@@ -36,7 +36,7 @@ async function getComments(req, res) {
       limit,
       offset,
       where: {
-        newsId: req.params.newsId,
+        postId: req.params.postId,
       },
     });
 
@@ -50,7 +50,7 @@ async function getComments(req, res) {
 
 async function deleteComments(req, res) {
   try {
-    await Comment.destroy({ where: { newsId: req.params.newsId } });
+    await Comment.destroy({ where: { postId: req.params.postId } });
 
     res.status(204).end();
   } catch (error) {

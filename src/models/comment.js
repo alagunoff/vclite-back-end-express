@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 
 const db = require("../configs/db");
 const validators = require("../shared/validators");
-const News = require("./news");
+const Post = require("./post");
 
 const Comment = db.define(
   "comment",
@@ -28,12 +28,12 @@ const Comment = db.define(
   }
 );
 
-Comment.belongsTo(News, {
+Comment.belongsTo(Post, {
   foreignKey: {
     allowNull: false,
   },
 });
-News.hasMany(Comment, {
+Post.hasMany(Comment, {
   onDelete: "CASCADE",
 });
 

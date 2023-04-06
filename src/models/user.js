@@ -52,7 +52,7 @@ const User = db.define(
     image: {
       type: DataTypes.STRING,
       validate: {
-        isBase64Image: validators.isBase64Image,
+        isBase64ImageDataUrl: validators.isBase64ImageDataUrl,
       },
     },
     isAdmin: {

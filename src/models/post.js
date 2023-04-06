@@ -7,8 +7,8 @@ const Author = require("./author");
 const Category = require("./category");
 const Tag = require("./tag");
 
-const News = db.define(
-  "news",
+const Post = db.define(
+  "posts",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -38,7 +38,7 @@ const News = db.define(
     mainImage: {
       type: DataTypes.STRING,
       validate: {
-        isBase64Image: validators.isBase64Image,
+        isBase64ImageDataUrl: validators.isBase64ImageDataUrl,
       },
     },
   },
@@ -47,28 +47,28 @@ const News = db.define(
     hooks: {
       afterDestroy(news) {
         if (news.mainImage) {
-          deleteImageFromStaticFiles("news", news.mainImage);
+          deleteImageFromStaticFiles("posts", news.mainImage);
         }
       },
     },
   }
 );
 
-News.belongsTo(Author, {
+Post.belongsTo(Author, {
   foreignKey: {
     allowNull: false,
   },
 });
-Author.hasMany(News);
+Author.hasMany(Post);
 
-News.belongsTo(Category, {
+Post.belongsTo(Category, {
   foreignKey: {
     allowNull: false,
   },
 });
-Category.hasMany(News);
+Category.hasMany(Post);
 
-News.belongsToMany(Tag, { through: "news_tags" });
-Tag.belongsToMany(News, { through: "news_tags" });
+Post.belongsToMany(Tag, { through: "posts_tags" });
+Tag.belongsToMany(Post, { through: "posts_tags" });
 
-module.exports = News;
+module.exports = Post;

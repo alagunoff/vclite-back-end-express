@@ -4,7 +4,7 @@ function isNotEmptyString(value) {
   }
 }
 
-function isBase64Image(value) {
+function isBase64ImageDataUrl(value) {
   if (
     typeof value !== "string" ||
     !/^data:image\/(jpe?g|png);base64,/.test(value)
@@ -15,5 +15,5 @@ function isBase64Image(value) {
 
 module.exports = {
   isNotEmptyString,
-  isBase64Image,
+  isBase64ImageDataUrl,
 };
