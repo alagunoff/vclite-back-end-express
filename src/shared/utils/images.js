@@ -42,7 +42,20 @@ function deleteImageFromStaticFiles(hostedImageUrl) {
   );
 }
 
+function deleteImageFolderFromStaticFiles(hostedImageUrl) {
+  fs.rmSync(
+    path.dirname(
+      path.join(
+        PROJECT_ROOT_PATH,
+        hostedImageUrl.replace(`${APP_HOST_NAME}/`, "")
+      )
+    ),
+    { recursive: true, force: true }
+  );
+}
+
 module.exports = {
   saveImageToStaticFiles,
   deleteImageFromStaticFiles,
+  deleteImageFolderFromStaticFiles,
 };

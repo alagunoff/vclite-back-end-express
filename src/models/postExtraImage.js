@@ -1,8 +1,8 @@
 const { DataTypes } = require("sequelize");
 
 const db = require("../configs/db");
-const { deleteImageFromStaticFiles } = require("../shared/utils/images");
 const validators = require("../shared/validators");
+const Post = require("./post");
 
 const PostExtraImage = db.define(
   "postExtraImage",
@@ -22,14 +22,15 @@ const PostExtraImage = db.define(
   {
     timestamps: false,
     tableName: "post_extra_images",
-    hooks: {
-      afterDestroy(postExtraImage) {
-        if (postExtraImage.image) {
-          deleteImageFromStaticFiles(postExtraImage.image);
-        }
-      },
-    },
   }
 );
+
+PostExtraImage.belongsTo(Post, {
+  foreignKey: {
+    allowNull: false,
+  },
+  onDelete: "CASCADE",
+});
+Post.hasMany(PostExtraImage, { as: "extraImages" });
 
 module.exports = PostExtraImage;

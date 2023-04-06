@@ -3,7 +3,7 @@ const { DataTypes } = require("sequelize");
 const db = require("../configs/db");
 const {
   saveImageToStaticFiles,
-  deleteImageFromStaticFiles,
+  deleteImageFolderFromStaticFiles,
 } = require("../shared/utils/images");
 const {
   transformStringToLowercasedKebabString,
@@ -12,7 +12,6 @@ const validators = require("../shared/validators");
 const Author = require("./author");
 const Category = require("./category");
 const Tag = require("./tag");
-const PostExtraImage = require("./postExtraImage");
 
 const Post = db.define(
   "post",
@@ -49,7 +48,11 @@ const Post = db.define(
     },
     image: {
       type: DataTypes.STRING,
+      allowNull: false,
       validate: {
+        notNull: {
+          msg: "required",
+        },
         isBase64ImageDataUrl: validators.isBase64ImageDataUrl,
       },
     },
@@ -58,21 +61,14 @@ const Post = db.define(
     updatedAt: false,
     hooks: {
       beforeCreate(post) {
-        if (post.image) {
-          post.image = saveImageToStaticFiles(
-            post.image,
-            `posts/${transformStringToLowercasedKebabString(post.title)}`,
-            "main"
-          );
-        }
-      },
-      async beforeDestroy(post) {
-        await PostExtraImage.destroy({ where: { postId: post.id } });
+        post.image = saveImageToStaticFiles(
+          post.image,
+          `posts/${transformStringToLowercasedKebabString(post.title)}`,
+          "main"
+        );
       },
       afterDestroy(post) {
-        if (post.image) {
-          deleteImageFromStaticFiles(post.image);
-        }
+        deleteImageFolderFromStaticFiles(post.image);
       },
     },
   }
@@ -94,8 +90,5 @@ Category.hasMany(Post);
 
 Post.belongsToMany(Tag, { through: "PostsTags" });
 Tag.belongsToMany(Post, { through: "PostsTags" });
-
-Post.hasMany(PostExtraImage);
-PostExtraImage.belongsTo(Post);
 
 module.exports = Post;

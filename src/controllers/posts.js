@@ -85,7 +85,14 @@ async function getPosts(req, res) {
         {
           model: Comment,
           attributes: {
-            exclude: ["newsId"],
+            exclude: ["postId"],
+          },
+        },
+        {
+          model: PostExtraImage,
+          as: "extraImages",
+          attributes: {
+            exclude: ["postId"],
           },
         },
       ],
