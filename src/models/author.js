@@ -25,12 +25,16 @@ const Author = db.define(
 );
 
 Author.belongsTo(User, {
+  as: "user",
   foreignKey: {
+    name: "userId",
     allowNull: false,
   },
+  onDelete: "CASCADE",
 });
 User.hasOne(Author, {
-  onDelete: "CASCADE",
+  as: "author",
+  foreignKey: "userId",
 });
 
 module.exports = Author;

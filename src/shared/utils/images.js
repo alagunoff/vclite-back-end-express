@@ -34,23 +34,20 @@ function saveImageToStaticFiles(
 }
 
 function deleteImageFromStaticFiles(hostedImageUrl) {
-  fs.unlinkSync(
-    path.join(
-      PROJECT_ROOT_PATH,
-      hostedImageUrl.replace(`${APP_HOST_NAME}/`, "")
-    )
-  );
+  fs.unlinkSync(getImageLocalPathFromHostedImageUrl(hostedImageUrl));
 }
 
 function deleteImageFolderFromStaticFiles(hostedImageUrl) {
-  fs.rmSync(
-    path.dirname(
-      path.join(
-        PROJECT_ROOT_PATH,
-        hostedImageUrl.replace(`${APP_HOST_NAME}/`, "")
-      )
-    ),
-    { recursive: true, force: true }
+  fs.rmSync(path.dirname(getImageLocalPathFromHostedImageUrl(hostedImageUrl)), {
+    recursive: true,
+    force: true,
+  });
+}
+
+function getImageLocalPathFromHostedImageUrl(hostedImageUrl) {
+  return path.join(
+    PROJECT_ROOT_PATH,
+    hostedImageUrl.replace(`${APP_HOST_NAME}/`, "")
   );
 }
 

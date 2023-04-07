@@ -60,7 +60,7 @@ const Post = db.define(
   {
     updatedAt: false,
     hooks: {
-      beforeSave(post, options) {
+      beforeSave(post) {
         post.image = saveImageToStaticFiles(
           post.image,
           `posts/${transformStringToLowercasedKebabString(post.title)}`,
@@ -75,6 +75,7 @@ const Post = db.define(
 );
 
 Post.belongsTo(Author, {
+  as: "author",
   foreignKey: {
     allowNull: false,
   },

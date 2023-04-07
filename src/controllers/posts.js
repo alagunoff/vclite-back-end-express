@@ -11,6 +11,7 @@ const {
   transformStringToLowercasedKebabString,
 } = require("../shared/utils/strings");
 const Post = require("../models/post");
+const User = require("../models/user");
 const Author = require("../models/author");
 const Category = require("../models/category");
 const Tag = require("../models/tag");
@@ -63,6 +64,24 @@ async function createPost(req, res) {
   }
 }
 
+function getOrderOptions(req) {
+  if (req.query.orderBy === "createdAt") {
+    return [["createdAt", "ASC"]];
+  }
+
+  if (req.query.orderBy === "-createdAt") {
+    return [["createdAt", "DESC"]];
+  }
+
+  if (req.query.orderBy === "authorName") {
+    return [["author", "user", "firstName", "ASC"]];
+  }
+
+  if (req.query.orderBy === "-authorName") {
+    return [["author", "user", "firstName", "DESC"]];
+  }
+}
+
 async function getPosts(req, res) {
   try {
     const { limit, offset } = createPaginationParameters(
@@ -72,11 +91,27 @@ async function getPosts(req, res) {
     const posts = await Post.findAll({
       limit,
       offset,
+      order: getOrderOptions(req),
       attributes: {
         exclude: ["authorId", "categoryId"],
       },
       include: [
-        Author,
+        {
+          model: Author,
+          as: "author",
+          attributes: {
+            exclude: ["userId"],
+          },
+          include: [
+            {
+              model: User,
+              as: "user",
+              attributes: {
+                exclude: ["password"],
+              },
+            },
+          ],
+        },
         Category,
         {
           model: Tag,
