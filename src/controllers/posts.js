@@ -110,6 +110,44 @@ async function getPosts(req, res) {
   }
 }
 
+async function updatePost(req, res) {
+  try {
+    const postToUpdate = await Post.findByPk(req.params.id);
+
+    if (postToUpdate) {
+      try {
+        await postToUpdate.update({
+          title: req.body.title,
+          content: req.body.content,
+          authorId: req.body.authorId,
+          categoryId: req.body.categoryId,
+          image: req.body.image,
+        });
+
+        if (req.body.tagsIds) {
+          await postToUpdate.setTags(req.body.tagsIds);
+        }
+
+        res.status(204).end();
+      } catch (error) {
+        console.log(error);
+
+        if (error instanceof ValidationError) {
+          res.status(400).json(createErrorsObject(error));
+        } else {
+          res.status(500).end();
+        }
+      }
+    } else {
+      res.status(404).end();
+    }
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).end();
+  }
+}
+
 async function deletePost(req, res) {
   try {
     const postToDelete = await Post.findByPk(req.params.id);
@@ -137,5 +175,6 @@ async function deletePost(req, res) {
 module.exports = {
   createPost,
   getPosts,
+  updatePost,
   deletePost,
 };

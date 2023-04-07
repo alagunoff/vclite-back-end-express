@@ -67,7 +67,7 @@ const User = db.define(
   {
     updatedAt: false,
     hooks: {
-      beforeCreate(user) {
+      beforeSave(user) {
         user.password = bcrypt.hashSync(user.password);
 
         if (user.image) {

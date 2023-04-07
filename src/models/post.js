@@ -60,7 +60,7 @@ const Post = db.define(
   {
     updatedAt: false,
     hooks: {
-      beforeCreate(post) {
+      beforeSave(post, options) {
         post.image = saveImageToStaticFiles(
           post.image,
           `posts/${transformStringToLowercasedKebabString(post.title)}`,
