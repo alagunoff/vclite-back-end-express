@@ -111,20 +111,26 @@ async function getPosts(req, res) {
 }
 
 async function deletePost(req, res) {
-  const postToDelete = await Post.findByPk(req.params.id);
+  try {
+    const postToDelete = await Post.findByPk(req.params.id);
 
-  if (postToDelete) {
-    try {
-      await postToDelete.destroy();
+    if (postToDelete) {
+      try {
+        await postToDelete.destroy();
 
-      res.status(204).end();
-    } catch (error) {
-      console.log(error);
+        res.status(204).end();
+      } catch (error) {
+        console.log(error);
 
-      res.status(500).end();
+        res.status(500).end();
+      }
+    } else {
+      res.status(404).end();
     }
-  } else {
-    res.status(404).end();
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).end();
   }
 }
 

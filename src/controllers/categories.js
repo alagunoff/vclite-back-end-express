@@ -17,6 +17,8 @@ async function createCategory(req, res) {
 
     res.status(201).end();
   } catch (error) {
+    console.log(error);
+
     if (error instanceof ValidationError) {
       res.status(400).json(createErrorsObject(error));
     } else {
@@ -26,12 +28,11 @@ async function createCategory(req, res) {
 }
 
 async function getCategories(req, res) {
-  const { limit, offset } = createPaginationParameters(
-    req.query.itemsNumber,
-    req.query.pageNumber
-  );
-
   try {
+    const { limit, offset } = createPaginationParameters(
+      req.query.itemsNumber,
+      req.query.pageNumber
+    );
     const categories = await Category.findAll({
       limit,
       offset,
@@ -47,43 +48,59 @@ async function getCategories(req, res) {
     res.json(createPaginatedResponse(categories, categories.length, limit));
   } catch (error) {
     console.log(error);
+
     res.status(500).end();
   }
 }
 
 async function updateCategory(req, res) {
-  const categoryToUpdate = await Category.findByPk(req.params.id);
+  try {
+    const categoryToUpdate = await Category.findByPk(req.params.id);
 
-  if (categoryToUpdate) {
-    try {
-      await categoryToUpdate.update({ category: req.body.category });
+    if (categoryToUpdate) {
+      try {
+        await categoryToUpdate.update({ category: req.body.category });
 
-      res.status(204).end();
-    } catch (error) {
-      if (error instanceof ValidationError) {
-        res.status(400).json(createErrorsObject(error));
-      } else {
-        res.status(500).end();
+        res.status(204).end();
+      } catch (error) {
+        console.log(error);
+
+        if (error instanceof ValidationError) {
+          res.status(400).json(createErrorsObject(error));
+        } else {
+          res.status(500).end();
+        }
       }
+    } else {
+      res.status(404).end();
     }
-  } else {
-    res.status(404).end();
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).end();
   }
 }
 
 async function deleteCategory(req, res) {
-  const categoryToDelete = await Category.findByPk(req.params.id);
+  try {
+    const categoryToDelete = await Category.findByPk(req.params.id);
 
-  if (categoryToDelete) {
-    try {
-      await categoryToDelete.destroy();
+    if (categoryToDelete) {
+      try {
+        await categoryToDelete.destroy();
 
-      res.status(204).end();
-    } catch {
-      res.status(500).end();
+        res.status(204).end();
+      } catch (error) {
+        console.log(error);
+        res.status(500).end();
+      }
+    } else {
+      res.status(404).end();
     }
-  } else {
-    res.status(404).end();
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).end();
   }
 }
 

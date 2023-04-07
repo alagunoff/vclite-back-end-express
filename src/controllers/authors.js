@@ -16,6 +16,8 @@ async function createAuthor(req, res) {
 
     res.status(201).end();
   } catch (error) {
+    console.log(error);
+
     if (error instanceof ValidationError) {
       res.status(400).json(createErrorsObject(error));
     } else {
@@ -25,56 +27,71 @@ async function createAuthor(req, res) {
 }
 
 async function getAuthors(req, res) {
-  const { limit, offset } = createPaginationParameters(
-    req.query.itemsNumber,
-    req.query.pageNumber
-  );
-
   try {
-    const { rows, count } = await Author.findAndCountAll({ limit, offset });
+    const { limit, offset } = createPaginationParameters(
+      req.query.itemsNumber,
+      req.query.pageNumber
+    );
+    const authors = await Author.findAll({ limit, offset });
 
-    res.json(createPaginatedResponse(rows, count, limit));
-  } catch {
+    res.json(createPaginatedResponse(authors, authors.length, limit));
+  } catch (error) {
+    console.log(error);
+
     res.status(500).end();
   }
 }
 
 async function updateAuthor(req, res) {
-  const authorToUpdate = await Author.findByPk(req.params.id);
+  try {
+    const authorToUpdate = await Author.findByPk(req.params.id);
 
-  if (authorToUpdate) {
-    try {
-      await authorToUpdate.update({
-        description: req.body.description,
-        userId: req.body.userId,
-      });
+    if (authorToUpdate) {
+      try {
+        await authorToUpdate.update({
+          description: req.body.description,
+          userId: req.body.userId,
+        });
 
-      res.status(204).end();
-    } catch (error) {
-      if (error instanceof ValidationError) {
-        res.status(400).json(createErrorsObject(error));
-      } else {
-        res.status(500).end();
+        res.status(204).end();
+      } catch (error) {
+        console.log(error);
+
+        if (error instanceof ValidationError) {
+          res.status(400).json(createErrorsObject(error));
+        } else {
+          res.status(500).end();
+        }
       }
+    } else {
+      res.status(404).end();
     }
-  } else {
-    res.status(404).end();
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).end();
   }
 }
 
 async function deleteAuthor(req, res) {
-  const authorToDelete = await Author.findByPk(req.params.id);
+  try {
+    const authorToDelete = await Author.findByPk(req.params.id);
 
-  if (authorToDelete) {
-    try {
-      await authorToDelete.destroy();
+    if (authorToDelete) {
+      try {
+        await authorToDelete.destroy();
 
-      res.status(204).end();
-    } catch {
-      res.status(500).end();
+        res.status(204).end();
+      } catch {
+        res.status(500).end();
+      }
+    } else {
+      res.status(404).end();
     }
-  } else {
-    res.status(404).end();
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).end();
   }
 }
 
