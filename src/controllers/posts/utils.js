@@ -1,4 +1,54 @@
-const sequelize = require("sequelize");
+const { Op } = require("sequelize");
+
+function createWhereOptions(req) {
+  const options = {
+    createdAt: {},
+  };
+
+  if (req.query.createdAt) {
+    options.createdAt = req.query.createdAt;
+  }
+
+  if (req.query.createdAt__lt) {
+    options.createdAt[Op.lt] = req.query.createdAt__lt;
+  }
+
+  if (req.query.createdAt__gt) {
+    options.createdAt[Op.gt] = req.query.createdAt__gt;
+  }
+
+  if (req.query.authorName) {
+    options["$author.user.firstName$"] = req.query.authorName;
+  }
+
+  if (req.query.categoryId) {
+    options["$category.id$"] = req.query.categoryId;
+  }
+
+  if (req.query.tagId) {
+    options["$tags.id$"] = req.query.tagId;
+  }
+
+  if (req.query.tags__in) {
+    options["$tags.id$"] = {
+      [Op.in]: JSON.parse(req.query.tags__in),
+    };
+  }
+
+  if (req.query.title__contains) {
+    options.title = {
+      [Op.substring]: req.query.title__contains,
+    };
+  }
+
+  if (req.query.content__contains) {
+    options.content = {
+      [Op.substring]: req.query.content__contains,
+    };
+  }
+
+  return options;
+}
 
 function createOrderOptions(req) {
   if (req.query.orderBy === "createdAt") {
@@ -26,14 +76,15 @@ function createOrderOptions(req) {
   }
 
   if (req.query.orderBy === "imagesNumber") {
-    return [[sequelize.literal('"extraImagesNumber"'), "ASC"]];
+    return [["extraImagesNumber", "ASC"]];
   }
 
   if (req.query.orderBy === "-imagesNumber") {
-    return [[sequelize.literal('"extraImagesNumber"'), "DESC"]];
+    return [["extraImagesNumber", "DESC"]];
   }
 }
 
 module.exports = {
+  createWhereOptions,
   createOrderOptions,
 };

@@ -56,9 +56,13 @@ const Post = db.define(
         isBase64ImageDataUrl: validators.isBase64ImageDataUrl,
       },
     },
+    createdAt: {
+      type: DataTypes.DATEONLY,
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
-    updatedAt: false,
+    timestamps: false,
     hooks: {
       beforeSave(post) {
         post.image = saveImageToStaticFiles(

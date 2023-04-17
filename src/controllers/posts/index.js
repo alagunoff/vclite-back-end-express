@@ -17,7 +17,7 @@ const Category = require("../../models/category");
 const Tag = require("../../models/tag");
 const Comment = require("../../models/comment");
 const PostExtraImage = require("../../models/postExtraImage");
-const { createOrderOptions } = require("./utils");
+const { createWhereOptions, createOrderOptions } = require("./utils");
 
 async function createPost(req, res) {
   try {
@@ -72,6 +72,7 @@ async function getPosts(req, res) {
       req.query.pageNumber
     );
     const posts = await Post.findAll({
+      where: createWhereOptions(req),
       limit,
       offset,
       order: createOrderOptions(req),
