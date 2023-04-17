@@ -27,10 +27,16 @@ const PostExtraImage = db.define(
 
 PostExtraImage.belongsTo(Post, {
   foreignKey: {
+    name: "post_id",
     allowNull: false,
   },
   onDelete: "CASCADE",
 });
-Post.hasMany(PostExtraImage, { as: "extraImages" });
+Post.hasMany(PostExtraImage, {
+  foreignKey: {
+    name: "post_id",
+  },
+  as: "extraImages",
+});
 
 module.exports = PostExtraImage;

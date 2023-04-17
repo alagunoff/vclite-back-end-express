@@ -1,22 +1,23 @@
-const { ValidationError } = require("sequelize");
+const sequelize = require("sequelize");
 
-const { createErrorsObject } = require("../shared/utils/errors");
+const { createErrorsObject } = require("../../shared/utils/errors");
 const {
   createPaginationParameters,
   createPaginatedResponse,
-} = require("../shared/utils/pagination");
-const { setSubcategories } = require("../shared/utils/categories");
-const { saveImageToStaticFiles } = require("../shared/utils/images");
+} = require("../../shared/utils/pagination");
+const { setSubcategories } = require("../../shared/utils/categories");
+const { saveImageToStaticFiles } = require("../../shared/utils/images");
 const {
   transformStringToLowercasedKebabString,
-} = require("../shared/utils/strings");
-const Post = require("../models/post");
-const User = require("../models/user");
-const Author = require("../models/author");
-const Category = require("../models/category");
-const Tag = require("../models/tag");
-const Comment = require("../models/comment");
-const PostExtraImage = require("../models/postExtraImage");
+} = require("../../shared/utils/strings");
+const Post = require("../../models/post");
+const User = require("../../models/user");
+const Author = require("../../models/author");
+const Category = require("../../models/category");
+const Tag = require("../../models/tag");
+const Comment = require("../../models/comment");
+const PostExtraImage = require("../../models/postExtraImage");
+const { createOrderOptions } = require("./utils");
 
 async function createPost(req, res) {
   try {
@@ -33,13 +34,13 @@ async function createPost(req, res) {
       for (const extraImage of req.body.extraImages) {
         const createdPostExtraImage = PostExtraImage.build({
           image: extraImage,
-          postId: createdPost.id,
+          post_id: createdPost.id,
         });
 
         await createdPostExtraImage.validate();
         await createdPostExtraImage.save({
           validate: false,
-          fields: ["postId"],
+          fields: ["post_id"],
         });
 
         createdPostExtraImage.image = saveImageToStaticFiles(
@@ -56,29 +57,11 @@ async function createPost(req, res) {
   } catch (error) {
     console.log(error);
 
-    if (error instanceof ValidationError) {
+    if (error instanceof sequelize.ValidationError) {
       res.status(400).json(createErrorsObject(error));
     } else {
       res.status(500).end();
     }
-  }
-}
-
-function getOrderOptions(req) {
-  if (req.query.orderBy === "createdAt") {
-    return [["createdAt", "ASC"]];
-  }
-
-  if (req.query.orderBy === "-createdAt") {
-    return [["createdAt", "DESC"]];
-  }
-
-  if (req.query.orderBy === "authorName") {
-    return [["author", "user", "firstName", "ASC"]];
-  }
-
-  if (req.query.orderBy === "-authorName") {
-    return [["author", "user", "firstName", "DESC"]];
   }
 }
 
@@ -91,8 +74,16 @@ async function getPosts(req, res) {
     const posts = await Post.findAll({
       limit,
       offset,
-      order: getOrderOptions(req),
+      order: createOrderOptions(req),
       attributes: {
+        include: [
+          [
+            sequelize.literal(
+              "(SELECT COUNT(*) FROM post_extra_images WHERE post_extra_images.post_id = Post.id)"
+            ),
+            "extraImagesNumber",
+          ],
+        ],
         exclude: ["authorId", "categoryId"],
       },
       include: [
@@ -112,7 +103,10 @@ async function getPosts(req, res) {
             },
           ],
         },
-        Category,
+        {
+          model: Category,
+          as: "category",
+        },
         {
           model: Tag,
           through: { attributes: [] },
@@ -127,7 +121,7 @@ async function getPosts(req, res) {
           model: PostExtraImage,
           as: "extraImages",
           attributes: {
-            exclude: ["postId"],
+            exclude: ["post_id"],
           },
         },
       ],
@@ -167,7 +161,7 @@ async function updatePost(req, res) {
       } catch (error) {
         console.log(error);
 
-        if (error instanceof ValidationError) {
+        if (error instanceof sequelize.ValidationError) {
           res.status(400).json(createErrorsObject(error));
         } else {
           res.status(500).end();

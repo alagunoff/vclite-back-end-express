@@ -83,6 +83,7 @@ Post.belongsTo(Author, {
 Author.hasMany(Post);
 
 Post.belongsTo(Category, {
+  as: "category",
   foreignKey: {
     allowNull: false,
   },
