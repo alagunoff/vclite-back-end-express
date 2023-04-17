@@ -31,7 +31,13 @@ function createWhereOptions(req) {
 
   if (req.query.tags__in) {
     options["$tags.id$"] = {
-      [Op.in]: JSON.parse(req.query.tags__in),
+      [Op.or]: JSON.parse(req.query.tags__in),
+    };
+  }
+
+  if (req.query.tags__all) {
+    options["$tags.id$"] = {
+      [Op.in]: JSON.parse(req.query.tags__all),
     };
   }
 
