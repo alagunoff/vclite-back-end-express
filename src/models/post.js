@@ -56,6 +56,10 @@ const Post = db.define(
         isBase64ImageDataUrl: validators.isBase64ImageDataUrl,
       },
     },
+    isDraft: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     createdAt: {
       type: DataTypes.DATEONLY,
       defaultValue: DataTypes.NOW,

@@ -6,6 +6,7 @@ const authRouter = require("./src/routers/auth");
 const usersRouter = require("./src/routers/users");
 const authorsRouter = require("./src/routers/authors");
 const postsRouter = require("./src/routers/posts");
+const draftsRouter = require("./src/routers/drafts");
 const categoriesRouter = require("./src/routers/categories");
 const tagsRouter = require("./src/routers/tags");
 
@@ -17,6 +18,7 @@ app.use("/auth", authRouter);
 app.use("/users", usersRouter);
 app.use("/authors", authorsRouter);
 app.use("/posts", postsRouter);
+app.use("/drafts", draftsRouter);
 app.use("/categories", categoriesRouter);
 app.use("/tags", tagsRouter);
 

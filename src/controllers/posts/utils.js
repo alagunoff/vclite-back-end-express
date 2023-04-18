@@ -2,6 +2,7 @@ const { Op } = require("sequelize");
 
 function createWhereOptions(req) {
   const options = {
+    isDraft: false,
     createdAt: {},
   };
 

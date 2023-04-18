@@ -10,7 +10,7 @@ const {
 const { authenticateUser, isAdmin } = require("../middlewares/auth");
 const commentsRouter = require("./comments");
 
-router.post("", [authenticateUser(404), isAdmin], createPost);
+router.post("", [authenticateUser()], createPost);
 router.get("", getPosts);
 router.patch("/:id", [authenticateUser(404), isAdmin], updatePost);
 router.delete("/:id", [authenticateUser(404), isAdmin], deletePost);
