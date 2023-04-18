@@ -1,5 +1,7 @@
-require("dotenv").config();
-const express = require("express");
+import express from "express";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const db = require("./src/configs/db");
 const authRouter = require("./src/routers/auth");
