@@ -13,7 +13,7 @@ async function login (req: Request, res: Response): Promise<void> {
 
   if (user) {
     if (bcrypt.compareSync(req.body.password, user.password)) {
-      res.send(jwt.sign(String(user.id), process.env.JWT_SECRET_KEY ?? ''))
+      res.send(jwt.sign(String(user.id), process.env.JWT_SECRET_KEY))
     } else {
       res.status(400).send('invalid password')
     }

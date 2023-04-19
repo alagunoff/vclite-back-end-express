@@ -3,13 +3,13 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 
 import prisma from 'prisma'
-import { saveImageToStaticFiles } from 'shared/utils/images'
+import { saveImageToStaticFiles, deleteImageFromStaticFiles } from 'shared/utils/images'
 
 async function createUser (req: Request, res: Response): Promise<void> {
   try {
     const createdUser = await prisma.user.create({
       data: {
-        image: saveImageToStaticFiles(
+        image: req.body.image && saveImageToStaticFiles(
           req.body.image,
           'users',
           req.body.username
@@ -21,7 +21,7 @@ async function createUser (req: Request, res: Response): Promise<void> {
       }
     })
 
-    res.status(201).send(jwt.sign(String(createdUser.id), process.env.JWT_SECRET_KEY ?? ''))
+    res.status(201).send(jwt.sign(String(createdUser.id), process.env.JWT_SECRET_KEY))
   } catch (error) {
     console.log(error)
 
@@ -30,47 +30,31 @@ async function createUser (req: Request, res: Response): Promise<void> {
 }
 
 async function getUser (req: Request, res: Response): Promise<void> {
-  // try {
-  //   const authenticatedUser = await User.findByPk(req.authenticatedUserId, {
-  //     attributes: {
-  //       exclude: ['password']
-  //     }
-  //   })
-
-  //   if (authenticatedUser) {
-  //     res.json(authenticatedUser)
-  //   } else {
-  //     res.status(404).end()
-  //   }
-  // } catch (error) {
-  //   console.log(error)
-
-  //   res.status(500).end()
-  // }
+  res.json({
+    id: req.authenticatedUser?.id,
+    image: req.authenticatedUser?.image,
+    username: req.authenticatedUser?.username,
+    firstName: req.authenticatedUser?.firstName,
+    lastName: req.authenticatedUser?.lastName,
+    isAdmin: req.authenticatedUser?.isAdmin,
+    createdAt: req.authenticatedUser?.createdAt
+  })
 }
 
 async function deleteUser (req: Request, res: Response): Promise<void> {
-  // try {
-  //   const userToDelete = await User.findByPk(req.params.id)
+  try {
+    const deletedUser = await prisma.user.delete({ where: { id: Number(req.params.id) } })
 
-  //   if (userToDelete) {
-  //     try {
-  //       await userToDelete.destroy()
+    res.status(204).end()
 
-  //       res.status(204).end()
-  //     } catch (error) {
-  //       console.log(error)
+    if (deletedUser.image) {
+      deleteImageFromStaticFiles(deletedUser.image)
+    }
+  } catch (error) {
+    console.log(error)
 
-  //       res.status(500).end()
-  //     }
-  //   } else {
-  //     res.status(404).end()
-  //   }
-  // } catch (error) {
-  //   console.log(error)
-
-  //   res.status(500).end()
-  // }
+    res.status(404).end()
+  }
 }
 
 export {
