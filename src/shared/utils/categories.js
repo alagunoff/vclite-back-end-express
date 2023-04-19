@@ -1,13 +1,13 @@
-async function setSubcategories(category) {
-  const subcategories = await category.getSubcategories();
+async function setSubcategories (category) {
+  const subcategories = await category.getSubcategories()
 
-  category.setDataValue("subcategories", subcategories);
+  category.setDataValue('subcategories', subcategories)
 
   if (subcategories.length) {
     for (const subcategory of subcategories) {
-      await setSubcategories(subcategory);
+      await setSubcategories(subcategory)
     }
   }
 }
 
-module.exports = { setSubcategories };
+module.exports = { setSubcategories }

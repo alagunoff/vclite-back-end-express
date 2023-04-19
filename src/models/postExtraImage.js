@@ -1,42 +1,42 @@
-const { DataTypes } = require("sequelize");
+const { DataTypes } = require('sequelize')
 
-const db = require("../configs/db");
-const validators = require("../shared/validators");
-const Post = require("./post");
+const db = require('../configs/db')
+const validators = require('../shared/validators')
+const Post = require('./post')
 
 const PostExtraImage = db.define(
-  "postExtraImage",
+  'postExtraImage',
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: true
     },
     image: {
       type: DataTypes.STRING,
       validate: {
-        isBase64ImageDataUrl: validators.isBase64ImageDataUrl,
-      },
-    },
+        isBase64ImageDataUrl: validators.isBase64ImageDataUrl
+      }
+    }
   },
   {
     timestamps: false,
-    tableName: "post_extra_images",
+    tableName: 'post_extra_images'
   }
-);
+)
 
 PostExtraImage.belongsTo(Post, {
   foreignKey: {
-    name: "post_id",
-    allowNull: false,
+    name: 'post_id',
+    allowNull: false
   },
-  onDelete: "CASCADE",
-});
+  onDelete: 'CASCADE'
+})
 Post.hasMany(PostExtraImage, {
   foreignKey: {
-    name: "post_id",
+    name: 'post_id'
   },
-  as: "extraImages",
-});
+  as: 'extraImages'
+})
 
-module.exports = PostExtraImage;
+module.exports = PostExtraImage

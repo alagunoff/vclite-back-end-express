@@ -1,90 +1,90 @@
-const { DataTypes } = require("sequelize");
-const bcrypt = require("bcryptjs");
+const { DataTypes } = require('sequelize')
+const bcrypt = require('bcryptjs')
 
-const db = require("../configs/db");
+const db = require('../configs/db')
 const {
   saveImageToStaticFiles,
-  deleteImageFromStaticFiles,
-} = require("../shared/utils/images");
-const validators = require("../shared/validators");
+  deleteImageFromStaticFiles
+} = require('../shared/utils/images')
+const validators = require('../shared/validators')
 
 const User = db.define(
-  "user",
+  'user',
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: true
     },
     username: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notNull: {
-          msg: "required",
+          msg: 'required'
         },
         isNotEmptyString: validators.isNotEmptyString,
-        async isUnique(value) {
+        async isUnique (value) {
           if (await User.findOne({ where: { username: value } })) {
-            throw Error("already taken");
+            throw Error('already taken')
           }
-        },
-      },
+        }
+      }
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notNull: {
-          msg: "required",
+          msg: 'required'
         },
-        isNotEmptyString: validators.isNotEmptyString,
-      },
+        isNotEmptyString: validators.isNotEmptyString
+      }
     },
     firstName: {
       type: DataTypes.STRING,
       validate: {
-        isNotEmptyString: validators.isNotEmptyString,
-      },
+        isNotEmptyString: validators.isNotEmptyString
+      }
     },
     lastName: {
       type: DataTypes.STRING,
       validate: {
-        isNotEmptyString: validators.isNotEmptyString,
-      },
+        isNotEmptyString: validators.isNotEmptyString
+      }
     },
     image: {
       type: DataTypes.STRING,
       validate: {
-        isBase64ImageDataUrl: validators.isBase64ImageDataUrl,
-      },
+        isBase64ImageDataUrl: validators.isBase64ImageDataUrl
+      }
     },
     isAdmin: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
+      defaultValue: false
+    }
   },
   {
     updatedAt: false,
     hooks: {
-      beforeSave(user) {
-        user.password = bcrypt.hashSync(user.password);
+      beforeSave (user) {
+        user.password = bcrypt.hashSync(user.password)
 
         if (user.image) {
           user.image = saveImageToStaticFiles(
             user.image,
-            "users",
+            'users',
             user.username
-          );
+          )
         }
       },
-      afterDestroy(user) {
+      afterDestroy (user) {
         if (user.image) {
-          deleteImageFromStaticFiles(user.image);
+          deleteImageFromStaticFiles(user.image)
         }
-      },
-    },
+      }
+    }
   }
-);
+)
 
-module.exports = User;
+module.exports = User

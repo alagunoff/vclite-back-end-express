@@ -1,40 +1,40 @@
-const { DataTypes } = require("sequelize");
+const { DataTypes } = require('sequelize')
 
-const db = require("../configs/db");
-const validators = require("../shared/validators");
-const Post = require("./post");
+const db = require('../configs/db')
+const validators = require('../shared/validators')
+const Post = require('./post')
 
 const Comment = db.define(
-  "comment",
+  'comment',
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: true
     },
     comment: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notNull: {
-          msg: "required",
+          msg: 'required'
         },
-        isNotEmptyString: validators.isNotEmptyString,
-      },
-    },
+        isNotEmptyString: validators.isNotEmptyString
+      }
+    }
   },
   {
-    timestamps: false,
+    timestamps: false
   }
-);
+)
 
 Comment.belongsTo(Post, {
   foreignKey: {
-    allowNull: false,
-  },
-});
+    allowNull: false
+  }
+})
 Post.hasMany(Comment, {
-  onDelete: "CASCADE",
-});
+  onDelete: 'CASCADE'
+})
 
-module.exports = Comment;
+module.exports = Comment

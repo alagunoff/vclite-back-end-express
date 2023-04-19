@@ -1,43 +1,43 @@
-const { DataTypes } = require("sequelize");
+const { DataTypes } = require('sequelize')
 
-const db = require("../configs/db");
-const validators = require("../shared/validators");
+const db = require('../configs/db')
+const validators = require('../shared/validators')
 
 const Category = db.define(
-  "category",
+  'category',
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: true
     },
     category: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: {
         arg: true,
-        msg: "already taken",
+        msg: 'already taken'
       },
       validate: {
         notNull: {
-          msg: "required",
+          msg: 'required'
         },
-        isNotEmptyString: validators.isNotEmptyString,
-      },
-    },
+        isNotEmptyString: validators.isNotEmptyString
+      }
+    }
   },
   {
-    timestamps: false,
+    timestamps: false
   }
-);
+)
 
 Category.hasMany(Category, {
-  as: "subcategories",
-  foreignKey: "parentCategoryId",
-});
+  as: 'subcategories',
+  foreignKey: 'parentCategoryId'
+})
 Category.belongsTo(Category, {
-  as: "parentCategory",
-  foreignKey: "parentCategoryId",
-});
+  as: 'parentCategory',
+  foreignKey: 'parentCategoryId'
+})
 
-module.exports = Category;
+module.exports = Category

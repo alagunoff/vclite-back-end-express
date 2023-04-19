@@ -1,40 +1,40 @@
-const { DataTypes } = require("sequelize");
+const { DataTypes } = require('sequelize')
 
-const db = require("../configs/db");
-const validators = require("../shared/validators");
-const User = require("./user");
+const db = require('../configs/db')
+const validators = require('../shared/validators')
+const User = require('./user')
 
 const Author = db.define(
-  "author",
+  'author',
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: true
     },
     description: {
       type: DataTypes.STRING,
       validate: {
-        isNotEmptyString: validators.isNotEmptyString,
-      },
-    },
+        isNotEmptyString: validators.isNotEmptyString
+      }
+    }
   },
   {
-    timestamps: false,
+    timestamps: false
   }
-);
+)
 
 Author.belongsTo(User, {
-  as: "user",
+  as: 'user',
   foreignKey: {
-    name: "userId",
-    allowNull: false,
+    name: 'userId',
+    allowNull: false
   },
-  onDelete: "CASCADE",
-});
+  onDelete: 'CASCADE'
+})
 User.hasOne(Author, {
-  as: "author",
-  foreignKey: "userId",
-});
+  as: 'author',
+  foreignKey: 'userId'
+})
 
-module.exports = Author;
+module.exports = Author

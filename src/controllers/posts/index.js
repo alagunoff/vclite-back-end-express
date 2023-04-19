@@ -1,76 +1,76 @@
-const sequelize = require("sequelize");
+const sequelize = require('sequelize')
 
-const { createErrorsObject } = require("../../shared/utils/errors");
+const { createErrorsObject } = require('../../shared/utils/errors')
 const {
   createPaginationParameters,
-  createPaginatedResponse,
-} = require("../../shared/utils/pagination");
-const { setSubcategories } = require("../../shared/utils/categories");
-const { saveImageToStaticFiles } = require("../../shared/utils/images");
+  createPaginatedResponse
+} = require('../../shared/utils/pagination')
+const { setSubcategories } = require('../../shared/utils/categories')
+const { saveImageToStaticFiles } = require('../../shared/utils/images')
 const {
-  transformStringToLowercasedKebabString,
-} = require("../../shared/utils/strings");
-const Post = require("../../models/post");
-const User = require("../../models/user");
-const Author = require("../../models/author");
-const Category = require("../../models/category");
-const Tag = require("../../models/tag");
-const Comment = require("../../models/comment");
-const PostExtraImage = require("../../models/postExtraImage");
-const { createWhereOptions, createOrderOptions } = require("./utils");
+  transformStringToLowercasedKebabString
+} = require('../../shared/utils/strings')
+const Post = require('../../models/post')
+const User = require('../../models/user')
+const Author = require('../../models/author')
+const Category = require('../../models/category')
+const Tag = require('../../models/tag')
+const Comment = require('../../models/comment')
+const PostExtraImage = require('../../models/postExtraImage')
+const { createWhereOptions, createOrderOptions } = require('./utils')
 
-async function createPost(req, res) {
+async function createPost (req, res) {
   try {
     const createdPost = await Post.create({
       title: req.body.title,
       content: req.body.content,
       authorId: req.body.authorId,
       categoryId: req.body.categoryId,
-      image: req.body.image,
-    });
-    await createdPost.setTags(req.body.tagsIds);
+      image: req.body.image
+    })
+    await createdPost.setTags(req.body.tagsIds)
 
     if (Array.isArray(req.body.extraImages)) {
       for (const extraImage of req.body.extraImages) {
         const createdPostExtraImage = PostExtraImage.build({
           image: extraImage,
-          post_id: createdPost.id,
-        });
+          post_id: createdPost.id
+        })
 
-        await createdPostExtraImage.validate();
+        await createdPostExtraImage.validate()
         await createdPostExtraImage.save({
           validate: false,
-          fields: ["post_id"],
-        });
+          fields: ['post_id']
+        })
 
         createdPostExtraImage.image = saveImageToStaticFiles(
           extraImage,
           `posts/${transformStringToLowercasedKebabString(createdPost.title)}`,
           `extra-${createdPostExtraImage.id}`
-        );
+        )
 
-        await createdPostExtraImage.save({ validate: false });
+        await createdPostExtraImage.save({ validate: false })
       }
     }
 
-    res.status(201).end();
+    res.status(201).end()
   } catch (error) {
-    console.log(error);
+    console.log(error)
 
     if (error instanceof sequelize.ValidationError) {
-      res.status(400).json(createErrorsObject(error));
+      res.status(400).json(createErrorsObject(error))
     } else {
-      res.status(500).end();
+      res.status(500).end()
     }
   }
 }
 
-async function getPosts(req, res) {
+async function getPosts (req, res) {
   try {
     const { limit, offset } = createPaginationParameters(
       req.query.itemsNumber,
       req.query.pageNumber
-    );
+    )
     const posts = await Post.findAll({
       where: createWhereOptions(req),
       limit,
@@ -80,69 +80,69 @@ async function getPosts(req, res) {
         include: [
           [
             sequelize.literal(
-              "(SELECT COUNT(*) FROM post_extra_images WHERE post_extra_images.post_id = Post.id)"
+              '(SELECT COUNT(*) FROM post_extra_images WHERE post_extra_images.post_id = Post.id)'
             ),
-            "extraImagesNumber",
-          ],
+            'extraImagesNumber'
+          ]
         ],
-        exclude: ["authorId", "categoryId"],
+        exclude: ['authorId', 'categoryId']
       },
       include: [
         {
           model: Author,
-          as: "author",
+          as: 'author',
           attributes: {
-            exclude: ["userId"],
+            exclude: ['userId']
           },
           include: [
             {
               model: User,
-              as: "user",
+              as: 'user',
               attributes: {
-                exclude: ["password"],
-              },
-            },
-          ],
+                exclude: ['password']
+              }
+            }
+          ]
         },
         {
           model: Category,
-          as: "category",
+          as: 'category'
         },
         {
           model: Tag,
-          through: { attributes: [] },
+          through: { attributes: [] }
         },
         {
           model: Comment,
           attributes: {
-            exclude: ["postId"],
-          },
+            exclude: ['postId']
+          }
         },
         {
           model: PostExtraImage,
-          as: "extraImages",
+          as: 'extraImages',
           attributes: {
-            exclude: ["post_id"],
-          },
-        },
-      ],
-    });
+            exclude: ['post_id']
+          }
+        }
+      ]
+    })
 
     for (const post of posts) {
-      await setSubcategories(post.category);
+      await setSubcategories(post.category)
     }
 
-    res.json(createPaginatedResponse(posts, posts.length, limit));
+    res.json(createPaginatedResponse(posts, posts.length, limit))
   } catch (error) {
-    console.log(error);
+    console.log(error)
 
-    res.status(500).end();
+    res.status(500).end()
   }
 }
 
-async function updatePost(req, res) {
+async function updatePost (req, res) {
   try {
-    const postToUpdate = await Post.findByPk(req.params.id);
+    const postToUpdate = await Post.findByPk(req.params.id)
 
     if (postToUpdate) {
       try {
@@ -151,54 +151,54 @@ async function updatePost(req, res) {
           content: req.body.content,
           authorId: req.body.authorId,
           categoryId: req.body.categoryId,
-          image: req.body.image,
-        });
+          image: req.body.image
+        })
 
         if (req.body.tagsIds) {
-          await postToUpdate.setTags(req.body.tagsIds);
+          await postToUpdate.setTags(req.body.tagsIds)
         }
 
-        res.status(204).end();
+        res.status(204).end()
       } catch (error) {
-        console.log(error);
+        console.log(error)
 
         if (error instanceof sequelize.ValidationError) {
-          res.status(400).json(createErrorsObject(error));
+          res.status(400).json(createErrorsObject(error))
         } else {
-          res.status(500).end();
+          res.status(500).end()
         }
       }
     } else {
-      res.status(404).end();
+      res.status(404).end()
     }
   } catch (error) {
-    console.log(error);
+    console.log(error)
 
-    res.status(500).end();
+    res.status(500).end()
   }
 }
 
-async function deletePost(req, res) {
+async function deletePost (req, res) {
   try {
-    const postToDelete = await Post.findByPk(req.params.id);
+    const postToDelete = await Post.findByPk(req.params.id)
 
     if (postToDelete) {
       try {
-        await postToDelete.destroy();
+        await postToDelete.destroy()
 
-        res.status(204).end();
+        res.status(204).end()
       } catch (error) {
-        console.log(error);
+        console.log(error)
 
-        res.status(500).end();
+        res.status(500).end()
       }
     } else {
-      res.status(404).end();
+      res.status(404).end()
     }
   } catch (error) {
-    console.log(error);
+    console.log(error)
 
-    res.status(500).end();
+    res.status(500).end()
   }
 }
 
@@ -206,5 +206,5 @@ module.exports = {
   createPost,
   getPosts,
   updatePost,
-  deletePost,
-};
+  deletePost
+}

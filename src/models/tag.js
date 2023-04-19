@@ -1,34 +1,34 @@
-const { DataTypes } = require("sequelize");
+const { DataTypes } = require('sequelize')
 
-const db = require("../configs/db");
-const validators = require("../shared/validators");
+const db = require('../configs/db')
+const validators = require('../shared/validators')
 
 const Tag = db.define(
-  "tag",
+  'tag',
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: true
     },
     tag: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: {
         arg: true,
-        msg: "already taken",
+        msg: 'already taken'
       },
       validate: {
         notNull: {
-          msg: "required",
+          msg: 'required'
         },
-        isNotEmptyString: validators.isNotEmptyString,
-      },
-    },
+        isNotEmptyString: validators.isNotEmptyString
+      }
+    }
   },
   {
-    timestamps: false,
+    timestamps: false
   }
-);
+)
 
-module.exports = Tag;
+module.exports = Tag
