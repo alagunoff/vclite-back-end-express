@@ -9,7 +9,6 @@ import {
   categoriesRouter,
   postsRouter,
 } from "routers";
-// const postsRouter = require('./src/routers/posts')
 // const draftsRouter = require('./src/routers/drafts')
 
 dotenv.config();

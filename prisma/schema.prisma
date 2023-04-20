@@ -76,7 +76,6 @@ model Post {
   content     String
   authorId    Int              @map("author_id")
   categoryId  Int              @map("category_id")
-  isDraft     Boolean          @default(false) @map("is_draft")
   createdAt   DateTime         @default(now()) @map("created_at")
   author      Author           @relation(fields: [authorId], references: [id], onDelete: Cascade)
   category    Category         @relation(fields: [categoryId], references: [id], onDelete: NoAction)

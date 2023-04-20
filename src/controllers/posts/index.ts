@@ -60,9 +60,6 @@ async function getPosts(req: Request, res: Response): Promise<void> {
       req.query.itemsNumber
     );
     const posts = await prisma.post.findMany({
-      where: {
-        isDraft: false,
-      },
       skip,
       take,
       select: {
