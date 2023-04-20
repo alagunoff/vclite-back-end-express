@@ -8,7 +8,7 @@ async function createAuthor(req: Request, res: Response): Promise<void> {
     await prisma.author.create({
       data: {
         description: req.body.description,
-        user: { connect: { id: Number(req.body.userId) } },
+        userId: Number(req.body.userId),
       },
     });
 
@@ -26,7 +26,11 @@ async function getAuthors(req: Request, res: Response): Promise<void> {
       req.query.pageNumber,
       req.query.itemsNumber
     );
-    const authors = await prisma.author.findMany({ skip, take });
+    const authors = await prisma.author.findMany({
+      select: { id: true, description: true },
+      skip,
+      take,
+    });
     const authorsTotalNumber = await prisma.author.count();
 
     res.json({

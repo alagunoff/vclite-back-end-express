@@ -1,17 +1,17 @@
-const express = require("express");
-const router = express.Router();
+import express from "express";
 
-const {
+import {
   createCategory,
   getCategories,
   updateCategory,
   deleteCategory,
-} = require("../controllers/categories");
-const { authenticateUser, isAdmin } = require("../middlewares/auth");
+} from "controllers/categories";
+import { authenticateUser, isAdmin } from "middlewares/auth";
 
+const router = express.Router();
 router.post("", [authenticateUser(404), isAdmin], createCategory);
 router.get("", getCategories);
 router.patch("/:id", [authenticateUser(404), isAdmin], updateCategory);
 router.delete("/:id", [authenticateUser(404), isAdmin], deleteCategory);
 
-module.exports = router;
+export default router;

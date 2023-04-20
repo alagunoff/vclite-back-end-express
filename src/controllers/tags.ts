@@ -21,7 +21,11 @@ async function getTags(req: Request, res: Response): Promise<void> {
       req.query.pageNumber,
       req.query.itemsNumber
     );
-    const tags = await prisma.tag.findMany({ skip, take });
+    const tags = await prisma.tag.findMany({
+      skip,
+      take,
+      orderBy: { id: "asc" },
+    });
     const tagsTotalNumber = await prisma.tag.count();
 
     res.json({
