@@ -1,10 +1,10 @@
-function transformStringToLowercasedKebabString (string) {
+function transformStringToLowercasedKebabString(string) {
   return string
-    .split(' ')
+    .split(" ")
     .map((word) => word.toLowerCase())
-    .join('-')
+    .join("-");
 }
 
 module.exports = {
-  transformStringToLowercasedKebabString
-}
+  transformStringToLowercasedKebabString,
+};

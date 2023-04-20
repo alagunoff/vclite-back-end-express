@@ -17,7 +17,7 @@ model User {
   lastName  String?  @map("last_name")
   isAdmin   Boolean? @default(false) @map("is_admin")
   createdAt DateTime @default(now()) @map("created_at")
-  author    Author[]
+  author    Author?
 
   @@map("users")
 }
@@ -32,6 +32,14 @@ model Author {
   @@map("authors")
 }
 
+model Tag {
+  id    Int    @id @default(autoincrement())
+  tag   String @unique
+  posts Post[]
+
+  @@map("tags")
+}
+
 model Category {
   id               Int        @id @default(autoincrement())
   category         String     @unique
@@ -41,25 +49,6 @@ model Category {
   posts            Post[]
 
   @@map("categories")
-}
-
-model Tag {
-  id       Int          @id @default(autoincrement())
-  tag      String       @unique
-  postTags PostToTags[]
-
-  @@map("tags")
-}
-
-model PostToTags {
-  postId    Int      @map("post_id")
-  tagId     Int      @map("tag_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  posts     Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  tags      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@id([postId, tagId])
-  @@map("posts_to_tags")
 }
 
 model Comment {
@@ -89,7 +78,7 @@ model Post {
   createdAt   DateTime?        @default(now()) @map("created_at")
   author      Author           @relation(fields: [authorId], references: [id], onDelete: NoAction)
   categories  Category         @relation(fields: [categoryId], references: [id], onDelete: NoAction)
-  postToTags  PostToTags[]
+  tags        Tag[]
   comments    Comment[]
   extraImages PostExtraImage[]
 

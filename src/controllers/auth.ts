@@ -1,31 +1,31 @@
-import { type Request, type Response } from 'express'
-import jwt from 'jsonwebtoken'
-import bcrypt from 'bcryptjs'
+import { type Request, type Response } from "express";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
-import prisma from 'prisma'
+import prisma from "prisma";
 
-async function login (req: Request, res: Response): Promise<void> {
+async function login(req: Request, res: Response): Promise<void> {
   try {
     const user = await prisma.user.findUnique({
       where: {
-        username: req.body.username
-      }
-    })
+        username: req.body.username,
+      },
+    });
 
     if (user) {
       if (bcrypt.compareSync(req.body.password, user.password)) {
-        res.send(jwt.sign(String(user.id), process.env.JWT_SECRET_KEY))
+        res.send(jwt.sign(String(user.id), process.env.JWT_SECRET_KEY));
       } else {
-        res.status(400).send('invalid password')
+        res.status(400).send("invalid password");
       }
     } else {
-      res.status(404).send('There is no user with this username')
+      res.status(404).send("There is no user with this username");
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
 
-    res.status(500).end()
+    res.status(500).end();
   }
 }
 
-export { login }
+export { login };
