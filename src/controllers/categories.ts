@@ -28,31 +28,30 @@ async function getCategories(req: Request, res: Response): Promise<void> {
       req.query.pageNumber,
       req.query.itemsNumber
     );
-    const categories = await prisma.category.findMany({
-      where: { parentCategoryId: null },
-      select: {
-        id: true,
-        category: true,
-      },
-      skip,
-      take,
-      orderBy: { id: "asc" },
-    });
+    const categories: CategoryWithSubcategories[] =
+      await prisma.category.findMany({
+        where: { parentCategoryId: null },
+        select: {
+          id: true,
+          category: true,
+        },
+        skip,
+        take,
+        orderBy: { id: "asc" },
+      });
+    for (const category of categories) {
+      await includeSubcategories(category);
+    }
+
     const categoriesTotalNumber = await prisma.category.count({
       where: { parentCategoryId: null },
     });
 
-    const categoriesWithSubcategories: CategoryWithSubcategories[] =
-      categories.slice();
-    for (const category of categoriesWithSubcategories) {
-      await includeSubcategories(category);
-    }
-
     res.json({
-      categories: categoriesWithSubcategories,
+      categories,
       categoriesTotalNumber,
       pagesTotalNumber: Math.ceil(
-        categoriesTotalNumber / categoriesWithSubcategories.length ?? 1
+        categoriesTotalNumber / categories.length ?? 1
       ),
     });
   } catch (error) {
