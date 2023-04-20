@@ -32,7 +32,7 @@ function authenticateUser (responseStatus = 401) {
   }
 }
 
-function checkIfAuthenticatedUserIsAdmin (req: Request, res: Response, next: NextFunction): void {
+function isAdmin (req: Request, res: Response, next: NextFunction): void {
   if (req.authenticatedUser?.isAdmin) {
     next()
   } else {
@@ -42,5 +42,5 @@ function checkIfAuthenticatedUserIsAdmin (req: Request, res: Response, next: Nex
 
 export {
   authenticateUser,
-  checkIfAuthenticatedUserIsAdmin
+  isAdmin
 }

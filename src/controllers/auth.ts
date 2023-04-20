@@ -5,20 +5,26 @@ import bcrypt from 'bcryptjs'
 import prisma from 'prisma'
 
 async function login (req: Request, res: Response): Promise<void> {
-  const user = await prisma.user.findUnique({
-    where: {
-      username: req.body.username
-    }
-  })
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        username: req.body.username
+      }
+    })
 
-  if (user) {
-    if (bcrypt.compareSync(req.body.password, user.password)) {
-      res.send(jwt.sign(String(user.id), process.env.JWT_SECRET_KEY))
+    if (user) {
+      if (bcrypt.compareSync(req.body.password, user.password)) {
+        res.send(jwt.sign(String(user.id), process.env.JWT_SECRET_KEY))
+      } else {
+        res.status(400).send('invalid password')
+      }
     } else {
-      res.status(400).send('invalid password')
+      res.status(404).send('There is no user with this username')
     }
-  } else {
-    res.status(404).send('There is no user with this username')
+  } catch (error) {
+    console.log(error)
+
+    res.status(500).end()
   }
 }
 
