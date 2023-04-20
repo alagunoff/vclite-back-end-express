@@ -27,7 +27,10 @@ async function getAuthors(req: Request, res: Response): Promise<void> {
       req.query.itemsNumber
     );
     const authors = await prisma.author.findMany({
-      select: { id: true, description: true },
+      select: {
+        id: true,
+        description: true,
+      },
       skip,
       take,
     });
@@ -66,7 +69,11 @@ async function updateAuthor(req: Request, res: Response): Promise<void> {
 
 async function deleteAuthor(req: Request, res: Response): Promise<void> {
   try {
-    await prisma.author.delete({ where: { id: Number(req.params.id) } });
+    await prisma.author.delete({
+      where: {
+        id: Number(req.params.id),
+      },
+    });
 
     res.status(204).end();
   } catch (error) {

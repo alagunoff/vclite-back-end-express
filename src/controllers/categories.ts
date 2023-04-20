@@ -1,9 +1,9 @@
 import { type Request, type Response } from "express";
 
 import prisma from "prisma";
-import { createPaginationParameters } from "shared/utils/pagination";
-import { includeSubcategories } from "shared/utils/categories";
 import { type CategoryWithSubcategories } from "shared/types/categories";
+import { includeSubcategories } from "shared/utils/categories";
+import { createPaginationParameters } from "shared/utils/pagination";
 
 async function createCategory(req: Request, res: Response): Promise<void> {
   try {
@@ -30,21 +30,24 @@ async function getCategories(req: Request, res: Response): Promise<void> {
     );
     const categories: CategoryWithSubcategories[] =
       await prisma.category.findMany({
-        where: { parentCategoryId: null },
+        where: {
+          parentCategoryId: null,
+        },
         select: {
           id: true,
           category: true,
         },
         skip,
         take,
-        orderBy: { id: "asc" },
       });
     for (const category of categories) {
       await includeSubcategories(category);
     }
 
     const categoriesTotalNumber = await prisma.category.count({
-      where: { parentCategoryId: null },
+      where: {
+        parentCategoryId: null,
+      },
     });
 
     res.json({
@@ -83,7 +86,11 @@ async function updateCategory(req: Request, res: Response): Promise<void> {
 
 async function deleteCategory(req: Request, res: Response): Promise<void> {
   try {
-    await prisma.category.delete({ where: { id: Number(req.params.id) } });
+    await prisma.category.delete({
+      where: {
+        id: Number(req.params.id),
+      },
+    });
 
     res.status(204).end();
   } catch (error) {

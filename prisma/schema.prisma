@@ -10,12 +10,12 @@ generator client {
 
 model User {
   id        Int      @id @default(autoincrement())
-  image     String?
+  image     String
   username  String   @unique
   password  String
   firstName String?  @map("first_name")
   lastName  String?  @map("last_name")
-  isAdmin   Boolean? @default(false) @map("is_admin")
+  isAdmin   Boolean  @default(false) @map("is_admin")
   createdAt DateTime @default(now()) @map("created_at")
   author    Author?
 
@@ -64,7 +64,9 @@ model PostExtraImage {
   id     Int    @id @default(autoincrement())
   image  String
   postId Int    @map("post_id")
-  posts  Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("post_extra_images")
 }
 
 model Post {
@@ -74,10 +76,10 @@ model Post {
   content     String
   authorId    Int              @map("author_id")
   categoryId  Int              @map("category_id")
-  isDraft     Boolean?         @default(false) @map("is_draft")
-  createdAt   DateTime?        @default(now()) @map("created_at")
-  author      Author           @relation(fields: [authorId], references: [id], onDelete: NoAction)
-  categories  Category         @relation(fields: [categoryId], references: [id], onDelete: NoAction)
+  isDraft     Boolean          @default(false) @map("is_draft")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  author      Author           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category    Category         @relation(fields: [categoryId], references: [id], onDelete: NoAction)
   tags        Tag[]
   comments    Comment[]
   extraImages PostExtraImage[]

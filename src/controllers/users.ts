@@ -12,9 +12,11 @@ async function createUser(req: Request, res: Response): Promise<void> {
   try {
     const createdUser = await prisma.user.create({
       data: {
-        image:
-          req.body.image &&
-          saveImageToStaticFiles(req.body.image, "users", req.body.username),
+        image: saveImageToStaticFiles(
+          req.body.image,
+          "users",
+          req.body.username
+        ),
         username: req.body.username,
         password: bcrypt.hashSync(req.body.password),
         firstName: req.body.firstName,
@@ -47,14 +49,13 @@ async function getUser(req: Request, res: Response): Promise<void> {
 async function deleteUser(req: Request, res: Response): Promise<void> {
   try {
     const deletedUser = await prisma.user.delete({
-      where: { id: Number(req.params.id) },
+      where: {
+        id: Number(req.params.id),
+      },
     });
 
     res.status(204).end();
-
-    if (deletedUser.image) {
-      deleteImageFromStaticFiles(deletedUser.image);
-    }
+    deleteImageFromStaticFiles(deletedUser.image);
   } catch (error) {
     console.log(error);
 

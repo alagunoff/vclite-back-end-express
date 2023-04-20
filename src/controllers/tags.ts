@@ -5,7 +5,11 @@ import { createPaginationParameters } from "shared/utils/pagination";
 
 async function createTag(req: Request, res: Response): Promise<void> {
   try {
-    await prisma.tag.create({ data: { tag: req.body.tag } });
+    await prisma.tag.create({
+      data: {
+        tag: req.body.tag,
+      },
+    });
 
     res.status(201).end();
   } catch (error) {
@@ -24,7 +28,6 @@ async function getTags(req: Request, res: Response): Promise<void> {
     const tags = await prisma.tag.findMany({
       skip,
       take,
-      orderBy: { id: "asc" },
     });
     const tagsTotalNumber = await prisma.tag.count();
 
@@ -61,7 +64,11 @@ async function updateTag(req: Request, res: Response): Promise<void> {
 
 async function deleteTag(req: Request, res: Response): Promise<void> {
   try {
-    await prisma.tag.delete({ where: { id: Number(req.params.id) } });
+    await prisma.tag.delete({
+      where: {
+        id: Number(req.params.id),
+      },
+    });
 
     res.status(204).end();
   } catch (error) {

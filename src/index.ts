@@ -7,8 +7,8 @@ import {
   authorsRouter,
   tagsRouter,
   categoriesRouter,
+  postsRouter,
 } from "routers";
-// const categoriesRouter = require('./src/routers/categories')
 // const postsRouter = require('./src/routers/posts')
 // const draftsRouter = require('./src/routers/drafts')
 
@@ -23,5 +23,5 @@ app.use("/auth", authRouter);
 app.use("/authors", authorsRouter);
 app.use("/tags", tagsRouter);
 app.use("/categories", categoriesRouter);
-// app.use('/posts', postsRouter)
+app.use("/posts", postsRouter);
 // app.use('/drafts', draftsRouter)
