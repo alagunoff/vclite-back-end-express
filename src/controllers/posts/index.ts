@@ -7,6 +7,7 @@ import {
 } from "shared/utils/images";
 import { createPaginationParameters } from "shared/utils/pagination";
 import { transformStringToLowercasedKebabString } from "shared/utils/strings";
+import { includeSubcategories } from "shared/utils/categories";
 
 async function createPost(req: Request, res: Response): Promise<void> {
   try {
@@ -97,6 +98,10 @@ async function getPosts(req: Request, res: Response): Promise<void> {
         createdAt: true,
       },
     });
+    for (const post of posts) {
+      await includeSubcategories(post.category);
+    }
+
     const postsTotalNumber = await prisma.post.count();
 
     res.json({

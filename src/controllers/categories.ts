@@ -1,7 +1,6 @@
 import { type Request, type Response } from "express";
 
 import prisma from "prisma";
-import { type CategoryWithSubcategories } from "shared/types/categories";
 import { includeSubcategories } from "shared/utils/categories";
 import { createPaginationParameters } from "shared/utils/pagination";
 
@@ -28,18 +27,17 @@ async function getCategories(req: Request, res: Response): Promise<void> {
       req.query.pageNumber,
       req.query.itemsNumber
     );
-    const categories: CategoryWithSubcategories[] =
-      await prisma.category.findMany({
-        where: {
-          parentCategoryId: null,
-        },
-        select: {
-          id: true,
-          category: true,
-        },
-        skip,
-        take,
-      });
+    const categories = await prisma.category.findMany({
+      where: {
+        parentCategoryId: null,
+      },
+      select: {
+        id: true,
+        category: true,
+      },
+      skip,
+      take,
+    });
     for (const category of categories) {
       await includeSubcategories(category);
     }

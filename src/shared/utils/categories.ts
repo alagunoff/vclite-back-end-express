@@ -1,11 +1,18 @@
 import prisma from "prisma";
-import { type CategoryWithSubcategories } from "shared/types/categories";
+
+interface CategoryWithSubcategories {
+  id: number;
+  category: string;
+  subcategories?: CategoryWithSubcategories[];
+}
 
 async function includeSubcategories(
   category: CategoryWithSubcategories
 ): Promise<void> {
   const subcategories = await prisma.category.findMany({
-    where: { parentCategoryId: category.id },
+    where: {
+      parentCategoryId: category.id,
+    },
     select: {
       id: true,
       category: true,
