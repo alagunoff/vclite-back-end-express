@@ -27,8 +27,16 @@ async function createPost(req: Request, res: Response): Promise<void> {
           ),
         title: req.body.title,
         content: req.body.content,
-        authorId: req.body.authorId,
-        categoryId: req.body.categoryId,
+        author: {
+          connect: {
+            userId: req.authenticatedUser?.id,
+          },
+        },
+        category: {
+          connect: {
+            id: req.body.categoryId,
+          },
+        },
         tags: req.body.tagsIds && {
           connect: req.body.tagsIds.map((tagId: number) => ({
             id: tagId,

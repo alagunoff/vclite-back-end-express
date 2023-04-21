@@ -11,7 +11,7 @@ function authenticateUser(responseStatus = 401) {
       try {
         const authenticatedUser = await prisma.user.findUnique({
           where: {
-            id: Number(jwt.verify(token, process.env.JWT_SECRET_KEY) as string),
+            id: Number(jwt.verify(token, process.env.JWT_SECRET_KEY)),
           },
         });
 

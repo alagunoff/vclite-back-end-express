@@ -70,7 +70,7 @@ async function getDrafts(req: Request, res: Response): Promise<void> {
         isDraft: true,
         author: {
           user: {
-            id: Number(req.authenticatedUser?.id),
+            id: req.authenticatedUser?.id,
           },
         },
       },
@@ -123,7 +123,7 @@ async function getDrafts(req: Request, res: Response): Promise<void> {
         isDraft: true,
         author: {
           user: {
-            id: Number(req.authenticatedUser?.id),
+            id: req.authenticatedUser?.id,
           },
         },
       },
