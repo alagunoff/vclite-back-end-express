@@ -1,6 +1,6 @@
 import { type Request } from "express";
 
-function createFilterOptions(req: Request): Record<string, unknown> {
+function createFilterParameters(req: Request): Record<string, unknown> {
   const result: Record<string, unknown> = {
     isDraft: false,
   };
@@ -88,38 +88,58 @@ function createFilterOptions(req: Request): Record<string, unknown> {
   return result;
 }
 
-// function createOrderOptions(req) {
-//   if (req.query.orderBy === "createdAt") {
-//     return [["createdAt", "ASC"]];
-//   }
+function createOrderParameters(req: Request): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
 
-//   if (req.query.orderBy === "-createdAt") {
-//     return [["createdAt", "DESC"]];
-//   }
+  if (req.query.orderBy === "createdAt") {
+    result.createdAt = "asc";
+  }
 
-//   if (req.query.orderBy === "authorName") {
-//     return [["author", "user", "firstName", "ASC"]];
-//   }
+  if (req.query.orderBy === "-createdAt") {
+    result.createdAt = "desc";
+  }
 
-//   if (req.query.orderBy === "-authorName") {
-//     return [["author", "user", "firstName", "DESC"]];
-//   }
+  if (req.query.orderBy === "authorFirstName") {
+    result.author = {
+      user: {
+        firstName: "asc",
+      },
+    };
+  }
 
-//   if (req.query.orderBy === "categoryName") {
-//     return [["category", "category", "ASC"]];
-//   }
+  if (req.query.orderBy === "-authorFirstName") {
+    result.author = {
+      user: {
+        firstName: "desc",
+      },
+    };
+  }
 
-//   if (req.query.orderBy === "-categoryName") {
-//     return [["category", "category", "DESC"]];
-//   }
+  if (req.query.orderBy === "category") {
+    result.category = {
+      category: "asc",
+    };
+  }
 
-//   if (req.query.orderBy === "imagesNumber") {
-//     return [["extraImagesNumber", "ASC"]];
-//   }
+  if (req.query.orderBy === "-category") {
+    result.category = {
+      category: "desc",
+    };
+  }
 
-//   if (req.query.orderBy === "-imagesNumber") {
-//     return [["extraImagesNumber", "DESC"]];
-//   }
-// }
+  if (req.query.orderBy === "imagesNumber") {
+    result.extraImages = {
+      _count: "asc",
+    };
+  }
 
-export { createFilterOptions };
+  if (req.query.orderBy === "-imagesNumber") {
+    result.extraImages = {
+      _count: "desc",
+    };
+  }
+
+  return result;
+}
+
+export { createFilterParameters, createOrderParameters };
