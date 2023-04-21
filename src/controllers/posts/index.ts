@@ -12,6 +12,8 @@ import {
 import { transformStringToLowercasedKebabString } from "shared/utils/strings";
 import { includeSubcategories } from "shared/utils/categories";
 
+import { createFilterOptions } from "./utils";
+
 async function createPost(req: Request, res: Response): Promise<void> {
   try {
     await prisma.post.create({
@@ -63,9 +65,7 @@ async function getPosts(req: Request, res: Response): Promise<void> {
       req.query.itemsNumber
     );
     const posts = await prisma.post.findMany({
-      where: {
-        isDraft: false,
-      },
+      where: createFilterOptions(req),
       skip,
       take,
       select: {
