@@ -5,7 +5,10 @@ import {
   saveImageToStaticFiles,
   deleteImageFolderFromStaticFiles,
 } from "shared/utils/images";
-import { createPaginationParameters } from "shared/utils/pagination";
+import {
+  createPaginationParameters,
+  calculatePagesTotalNumber,
+} from "shared/utils/pagination";
 import { transformStringToLowercasedKebabString } from "shared/utils/strings";
 import { includeSubcategories } from "shared/utils/categories";
 
@@ -60,6 +63,9 @@ async function getPosts(req: Request, res: Response): Promise<void> {
       req.query.itemsNumber
     );
     const posts = await prisma.post.findMany({
+      where: {
+        isDraft: false,
+      },
       skip,
       take,
       select: {
@@ -85,7 +91,12 @@ async function getPosts(req: Request, res: Response): Promise<void> {
             tag: true,
           },
         },
-        comments: true,
+        comments: {
+          select: {
+            id: true,
+            comment: true,
+          },
+        },
         extraImages: {
           select: {
             id: true,
@@ -99,12 +110,19 @@ async function getPosts(req: Request, res: Response): Promise<void> {
       await includeSubcategories(post.category);
     }
 
-    const postsTotalNumber = await prisma.post.count();
+    const postsTotalNumber = await prisma.post.count({
+      where: {
+        isDraft: false,
+      },
+    });
 
     res.json({
       posts,
       postsTotalNumber,
-      pagesTotalNumber: Math.ceil(postsTotalNumber / posts.length ?? 1),
+      pagesTotalNumber: calculatePagesTotalNumber(
+        postsTotalNumber,
+        posts.length
+      ),
     });
   } catch (error) {
     console.log(error);
@@ -150,7 +168,10 @@ async function deletePost(req: Request, res: Response): Promise<void> {
   try {
     const deletedPost = await prisma.post.delete({
       where: {
-        id: Number(req.params.id),
+        id_isDraft: {
+          id: Number(req.params.id),
+          isDraft: false,
+        },
       },
     });
 

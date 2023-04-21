@@ -2,7 +2,10 @@ import { type Request, type Response } from "express";
 
 import prisma from "prisma";
 import { includeSubcategories } from "shared/utils/categories";
-import { createPaginationParameters } from "shared/utils/pagination";
+import {
+  createPaginationParameters,
+  calculatePagesTotalNumber,
+} from "shared/utils/pagination";
 
 async function createCategory(req: Request, res: Response): Promise<void> {
   try {
@@ -51,8 +54,9 @@ async function getCategories(req: Request, res: Response): Promise<void> {
     res.json({
       categories,
       categoriesTotalNumber,
-      pagesTotalNumber: Math.ceil(
-        categoriesTotalNumber / categories.length ?? 1
+      pagesTotalNumber: calculatePagesTotalNumber(
+        categoriesTotalNumber,
+        categories.length
       ),
     });
   } catch (error) {

@@ -14,4 +14,13 @@ function createPaginationParameters(
   };
 }
 
-export { createPaginationParameters };
+function calculatePagesTotalNumber(
+  itemsTotalNumber: number,
+  filteredItemsTotalNumber: number
+): number {
+  return itemsTotalNumber && filteredItemsTotalNumber
+    ? Math.ceil(itemsTotalNumber / filteredItemsTotalNumber)
+    : 1;
+}
+
+export { createPaginationParameters, calculatePagesTotalNumber };

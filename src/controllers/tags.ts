@@ -1,7 +1,10 @@
 import { type Request, type Response } from "express";
 
 import prisma from "prisma";
-import { createPaginationParameters } from "shared/utils/pagination";
+import {
+  createPaginationParameters,
+  calculatePagesTotalNumber,
+} from "shared/utils/pagination";
 
 async function createTag(req: Request, res: Response): Promise<void> {
   try {
@@ -34,7 +37,7 @@ async function getTags(req: Request, res: Response): Promise<void> {
     res.json({
       tags,
       tagsTotalNumber,
-      pagesTotalNumber: Math.ceil(tagsTotalNumber / tags.length ?? 1),
+      pagesTotalNumber: calculatePagesTotalNumber(tagsTotalNumber, tags.length),
     });
   } catch (error) {
     console.log(error);

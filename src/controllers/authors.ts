@@ -1,7 +1,10 @@
 import { type Request, type Response } from "express";
 
 import prisma from "prisma";
-import { createPaginationParameters } from "shared/utils/pagination";
+import {
+  createPaginationParameters,
+  calculatePagesTotalNumber,
+} from "shared/utils/pagination";
 
 async function createAuthor(req: Request, res: Response): Promise<void> {
   try {
@@ -39,7 +42,10 @@ async function getAuthors(req: Request, res: Response): Promise<void> {
     res.json({
       authors,
       authorsTotalNumber,
-      pagesTotalNumber: Math.ceil(authorsTotalNumber / authors.length ?? 1),
+      pagesTotalNumber: calculatePagesTotalNumber(
+        authorsTotalNumber,
+        authors.length
+      ),
     });
   } catch (error) {
     console.log(error);
