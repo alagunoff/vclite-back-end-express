@@ -85,5 +85,6 @@ model Post {
   extraImages PostExtraImage[]
 
   @@unique([id, isDraft])
+  @@unique([id, isDraft, authorId])
   @@map("posts")
 }

@@ -6,14 +6,13 @@ import {
   updateDraft,
   deleteDraft,
 } from "controllers/drafts";
-import { authenticateUser } from "middlewares/auth";
-import { isAdmin, isAuthor } from "middlewares/roles";
+import { authenticateUser, authenticateAuthor } from "middlewares/auth";
 
 const router = express.Router();
 
-router.post("", [authenticateUser(), isAuthor], createDraft);
-router.get("", [authenticateUser(), isAuthor], getDrafts);
-router.patch("/:id", [authenticateUser(404), isAdmin], updateDraft);
-router.delete("/:id", [authenticateUser(404), isAdmin], deleteDraft);
+router.post("", [authenticateUser(), authenticateAuthor], createDraft);
+router.get("", [authenticateUser(), authenticateAuthor], getDrafts);
+router.patch("/:id", [authenticateUser(404), authenticateAuthor], updateDraft);
+router.delete("/:id", [authenticateUser(404), authenticateAuthor], deleteDraft);
 
 export default router;

@@ -25,8 +25,16 @@ async function createDraft(req: Request, res: Response): Promise<void> {
           ),
         title: req.body.title,
         content: req.body.content,
-        authorId: req.body.authorId,
-        categoryId: req.body.categoryId,
+        author: {
+          connect: {
+            id: req.authenticatedAuthor?.id,
+          },
+        },
+        category: {
+          connect: {
+            id: req.body.categoryId,
+          },
+        },
         tags: req.body.tagsIds && {
           connect: req.body.tagsIds.map((tagId: number) => ({
             id: tagId,
@@ -69,9 +77,7 @@ async function getDrafts(req: Request, res: Response): Promise<void> {
       where: {
         isDraft: true,
         author: {
-          user: {
-            id: req.authenticatedUser?.id,
-          },
+          id: req.authenticatedAuthor?.id,
         },
       },
       skip,
@@ -122,9 +128,7 @@ async function getDrafts(req: Request, res: Response): Promise<void> {
       where: {
         isDraft: true,
         author: {
-          user: {
-            id: req.authenticatedUser?.id,
-          },
+          id: req.authenticatedAuthor?.id,
         },
       },
     });
@@ -148,9 +152,10 @@ async function updateDraft(req: Request, res: Response): Promise<void> {
   try {
     await prisma.post.update({
       where: {
-        id_isDraft: {
+        id_isDraft_authorId: {
           id: Number(req.params.id),
           isDraft: true,
+          authorId: Number(req.authenticatedAuthor?.id),
         },
       },
       data: {
@@ -201,14 +206,16 @@ async function deleteDraft(req: Request, res: Response): Promise<void> {
   try {
     const deletedDraft = await prisma.post.delete({
       where: {
-        id_isDraft: {
+        id_isDraft_authorId: {
           id: Number(req.params.id),
           isDraft: true,
+          authorId: Number(req.authenticatedAuthor?.id),
         },
       },
     });
 
     res.status(204).end();
+
     deleteImageFolderFromStaticFiles(deletedDraft.imageUrl);
   } catch (error) {
     console.log(error);

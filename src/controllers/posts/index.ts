@@ -29,7 +29,7 @@ async function createPost(req: Request, res: Response): Promise<void> {
         content: req.body.content,
         author: {
           connect: {
-            userId: req.authenticatedUser?.id,
+            id: req.authenticatedAuthor?.id,
           },
         },
         category: {

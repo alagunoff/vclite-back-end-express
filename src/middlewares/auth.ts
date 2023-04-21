@@ -17,6 +17,7 @@ function authenticateUser(responseStatus = 401) {
 
         if (authenticatedUser) {
           req.authenticatedUser = authenticatedUser;
+
           next();
         } else {
           res.status(responseStatus).end();
@@ -27,9 +28,33 @@ function authenticateUser(responseStatus = 401) {
         res.status(responseStatus).end();
       }
     } else {
-      res.status(responseStatus).end();
+      res
+        .status(responseStatus)
+        .send(
+          'You must provide "Authorization" header in the form "Bearer *jwt token*"'
+        );
     }
   };
 }
 
-export { authenticateUser };
+async function authenticateAuthor(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const authenticatedAuthor = await prisma.author.findUnique({
+    where: {
+      userId: req.authenticatedUser?.id,
+    },
+  });
+
+  if (authenticatedAuthor) {
+    req.authenticatedAuthor = authenticatedAuthor;
+
+    next();
+  } else {
+    res.status(403).send("Only authors have access");
+  }
+}
+
+export { authenticateUser, authenticateAuthor };
