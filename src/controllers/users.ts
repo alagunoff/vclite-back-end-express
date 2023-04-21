@@ -55,6 +55,7 @@ async function deleteUser(req: Request, res: Response): Promise<void> {
     });
 
     res.status(204).end();
+
     deleteImageFromStaticFiles(deletedUser.image);
   } catch (error) {
     console.log(error);
