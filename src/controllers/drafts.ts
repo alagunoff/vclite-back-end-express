@@ -12,9 +12,7 @@ import {
 import { transformStringToLowercasedKebabString } from "shared/utils/strings";
 import { includeSubcategories } from "shared/utils/categories";
 
-import { createFilterParameters, createOrderParameters } from "./utils";
-
-async function createPost(req: Request, res: Response): Promise<void> {
+async function createDraft(req: Request, res: Response): Promise<void> {
   try {
     await prisma.post.create({
       data: {
@@ -49,6 +47,7 @@ async function createPost(req: Request, res: Response): Promise<void> {
             ),
           },
         },
+        isDraft: true,
       },
     });
 
@@ -60,17 +59,23 @@ async function createPost(req: Request, res: Response): Promise<void> {
   }
 }
 
-async function getPosts(req: Request, res: Response): Promise<void> {
+async function getDrafts(req: Request, res: Response): Promise<void> {
   try {
     const { skip, take } = createPaginationParameters(
       req.query.pageNumber,
       req.query.itemsNumber
     );
-    const posts = await prisma.post.findMany({
-      where: createFilterParameters(req),
+    const drafts = await prisma.post.findMany({
+      where: {
+        isDraft: true,
+        author: {
+          user: {
+            id: Number(req.authenticatedUser?.id),
+          },
+        },
+      },
       skip,
       take,
-      orderBy: createOrderParameters(req),
       select: {
         id: true,
         imageUrl: true,
@@ -109,22 +114,27 @@ async function getPosts(req: Request, res: Response): Promise<void> {
         createdAt: true,
       },
     });
-    for (const post of posts) {
-      await includeSubcategories(post.category);
+    for (const draft of drafts) {
+      await includeSubcategories(draft.category);
     }
 
-    const postsTotalNumber = await prisma.post.count({
+    const draftsTotalNumber = await prisma.post.count({
       where: {
-        isDraft: false,
+        isDraft: true,
+        author: {
+          user: {
+            id: Number(req.authenticatedUser?.id),
+          },
+        },
       },
     });
 
     res.json({
-      posts,
-      postsTotalNumber,
+      drafts,
+      draftsTotalNumber,
       pagesTotalNumber: calculatePagesTotalNumber(
-        postsTotalNumber,
-        posts.length
+        draftsTotalNumber,
+        drafts.length
       ),
     });
   } catch (error) {
@@ -134,13 +144,13 @@ async function getPosts(req: Request, res: Response): Promise<void> {
   }
 }
 
-async function updatePost(req: Request, res: Response): Promise<void> {
+async function updateDraft(req: Request, res: Response): Promise<void> {
   try {
     await prisma.post.update({
       where: {
         id_isDraft: {
           id: Number(req.params.id),
-          isDraft: false,
+          isDraft: true,
         },
       },
       data: {
@@ -175,6 +185,7 @@ async function updatePost(req: Request, res: Response): Promise<void> {
             ),
           },
         },
+        isDraft: req.body.isDraft,
       },
     });
 
@@ -186,19 +197,19 @@ async function updatePost(req: Request, res: Response): Promise<void> {
   }
 }
 
-async function deletePost(req: Request, res: Response): Promise<void> {
+async function deleteDraft(req: Request, res: Response): Promise<void> {
   try {
-    const deletedPost = await prisma.post.delete({
+    const deletedDraft = await prisma.post.delete({
       where: {
         id_isDraft: {
           id: Number(req.params.id),
-          isDraft: false,
+          isDraft: true,
         },
       },
     });
 
     res.status(204).end();
-    deleteImageFolderFromStaticFiles(deletedPost.imageUrl);
+    deleteImageFolderFromStaticFiles(deletedDraft.imageUrl);
   } catch (error) {
     console.log(error);
 
@@ -206,4 +217,4 @@ async function deletePost(req: Request, res: Response): Promise<void> {
   }
 }
 
-export { createPost, getPosts, updatePost, deletePost };
+export { createDraft, getDrafts, updateDraft, deleteDraft };

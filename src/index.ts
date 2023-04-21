@@ -8,8 +8,8 @@ import {
   tagsRouter,
   categoriesRouter,
   postsRouter,
+  draftsRouter,
 } from "routers";
-// const draftsRouter = require('./src/routers/drafts')
 
 dotenv.config();
 
@@ -23,4 +23,4 @@ app.use("/authors", authorsRouter);
 app.use("/tags", tagsRouter);
 app.use("/categories", categoriesRouter);
 app.use("/posts", postsRouter);
-// app.use('/drafts', draftsRouter)
+app.use("/drafts", draftsRouter);
