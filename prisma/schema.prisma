@@ -34,7 +34,7 @@ model Author {
 
 model Tag {
   id    Int    @id @default(autoincrement())
-  tag   String @unique
+  name  String @unique
   posts Post[]
 
   @@map("tags")
@@ -42,8 +42,8 @@ model Tag {
 
 model Category {
   id               Int        @id @default(autoincrement())
-  category         String     @unique
-  parentCategoryId Int?
+  name             String     @unique
+  parentCategoryId Int?       @map("parent_category_id")
   parentCategory   Category?  @relation("ParentCategoriesSubcategories", fields: [parentCategoryId], references: [id], onDelete: Cascade)
   subcategories    Category[] @relation("ParentCategoriesSubcategories")
   posts            Post[]
@@ -53,7 +53,7 @@ model Category {
 
 model Comment {
   id      Int    @id @default(autoincrement())
-  comment String
+  content String
   postId  Int    @map("post_id")
   posts   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 
@@ -62,7 +62,7 @@ model Comment {
 
 model PostExtraImage {
   id     Int    @id @default(autoincrement())
-  image  String
+  url    String
   postId Int    @map("post_id")
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 
@@ -71,7 +71,7 @@ model PostExtraImage {
 
 model Post {
   id          Int              @id @default(autoincrement())
-  image       String
+  imageUrl    String           @map("image_url")
   title       String           @unique
   content     String
   authorId    Int              @map("author_id")

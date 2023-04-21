@@ -2,7 +2,7 @@ import prisma from "prisma";
 
 interface CategoryWithSubcategories {
   id: number;
-  category: string;
+  name: string;
   subcategories?: CategoryWithSubcategories[];
 }
 
@@ -15,7 +15,7 @@ async function includeSubcategories(
     },
     select: {
       id: true,
-      category: true,
+      name: true,
     },
   });
 

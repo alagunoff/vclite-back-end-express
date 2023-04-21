@@ -10,7 +10,7 @@ async function createTag(req: Request, res: Response): Promise<void> {
   try {
     await prisma.tag.create({
       data: {
-        tag: req.body.tag,
+        name: req.body.name,
       },
     });
 
@@ -53,7 +53,7 @@ async function updateTag(req: Request, res: Response): Promise<void> {
         id: Number(req.params.id),
       },
       data: {
-        tag: req.body.tag,
+        name: req.body.name,
       },
     });
 

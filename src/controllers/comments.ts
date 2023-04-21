@@ -10,7 +10,7 @@ async function createComment(req: Request, res: Response): Promise<void> {
   try {
     await prisma.comment.create({
       data: {
-        comment: req.body.comment,
+        content: req.body.content,
         postId: Number(req.params.postId),
       },
     });
@@ -37,7 +37,7 @@ async function getComments(req: Request, res: Response): Promise<void> {
       take,
       select: {
         id: true,
-        comment: true,
+        content: true,
       },
     });
     const commentsTotalNumber = await prisma.comment.count();

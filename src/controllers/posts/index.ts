@@ -18,7 +18,7 @@ async function createPost(req: Request, res: Response): Promise<void> {
   try {
     await prisma.post.create({
       data: {
-        image: saveImageToStaticFiles(
+        imageUrl: saveImageToStaticFiles(
           req.body.image,
           `posts/${transformStringToLowercasedKebabString(req.body.title)}`,
           "main"
@@ -36,7 +36,7 @@ async function createPost(req: Request, res: Response): Promise<void> {
           createMany: {
             data: req.body.extraImages.map(
               (extraImage: string, index: number) => ({
-                image: saveImageToStaticFiles(
+                url: saveImageToStaticFiles(
                   extraImage,
                   `posts/${transformStringToLowercasedKebabString(
                     req.body.title
@@ -71,7 +71,7 @@ async function getPosts(req: Request, res: Response): Promise<void> {
       orderBy: createOrderParameters(req),
       select: {
         id: true,
-        image: true,
+        imageUrl: true,
         title: true,
         content: true,
         author: {
@@ -83,25 +83,25 @@ async function getPosts(req: Request, res: Response): Promise<void> {
         category: {
           select: {
             id: true,
-            category: true,
+            name: true,
           },
         },
         tags: {
           select: {
             id: true,
-            tag: true,
+            name: true,
           },
         },
         comments: {
           select: {
             id: true,
-            comment: true,
+            content: true,
           },
         },
         extraImages: {
           select: {
             id: true,
-            image: true,
+            url: true,
           },
         },
         createdAt: true,
@@ -177,7 +177,7 @@ async function deletePost(req: Request, res: Response): Promise<void> {
     });
 
     res.status(204).end();
-    deleteImageFolderFromStaticFiles(deletedPost.image);
+    deleteImageFolderFromStaticFiles(deletedPost.imageUrl);
   } catch (error) {
     console.log(error);
 

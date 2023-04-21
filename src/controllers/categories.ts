@@ -11,8 +11,12 @@ async function createCategory(req: Request, res: Response): Promise<void> {
   try {
     await prisma.category.create({
       data: {
-        category: req.body.category,
-        parentCategoryId: Number(req.body.parentCategoryId) || undefined,
+        name: req.body.name,
+        parentCategory: {
+          connect: req.body.parentCategoryId && {
+            id: Number(req.body.parentCategoryId),
+          },
+        },
       },
     });
 
@@ -36,7 +40,7 @@ async function getCategories(req: Request, res: Response): Promise<void> {
       },
       select: {
         id: true,
-        category: true,
+        name: true,
       },
       skip,
       take,
@@ -73,7 +77,7 @@ async function updateCategory(req: Request, res: Response): Promise<void> {
         id: Number(req.params.id),
       },
       data: {
-        category: req.body.category,
+        name: req.body.name,
         parentCategoryId: Number(req.body.parentCategoryId) || undefined,
       },
     });
