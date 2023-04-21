@@ -18,21 +18,23 @@ async function createPost(req: Request, res: Response): Promise<void> {
   try {
     await prisma.post.create({
       data: {
-        imageUrl: saveImageToStaticFiles(
-          req.body.image,
-          `posts/${transformStringToLowercasedKebabString(req.body.title)}`,
-          "main"
-        ),
+        imageUrl:
+          req.body.image &&
+          saveImageToStaticFiles(
+            req.body.image,
+            `posts/${transformStringToLowercasedKebabString(req.body.title)}`,
+            "main"
+          ),
         title: req.body.title,
         content: req.body.content,
         authorId: req.body.authorId,
         categoryId: req.body.categoryId,
-        tags: {
+        tags: req.body.tagsIds && {
           connect: req.body.tagsIds.map((tagId: number) => ({
             id: tagId,
           })),
         },
-        extraImages: {
+        extraImages: req.body.extraImages && {
           createMany: {
             data: req.body.extraImages.map(
               (extraImage: string, index: number) => ({
@@ -133,36 +135,52 @@ async function getPosts(req: Request, res: Response): Promise<void> {
 }
 
 async function updatePost(req: Request, res: Response): Promise<void> {
-  // try {
-  //   const postToUpdate = await Post.findByPk(req.params.id);
-  //   if (postToUpdate) {
-  //     try {
-  //       await postToUpdate.update({
-  //         title: req.body.title,
-  //         content: req.body.content,
-  //         authorId: req.body.authorId,
-  //         categoryId: req.body.categoryId,
-  //         image: req.body.image,
-  //       });
-  //       if (req.body.tagsIds) {
-  //         await postToUpdate.setTags(req.body.tagsIds);
-  //       }
-  //       res.status(204).end();
-  //     } catch (error) {
-  //       console.log(error);
-  //       if (error instanceof sequelize.ValidationError) {
-  //         res.status(400).json(createErrorsObject(error));
-  //       } else {
-  //         res.status(500).end();
-  //       }
-  //     }
-  //   } else {
-  //     res.status(404).end();
-  //   }
-  // } catch (error) {
-  //   console.log(error);
-  //   res.status(500).end();
-  // }
+  try {
+    await prisma.post.update({
+      where: {
+        id: Number(req.params.id),
+      },
+      data: {
+        imageUrl:
+          req.body.image &&
+          saveImageToStaticFiles(
+            req.body.image,
+            `posts/${transformStringToLowercasedKebabString(req.body.title)}`,
+            "main"
+          ),
+        title: req.body.title,
+        content: req.body.content,
+        authorId: req.body.authorId,
+        categoryId: req.body.categoryId,
+        tags: req.body.tagsIds && {
+          connect: req.body.tagsIds.map((tagId: number) => ({
+            id: tagId,
+          })),
+        },
+        extraImages: req.body.extraImages && {
+          createMany: {
+            data: req.body.extraImages.map(
+              (extraImage: string, index: number) => ({
+                url: saveImageToStaticFiles(
+                  extraImage,
+                  `posts/${transformStringToLowercasedKebabString(
+                    req.body.title
+                  )}`,
+                  `extra-${index}`
+                ),
+              })
+            ),
+          },
+        },
+      },
+    });
+
+    res.status(204).end();
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).end();
+  }
 }
 
 async function deletePost(req: Request, res: Response): Promise<void> {
