@@ -32,12 +32,4 @@ function authenticateUser(responseStatus = 401) {
   };
 }
 
-function isAdmin(req: Request, res: Response, next: NextFunction): void {
-  if (req.authenticatedUser?.isAdmin) {
-    next();
-  } else {
-    res.status(404).end();
-  }
-}
-
-export { authenticateUser, isAdmin };
+export { authenticateUser };

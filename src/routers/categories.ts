@@ -6,7 +6,8 @@ import {
   updateCategory,
   deleteCategory,
 } from "controllers/categories";
-import { authenticateUser, isAdmin } from "middlewares/auth";
+import { authenticateUser } from "middlewares/auth";
+import { isAdmin } from "middlewares/roles";
 
 const router = express.Router();
 

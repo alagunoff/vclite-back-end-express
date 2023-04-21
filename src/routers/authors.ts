@@ -6,7 +6,8 @@ import {
   updateAuthor,
   deleteAuthor,
 } from "controllers/authors";
-import { authenticateUser, isAdmin } from "middlewares/auth";
+import { authenticateUser } from "middlewares/auth";
+import { isAdmin } from "middlewares/roles";
 
 const router = express.Router();
 
