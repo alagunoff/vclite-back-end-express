@@ -6,26 +6,20 @@ import {
   calculatePagesTotalNumber,
 } from "shared/utils/pagination";
 
-import { validateRequestBody } from "./utils";
+import { validateCreationData } from "./utils";
 
 async function createAuthor(req: Request, res: Response): Promise<void> {
-  const { isValid, errors } = validateRequestBody(req.body);
+  const { isValid, errors } = await validateCreationData(req.body);
 
   if (isValid) {
-    try {
-      await prisma.author.create({
-        data: {
-          description: req.body.description,
-          userId: Number(req.body.userId),
-        },
-      });
+    await prisma.author.create({
+      data: {
+        description: req.body.description,
+        userId: req.body.userId,
+      },
+    });
 
-      res.status(201).end();
-    } catch (error) {
-      console.log(error);
-
-      res.status(500).end();
-    }
+    res.status(201).end();
   } else {
     res.status(400).json(errors);
   }
@@ -77,7 +71,7 @@ async function updateAuthor(req: Request, res: Response): Promise<void> {
   } catch (error) {
     console.log(error);
 
-    res.status(500).end();
+    res.status(404).send("Author with this id wasn't found");
   }
 }
 
@@ -93,7 +87,7 @@ async function deleteAuthor(req: Request, res: Response): Promise<void> {
   } catch (error) {
     console.log(error);
 
-    res.status(500).end();
+    res.status(404).send("Author with this id wasn't found");
   }
 }
 

@@ -1,7 +1,11 @@
-import { type ValidationResult } from "shared/types/validation";
-import { isNotEmptyString } from "shared/utils/validators";
+import {
+  isNotEmptyString,
+  createValidationResult,
+} from "shared/utils/validation";
 
-function validateRequestBody(data: any): ValidationResult {
+function validateRequestBody(
+  data: any
+): ReturnType<typeof createValidationResult> {
   const errors: Record<string, string> = {};
 
   if ("username" in data) {
@@ -20,9 +24,7 @@ function validateRequestBody(data: any): ValidationResult {
     errors.password = "required";
   }
 
-  return Object.keys(errors).length
-    ? { isValid: false, errors }
-    : { isValid: true, errors: null };
+  return createValidationResult(errors);
 }
 
 export { validateRequestBody };

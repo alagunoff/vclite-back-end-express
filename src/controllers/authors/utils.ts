@@ -1,7 +1,13 @@
-import { type ValidationResult } from "shared/types/validation";
-import { isNotEmptyString, isPositiveInteger } from "shared/utils/validators";
+import prisma from "prisma";
+import {
+  isNotEmptyString,
+  isPositiveInteger,
+  createValidationResult,
+} from "shared/utils/validation";
 
-function validateRequestBody(data: any): ValidationResult {
+async function validateCreationData(
+  data: any
+): Promise<ReturnType<typeof createValidationResult>> {
   const errors: Record<string, string> = {};
 
   if ("description" in data && !isNotEmptyString(data.description)) {
@@ -9,16 +15,24 @@ function validateRequestBody(data: any): ValidationResult {
   }
 
   if ("userId" in data) {
-    if (!isPositiveInteger(data.userId)) {
-      errors.image = "must be positive integer";
+    if (isPositiveInteger(data.userId)) {
+      if (
+        !(await prisma.user.findUnique({
+          where: {
+            id: data.userId,
+          },
+        }))
+      ) {
+        errors.userId = "user with this id wasn't found";
+      }
+    } else {
+      errors.userId = "must be positive integer";
     }
   } else {
     errors.userId = "required";
   }
 
-  return Object.keys(errors).length
-    ? { isValid: false, errors }
-    : { isValid: true, errors: null };
+  return createValidationResult(errors);
 }
 
-export { validateRequestBody };
+export { validateCreationData };
