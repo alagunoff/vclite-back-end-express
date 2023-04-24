@@ -8,8 +8,12 @@ import {
   deleteImageFromStaticFiles,
 } from "shared/utils/images";
 
+import { validateRequestBody } from "./utils";
+
 async function createUser(req: Request, res: Response): Promise<void> {
-  try {
+  const { isValid, errors } = validateRequestBody(req.body);
+
+  if (isValid) {
     const createdUser = await prisma.user.create({
       data: {
         image: saveImageToStaticFiles(
@@ -27,10 +31,8 @@ async function createUser(req: Request, res: Response): Promise<void> {
     res
       .status(201)
       .send(jwt.sign(String(createdUser.id), process.env.JWT_SECRET_KEY));
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).end();
+  } else {
+    res.status(400).json(errors);
   }
 }
 
@@ -53,10 +55,9 @@ async function deleteUser(req: Request, res: Response): Promise<void> {
         id: Number(req.params.id),
       },
     });
+    deleteImageFromStaticFiles(deletedUser.image);
 
     res.status(204).end();
-
-    deleteImageFromStaticFiles(deletedUser.image);
   } catch (error) {
     console.log(error);
 

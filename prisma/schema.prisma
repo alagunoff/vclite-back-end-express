@@ -72,7 +72,7 @@ model PostExtraImage {
 model Post {
   id          Int              @id @default(autoincrement())
   imageUrl    String           @map("image_url")
-  title       String           @unique
+  title       String
   content     String
   authorId    Int              @map("author_id")
   categoryId  Int              @map("category_id")
