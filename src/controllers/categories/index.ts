@@ -8,24 +8,25 @@ import {
 } from "shared/utils/pagination";
 import { validatePaginationQueryParameters } from "shared/utils/validation";
 
+import { validateCreationData, validateUpdateData } from "./utils";
+
 async function createCategory(req: Request, res: Response): Promise<void> {
-  try {
+  const errors = await validateCreationData(req.body);
+
+  if (errors) {
+    res.status(400).json(errors);
+  } else {
     await prisma.category.create({
       data: {
         name: req.body.name,
-        parentCategory: {
-          connect: req.body.parentCategoryId && {
-            id: Number(req.body.parentCategoryId),
-          },
-        },
+        parentCategoryId:
+          "parentCategoryId" in req.body
+            ? req.body.parentCategoryId
+            : undefined,
       },
     });
 
     res.status(201).end();
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).end();
   }
 }
 
@@ -67,22 +68,31 @@ async function getCategories(req: Request, res: Response): Promise<void> {
 }
 
 async function updateCategory(req: Request, res: Response): Promise<void> {
-  try {
-    await prisma.category.update({
-      where: {
-        id: Number(req.params.id),
-      },
-      data: {
-        name: req.body.name,
-        parentCategoryId: Number(req.body.parentCategoryId) || undefined,
-      },
-    });
+  const errors = await validateUpdateData(req.body);
 
-    res.status(204).end();
-  } catch (error) {
-    console.log(error);
+  if (errors) {
+    res.status(400).json(errors);
+  } else {
+    try {
+      await prisma.category.update({
+        where: {
+          id: Number(req.params.id),
+        },
+        data: {
+          name: req.body.name,
+          parentCategoryId:
+            "parentCategoryId" in req.body
+              ? req.body.parentCategoryId
+              : undefined,
+        },
+      });
 
-    res.status(500).end();
+      res.status(204).end();
+    } catch (error) {
+      console.log(error);
+
+      res.status(404).send("Category with this id wasn't found");
+    }
   }
 }
 
@@ -98,7 +108,7 @@ async function deleteCategory(req: Request, res: Response): Promise<void> {
   } catch (error) {
     console.log(error);
 
-    res.status(500).end();
+    res.status(404).send("Category with this id wasn't found");
   }
 }
 

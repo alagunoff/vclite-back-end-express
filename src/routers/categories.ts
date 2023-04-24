@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.post("", authenticateUser(true), createCategory);
 router.get("", getCategories);
-router.patch("/:id", authenticateUser(true), updateCategory);
-router.delete("/:id", authenticateUser(true), deleteCategory);
+router.patch("/:id(\\d+)", authenticateUser(true), updateCategory);
+router.delete("/:id(\\d+)", authenticateUser(true), deleteCategory);
 
 export default router;
