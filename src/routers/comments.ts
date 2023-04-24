@@ -6,12 +6,11 @@ import {
   deleteComments,
 } from "controllers/comments";
 import { authenticateUser } from "middlewares/auth";
-import { isAdmin } from "middlewares/roles";
 
 const router = express.Router({ mergeParams: true });
 
 router.post("", authenticateUser(), createComment);
 router.get("", getComments);
-router.delete("", [authenticateUser(404), isAdmin], deleteComments);
+router.delete("", authenticateUser(true), deleteComments);
 
 export default router;

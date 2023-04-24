@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.post("", [authenticateUser(), authenticateAuthor], createDraft);
 router.get("", [authenticateUser(), authenticateAuthor], getDrafts);
-router.patch("/:id", [authenticateUser(404), authenticateAuthor], updateDraft);
-router.delete("/:id", [authenticateUser(404), authenticateAuthor], deleteDraft);
+router.patch("/:id", [authenticateUser(), authenticateAuthor], updateDraft);
+router.delete("/:id", [authenticateUser(), authenticateAuthor], deleteDraft);
 
 export default router;

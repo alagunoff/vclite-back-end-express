@@ -7,13 +7,12 @@ import {
   deleteCategory,
 } from "controllers/categories";
 import { authenticateUser } from "middlewares/auth";
-import { isAdmin } from "middlewares/roles";
 
 const router = express.Router();
 
-router.post("", [authenticateUser(404), isAdmin], createCategory);
+router.post("", authenticateUser(true), createCategory);
 router.get("", getCategories);
-router.patch("/:id", [authenticateUser(404), isAdmin], updateCategory);
-router.delete("/:id", [authenticateUser(404), isAdmin], deleteCategory);
+router.patch("/:id", authenticateUser(true), updateCategory);
+router.delete("/:id", authenticateUser(true), deleteCategory);
 
 export default router;

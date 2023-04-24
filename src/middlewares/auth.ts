@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 
 import prisma from "prisma";
 
-function authenticateUser(responseStatus = 401) {
+function authenticateUser(onlyAdmin?: true) {
   return async function (req: Request, res: Response, next: NextFunction) {
     if (req.headers.authorization?.startsWith("Bearer ")) {
       const token = req.headers.authorization.slice(7);
@@ -16,23 +16,37 @@ function authenticateUser(responseStatus = 401) {
         });
 
         if (authenticatedUser) {
-          req.authenticatedUser = authenticatedUser;
+          if (onlyAdmin) {
+            if (authenticatedUser.isAdmin) {
+              req.authenticatedUser = authenticatedUser;
 
-          next();
+              next();
+            } else {
+              res.status(404).end();
+            }
+          } else {
+            req.authenticatedUser = authenticatedUser;
+
+            next();
+          }
         } else {
-          res.status(responseStatus).end();
+          res.status(onlyAdmin ? 404 : 401).end();
         }
       } catch (error) {
         console.log(error);
 
-        res.status(responseStatus).end();
+        res.status(onlyAdmin ? 404 : 401).end();
       }
     } else {
-      res
-        .status(responseStatus)
-        .send(
-          'You must provide "Authorization" header in the form "Bearer *jwt token*"'
-        );
+      if (onlyAdmin) {
+        res.status(404).end();
+      } else {
+        res
+          .status(401)
+          .send(
+            'You must provide "Authorization" header in the form "Bearer *token*"'
+          );
+      }
     }
   };
 }
