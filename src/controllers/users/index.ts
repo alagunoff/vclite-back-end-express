@@ -14,23 +14,29 @@ async function createUser(req: Request, res: Response): Promise<void> {
   const { isValid, errors } = validateRequestBody(req.body);
 
   if (isValid) {
-    const createdUser = await prisma.user.create({
-      data: {
-        image: saveImageToStaticFiles(
-          req.body.image,
-          "users",
-          req.body.username
-        ),
-        username: req.body.username,
-        password: bcrypt.hashSync(req.body.password),
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-      },
-    });
+    try {
+      const createdUser = await prisma.user.create({
+        data: {
+          image: saveImageToStaticFiles(
+            req.body.image,
+            "users",
+            req.body.username
+          ),
+          username: req.body.username,
+          password: bcrypt.hashSync(req.body.password),
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+        },
+      });
 
-    res
-      .status(201)
-      .send(jwt.sign(String(createdUser.id), process.env.JWT_SECRET_KEY));
+      res
+        .status(201)
+        .send(jwt.sign(String(createdUser.id), process.env.JWT_SECRET_KEY));
+    } catch (error) {
+      console.log(error);
+
+      res.status(500).end();
+    }
   } else {
     res.status(400).json(errors);
   }

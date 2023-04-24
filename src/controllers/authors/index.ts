@@ -6,20 +6,28 @@ import {
   calculatePagesTotalNumber,
 } from "shared/utils/pagination";
 
+import { validateRequestBody } from "./utils";
+
 async function createAuthor(req: Request, res: Response): Promise<void> {
-  try {
-    await prisma.author.create({
-      data: {
-        description: req.body.description,
-        userId: Number(req.body.userId),
-      },
-    });
+  const { isValid, errors } = validateRequestBody(req.body);
 
-    res.status(201).end();
-  } catch (error) {
-    console.log(error);
+  if (isValid) {
+    try {
+      await prisma.author.create({
+        data: {
+          description: req.body.description,
+          userId: Number(req.body.userId),
+        },
+      });
 
-    res.status(500).end();
+      res.status(201).end();
+    } catch (error) {
+      console.log(error);
+
+      res.status(500).end();
+    }
+  } else {
+    res.status(400).json(errors);
   }
 }
 
