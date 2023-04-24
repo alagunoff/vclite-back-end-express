@@ -6,6 +6,7 @@ import {
   createPaginationParameters,
   calculatePagesTotalNumber,
 } from "shared/utils/pagination";
+import { validatePaginationQueryParameters } from "shared/utils/validation";
 
 async function createCategory(req: Request, res: Response): Promise<void> {
   try {
@@ -29,21 +30,20 @@ async function createCategory(req: Request, res: Response): Promise<void> {
 }
 
 async function getCategories(req: Request, res: Response): Promise<void> {
-  try {
-    const { skip, take } = createPaginationParameters(
-      req.query.pageNumber,
-      req.query.itemsNumber
-    );
+  const errors = validatePaginationQueryParameters(req.query);
+
+  if (errors) {
+    res.status(400).json(errors);
+  } else {
     const categories = await prisma.category.findMany({
       where: {
         parentCategoryId: null,
       },
+      ...createPaginationParameters(req.query),
       select: {
         id: true,
         name: true,
       },
-      skip,
-      take,
     });
     for (const category of categories) {
       await includeSubcategories(category);
@@ -63,10 +63,6 @@ async function getCategories(req: Request, res: Response): Promise<void> {
         categories.length
       ),
     });
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).end();
   }
 }
 

@@ -11,6 +11,7 @@ import {
 } from "shared/utils/pagination";
 import { transformStringToLowercasedKebabString } from "shared/utils/strings";
 import { includeSubcategories } from "shared/utils/categories";
+import { validatePaginationQueryParameters } from "shared/utils/validation";
 
 import { createFilterParameters, createOrderParameters } from "./utils";
 
@@ -69,15 +70,14 @@ async function createPost(req: Request, res: Response): Promise<void> {
 }
 
 async function getPosts(req: Request, res: Response): Promise<void> {
-  try {
-    const { skip, take } = createPaginationParameters(
-      req.query.pageNumber,
-      req.query.itemsNumber
-    );
+  const errors = validatePaginationQueryParameters(req.query);
+
+  if (errors) {
+    res.status(400).json(errors);
+  } else {
     const posts = await prisma.post.findMany({
       where: createFilterParameters(req),
-      skip,
-      take,
+      ...createPaginationParameters(req.query),
       orderBy: createOrderParameters(req),
       select: {
         id: true,
@@ -135,10 +135,6 @@ async function getPosts(req: Request, res: Response): Promise<void> {
         posts.length
       ),
     });
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).end();
   }
 }
 

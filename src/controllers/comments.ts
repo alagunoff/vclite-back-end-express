@@ -5,6 +5,7 @@ import {
   createPaginationParameters,
   calculatePagesTotalNumber,
 } from "shared/utils/pagination";
+import { validatePaginationQueryParameters } from "shared/utils/validation";
 
 async function createComment(req: Request, res: Response): Promise<void> {
   try {
@@ -24,17 +25,16 @@ async function createComment(req: Request, res: Response): Promise<void> {
 }
 
 async function getComments(req: Request, res: Response): Promise<void> {
-  try {
-    const { skip, take } = createPaginationParameters(
-      req.query.pageNumber,
-      req.query.itemsNumber
-    );
+  const errors = validatePaginationQueryParameters(req.query);
+
+  if (errors) {
+    res.status(400).json(errors);
+  } else {
     const comments = await prisma.comment.findMany({
       where: {
         postId: Number(req.params.postId),
       },
-      skip,
-      take,
+      ...createPaginationParameters(req.query),
       select: {
         id: true,
         content: true,
@@ -50,10 +50,6 @@ async function getComments(req: Request, res: Response): Promise<void> {
         comments.length
       ),
     });
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).end();
   }
 }
 

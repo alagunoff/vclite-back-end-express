@@ -7,9 +7,11 @@ import prisma from "prisma";
 import { validateRequestBody } from "./utils";
 
 async function login(req: Request, res: Response): Promise<void> {
-  const { isValid, errors } = validateRequestBody(req.body);
+  const errors = validateRequestBody(req.body);
 
-  if (isValid) {
+  if (errors) {
+    res.status(400).json(errors);
+  } else {
     const user = await prisma.user.findUnique({
       where: {
         username: req.body.username,
@@ -35,8 +37,6 @@ async function login(req: Request, res: Response): Promise<void> {
     } else {
       res.status(404).send("User with this username wasn't found");
     }
-  } else {
-    res.status(400).json(errors);
   }
 }
 

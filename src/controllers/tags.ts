@@ -5,6 +5,7 @@ import {
   createPaginationParameters,
   calculatePagesTotalNumber,
 } from "shared/utils/pagination";
+import { validatePaginationQueryParameters } from "shared/utils/validation";
 
 async function createTag(req: Request, res: Response): Promise<void> {
   try {
@@ -23,14 +24,13 @@ async function createTag(req: Request, res: Response): Promise<void> {
 }
 
 async function getTags(req: Request, res: Response): Promise<void> {
-  try {
-    const { skip, take } = createPaginationParameters(
-      req.query.pageNumber,
-      req.query.itemsNumber
-    );
+  const errors = validatePaginationQueryParameters(req.query);
+
+  if (errors) {
+    res.status(400).json(errors);
+  } else {
     const tags = await prisma.tag.findMany({
-      skip,
-      take,
+      ...createPaginationParameters(req.query),
     });
     const tagsTotalNumber = await prisma.tag.count();
 
@@ -39,10 +39,6 @@ async function getTags(req: Request, res: Response): Promise<void> {
       tagsTotalNumber,
       pagesTotalNumber: calculatePagesTotalNumber(tagsTotalNumber, tags.length),
     });
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).end();
   }
 }
 

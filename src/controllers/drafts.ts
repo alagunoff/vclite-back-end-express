@@ -11,6 +11,7 @@ import {
 } from "shared/utils/pagination";
 import { transformStringToLowercasedKebabString } from "shared/utils/strings";
 import { includeSubcategories } from "shared/utils/categories";
+import { validatePaginationQueryParameters } from "shared/utils/validation";
 
 async function createDraft(req: Request, res: Response): Promise<void> {
   try {
@@ -68,11 +69,11 @@ async function createDraft(req: Request, res: Response): Promise<void> {
 }
 
 async function getDrafts(req: Request, res: Response): Promise<void> {
-  try {
-    const { skip, take } = createPaginationParameters(
-      req.query.pageNumber,
-      req.query.itemsNumber
-    );
+  const errors = validatePaginationQueryParameters(req.query);
+
+  if (errors) {
+    res.status(400).json(errors);
+  } else {
     const drafts = await prisma.post.findMany({
       where: {
         isDraft: true,
@@ -80,8 +81,7 @@ async function getDrafts(req: Request, res: Response): Promise<void> {
           id: req.authenticatedAuthor?.id,
         },
       },
-      skip,
-      take,
+      ...createPaginationParameters(req.query),
       select: {
         id: true,
         imageUrl: true,
@@ -141,10 +141,6 @@ async function getDrafts(req: Request, res: Response): Promise<void> {
         drafts.length
       ),
     });
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).end();
   }
 }
 

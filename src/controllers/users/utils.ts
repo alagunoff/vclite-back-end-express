@@ -1,12 +1,9 @@
 import {
   isNotEmptyString,
   isBase64ImageDataUrl,
-  createValidationResult,
 } from "shared/utils/validation";
 
-function validateCreationData(
-  data: any
-): ReturnType<typeof createValidationResult> {
+function validateCreationData(data: any): Record<string, string> | undefined {
   const errors: Record<string, string> = {};
 
   if ("image" in data) {
@@ -41,7 +38,7 @@ function validateCreationData(
     errors.lastName = "must be not empty string";
   }
 
-  return createValidationResult(errors);
+  return Object.keys(errors).length ? errors : undefined;
 }
 
 export { validateCreationData };

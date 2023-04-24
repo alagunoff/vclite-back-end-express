@@ -1,17 +1,20 @@
-function createPaginationParameters(
-  pageNumber: any,
-  itemsNumber: any
-): { skip: number | undefined; take: number | undefined } {
-  const pageNumberAsNumber = Number(pageNumber);
-  const itemsNumberAsNumber = Number(itemsNumber);
-
-  return {
-    skip:
-      pageNumberAsNumber && itemsNumberAsNumber
-        ? (pageNumberAsNumber - 1) * itemsNumberAsNumber
-        : undefined,
-    take: itemsNumberAsNumber || undefined,
-  };
+function createPaginationParameters(queryParams: {
+  pageNumber?: string;
+  itemsNumber?: string;
+  [k: string]: unknown;
+}):
+  | {
+      skip: number;
+      take: number;
+    }
+  | undefined {
+  if ("pageNumber" in queryParams && "itemsNumber" in queryParams) {
+    return {
+      skip:
+        (Number(queryParams.pageNumber) - 1) * Number(queryParams.itemsNumber),
+      take: Number(queryParams.itemsNumber),
+    };
+  }
 }
 
 function calculatePagesTotalNumber(

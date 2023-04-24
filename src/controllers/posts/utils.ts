@@ -1,24 +1,24 @@
 import { type Request } from "express";
 
 function createFilterParameters(req: Request): Record<string, unknown> {
-  const result: Record<string, unknown> = {
+  const filterParams: Record<string, unknown> = {
     isDraft: false,
   };
 
   if (typeof req.query.titleContains === "string") {
-    result.title = {
+    filterParams.title = {
       contains: req.query.titleContains,
     };
   }
 
   if (typeof req.query.contentContains === "string") {
-    result.content = {
+    filterParams.content = {
       contains: req.query.contentContains,
     };
   }
 
   if (typeof req.query.authorFirstName === "string") {
-    result.author = {
+    filterParams.author = {
       user: {
         firstName: req.query.authorFirstName,
       },
@@ -26,13 +26,13 @@ function createFilterParameters(req: Request): Record<string, unknown> {
   }
 
   if (typeof req.query.categoryId === "string") {
-    result.category = {
+    filterParams.category = {
       id: Number(req.query.categoryId),
     };
   }
 
   if (typeof req.query.tagId === "string") {
-    result.tags = {
+    filterParams.tags = {
       some: {
         id: Number(req.query.tagId),
       },
@@ -40,23 +40,27 @@ function createFilterParameters(req: Request): Record<string, unknown> {
   }
 
   if (typeof req.query.tagIdIn === "string") {
-    result.OR = JSON.parse(req.query.tagIdIn).map((desiredTagId: number) => ({
-      tags: {
-        some: {
-          id: desiredTagId,
+    filterParams.OR = JSON.parse(req.query.tagIdIn).map(
+      (desiredTagId: number) => ({
+        tags: {
+          some: {
+            id: desiredTagId,
+          },
         },
-      },
-    }));
+      })
+    );
   }
 
   if (typeof req.query.tagIdAll === "string") {
-    result.AND = JSON.parse(req.query.tagIdAll).map((desiredTagId: number) => ({
-      tags: {
-        some: {
-          id: desiredTagId,
+    filterParams.AND = JSON.parse(req.query.tagIdAll).map(
+      (desiredTagId: number) => ({
+        tags: {
+          some: {
+            id: desiredTagId,
+          },
         },
-      },
-    }));
+      })
+    );
   }
 
   if (typeof req.query.createdAt === "string") {
@@ -64,14 +68,14 @@ function createFilterParameters(req: Request): Record<string, unknown> {
     const nextDayAfterDesiredDate = new Date(req.query.createdAt);
     nextDayAfterDesiredDate.setDate(nextDayAfterDesiredDate.getDate() + 1);
 
-    result.createdAt = {
+    filterParams.createdAt = {
       gte: desiredDate,
       lt: nextDayAfterDesiredDate,
     };
   }
 
   if (typeof req.query.createdAtLt === "string") {
-    result.createdAt = {
+    filterParams.createdAt = {
       lt: new Date(req.query.createdAtLt),
     };
   }
@@ -80,27 +84,27 @@ function createFilterParameters(req: Request): Record<string, unknown> {
     const nextDayAfterDesiredDate = new Date(req.query.createdAtGt);
     nextDayAfterDesiredDate.setDate(nextDayAfterDesiredDate.getDate() + 1);
 
-    result.createdAt = {
+    filterParams.createdAt = {
       gte: nextDayAfterDesiredDate,
     };
   }
 
-  return result;
+  return filterParams;
 }
 
 function createOrderParameters(req: Request): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
+  const orderParams: Record<string, unknown> = {};
 
   if (req.query.orderBy === "createdAt") {
-    result.createdAt = "asc";
+    orderParams.createdAt = "asc";
   }
 
   if (req.query.orderBy === "-createdAt") {
-    result.createdAt = "desc";
+    orderParams.createdAt = "desc";
   }
 
   if (req.query.orderBy === "authorFirstName") {
-    result.author = {
+    orderParams.author = {
       user: {
         firstName: "asc",
       },
@@ -108,7 +112,7 @@ function createOrderParameters(req: Request): Record<string, unknown> {
   }
 
   if (req.query.orderBy === "-authorFirstName") {
-    result.author = {
+    orderParams.author = {
       user: {
         firstName: "desc",
       },
@@ -116,30 +120,30 @@ function createOrderParameters(req: Request): Record<string, unknown> {
   }
 
   if (req.query.orderBy === "category") {
-    result.category = {
+    orderParams.category = {
       category: "asc",
     };
   }
 
   if (req.query.orderBy === "-category") {
-    result.category = {
+    orderParams.category = {
       category: "desc",
     };
   }
 
   if (req.query.orderBy === "imagesNumber") {
-    result.extraImages = {
+    orderParams.extraImages = {
       _count: "asc",
     };
   }
 
   if (req.query.orderBy === "-imagesNumber") {
-    result.extraImages = {
+    orderParams.extraImages = {
       _count: "desc",
     };
   }
 
-  return result;
+  return orderParams;
 }
 
 export { createFilterParameters, createOrderParameters };

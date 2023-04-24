@@ -5,13 +5,16 @@ import {
   createPaginationParameters,
   calculatePagesTotalNumber,
 } from "shared/utils/pagination";
+import { validatePaginationQueryParameters } from "shared/utils/validation";
 
 import { validateCreationData } from "./utils";
 
 async function createAuthor(req: Request, res: Response): Promise<void> {
-  const { isValid, errors } = await validateCreationData(req.body);
+  const errors = await validateCreationData(req.body);
 
-  if (isValid) {
+  if (errors) {
+    res.status(400).json(errors);
+  } else {
     await prisma.author.create({
       data: {
         description: req.body.description,
@@ -20,24 +23,21 @@ async function createAuthor(req: Request, res: Response): Promise<void> {
     });
 
     res.status(201).end();
-  } else {
-    res.status(400).json(errors);
   }
 }
 
 async function getAuthors(req: Request, res: Response): Promise<void> {
-  try {
-    const { skip, take } = createPaginationParameters(
-      req.query.pageNumber,
-      req.query.itemsNumber
-    );
+  const errors = validatePaginationQueryParameters(req.query);
+
+  if (errors) {
+    res.status(400).json(errors);
+  } else {
     const authors = await prisma.author.findMany({
+      ...createPaginationParameters(req.query),
       select: {
         id: true,
         description: true,
       },
-      skip,
-      take,
     });
     const authorsTotalNumber = await prisma.author.count();
 
@@ -49,10 +49,6 @@ async function getAuthors(req: Request, res: Response): Promise<void> {
         authors.length
       ),
     });
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).end();
   }
 }
 

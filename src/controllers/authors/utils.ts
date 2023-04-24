@@ -1,13 +1,9 @@
 import prisma from "prisma";
-import {
-  isNotEmptyString,
-  isPositiveInteger,
-  createValidationResult,
-} from "shared/utils/validation";
+import { isNotEmptyString, isPositiveInteger } from "shared/utils/validation";
 
 async function validateCreationData(
   data: any
-): Promise<ReturnType<typeof createValidationResult>> {
+): Promise<Record<string, string> | undefined> {
   const errors: Record<string, string> = {};
 
   if ("description" in data && !isNotEmptyString(data.description)) {
@@ -32,7 +28,7 @@ async function validateCreationData(
     errors.userId = "required";
   }
 
-  return createValidationResult(errors);
+  return Object.keys(errors).length ? errors : undefined;
 }
 
 export { validateCreationData };

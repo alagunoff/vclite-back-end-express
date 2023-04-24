@@ -11,9 +11,11 @@ import {
 import { validateCreationData } from "./utils";
 
 async function createUser(req: Request, res: Response): Promise<void> {
-  const { isValid, errors } = validateCreationData(req.body);
+  const errors = validateCreationData(req.body);
 
-  if (isValid) {
+  if (errors) {
+    res.status(400).json(errors);
+  } else {
     const createdUser = await prisma.user.create({
       data: {
         image: saveImageToStaticFiles(
@@ -31,8 +33,6 @@ async function createUser(req: Request, res: Response): Promise<void> {
     res
       .status(201)
       .send(jwt.sign(String(createdUser.id), process.env.JWT_SECRET_KEY));
-  } else {
-    res.status(400).json(errors);
   }
 }
 
