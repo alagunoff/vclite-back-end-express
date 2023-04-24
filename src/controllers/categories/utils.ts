@@ -62,7 +62,7 @@ async function validateUpdateData(
           where: { id: data.parentCategoryId },
         }))
       ) {
-        errors.parentCategoryId = "category with this id wasn't found";
+        errors.parentCategoryId = "parent category with this id wasn't found";
       }
     } else {
       errors.parentCategoryId = "must be positive integer or null";

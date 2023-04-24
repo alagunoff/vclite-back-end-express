@@ -200,9 +200,9 @@ async function deletePost(req: Request, res: Response): Promise<void> {
         },
       },
     });
+    deleteImageFolderFromStaticFiles(deletedPost.imageUrl);
 
     res.status(204).end();
-    deleteImageFolderFromStaticFiles(deletedPost.imageUrl);
   } catch (error) {
     console.log(error);
 
