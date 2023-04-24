@@ -29,7 +29,7 @@ async function getTags(req: Request, res: Response): Promise<void> {
   const errors = validatePaginationQueryParameters(req.query);
 
   if (errors) {
-    res.status(400).json(errors);
+    res.status(400).json({ queryParameters: errors });
   } else {
     const tags = await prisma.tag.findMany({
       ...createPaginationParameters(req.query),

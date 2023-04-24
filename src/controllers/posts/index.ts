@@ -13,19 +13,25 @@ import { transformStringToLowercasedKebabString } from "shared/utils/strings";
 import { includeSubcategories } from "shared/utils/categories";
 import { validatePaginationQueryParameters } from "shared/utils/validation";
 
-import { createFilterParameters, createOrderParameters } from "./utils";
+import {
+  validateCreationData,
+  createFilterParameters,
+  createOrderParameters,
+} from "./utils";
 
 async function createPost(req: Request, res: Response): Promise<void> {
-  try {
+  const errors = await validateCreationData(req.body);
+
+  if (errors) {
+    res.status(400).json(errors);
+  } else {
     await prisma.post.create({
       data: {
-        imageUrl:
-          req.body.image &&
-          saveImageToStaticFiles(
-            req.body.image,
-            `posts/${transformStringToLowercasedKebabString(req.body.title)}`,
-            "main"
-          ),
+        imageUrl: saveImageToStaticFiles(
+          req.body.image,
+          `posts/${transformStringToLowercasedKebabString(req.body.title)}`,
+          "main"
+        ),
         title: req.body.title,
         content: req.body.content,
         author: {
@@ -38,34 +44,33 @@ async function createPost(req: Request, res: Response): Promise<void> {
             id: req.body.categoryId,
           },
         },
-        tags: req.body.tagsIds && {
+        tags: {
           connect: req.body.tagsIds.map((tagId: number) => ({
             id: tagId,
           })),
         },
-        extraImages: req.body.extraImages && {
-          createMany: {
-            data: req.body.extraImages.map(
-              (extraImage: string, index: number) => ({
-                url: saveImageToStaticFiles(
-                  extraImage,
-                  `posts/${transformStringToLowercasedKebabString(
-                    req.body.title
-                  )}`,
-                  `extra-${index}`
-                ),
-              })
-            ),
-          },
-        },
+        extraImages:
+          "extraImages" in req.body
+            ? {
+                createMany: {
+                  data: req.body.extraImages.map(
+                    (extraImage: string, index: number) => ({
+                      url: saveImageToStaticFiles(
+                        extraImage,
+                        `posts/${transformStringToLowercasedKebabString(
+                          req.body.title
+                        )}`,
+                        `extra-${index}`
+                      ),
+                    })
+                  ),
+                },
+              }
+            : undefined,
       },
     });
 
     res.status(201).end();
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).end();
   }
 }
 
@@ -206,7 +211,7 @@ async function deletePost(req: Request, res: Response): Promise<void> {
   } catch (error) {
     console.log(error);
 
-    res.status(500).end();
+    res.status(404).send("Post with this id wasn't found");
   }
 }
 

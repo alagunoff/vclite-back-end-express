@@ -1,5 +1,91 @@
 import { type Request } from "express";
 
+import prisma from "prisma";
+import {
+  isBase64ImageDataUrl,
+  isNotEmptyString,
+  isPositiveInteger,
+  isNumericArray,
+  isBase64ImageDataUrlsArray,
+} from "shared/utils/validation";
+
+async function validateCreationData(
+  data: any
+): Promise<Record<string, any> | undefined> {
+  const errors: Record<string, any> = {};
+
+  if ("image" in data) {
+    if (!isBase64ImageDataUrl(data.image)) {
+      errors.image = "must be base64 image in data URL format with mediatype";
+    }
+  } else {
+    errors.image = "required";
+  }
+
+  if ("title" in data) {
+    if (!isNotEmptyString(data.title)) {
+      errors.title = "must be not empty string";
+    }
+  } else {
+    errors.title = "required";
+  }
+
+  if ("content" in data) {
+    if (!isNotEmptyString(data.content)) {
+      errors.content = "must be not empty string";
+    }
+  }
+
+  if ("categoryId" in data) {
+    if (isPositiveInteger(data.categoryId)) {
+      if (
+        !(await prisma.category.findUnique({ where: { id: data.categoryId } }))
+      ) {
+        errors.categoryId = "category with this id wasn't found";
+      }
+    } else {
+      errors.categoryId = "must be positive integer";
+    }
+  } else {
+    errors.categoryId = "required";
+  }
+
+  if ("tagsIds" in data) {
+    const tagsIds = data.tagsIds;
+
+    if (isNumericArray(tagsIds)) {
+      for (const tagId of tagsIds) {
+        const tag = await prisma.tag.findUnique({
+          where: { id: tagId },
+        });
+
+        if (!tag) {
+          if ("tagsIds" in errors) {
+            errors.tagsIds[tagId] = "tag with this id wasn't found";
+          } else {
+            errors.tagsIds = {
+              [tagId]: "tag with this id wasn't found",
+            };
+          }
+        }
+      }
+    } else {
+      errors.tagsIds = "must be numeric array with values greater than 0";
+    }
+  } else {
+    errors.tagsIds = "required";
+  }
+
+  if ("extraImages" in data) {
+    if (!isBase64ImageDataUrlsArray(data.extraImages)) {
+      errors.extraImages =
+        "must be array of base64 images in data URL formats with mediatypes";
+    }
+  }
+
+  return Object.keys(errors).length ? errors : undefined;
+}
+
 function createFilterParameters(req: Request): Record<string, unknown> {
   const filterParams: Record<string, unknown> = {
     isDraft: false,
@@ -146,4 +232,4 @@ function createOrderParameters(req: Request): Record<string, unknown> {
   return orderParams;
 }
 
-export { createFilterParameters, createOrderParameters };
+export { validateCreationData, createFilterParameters, createOrderParameters };

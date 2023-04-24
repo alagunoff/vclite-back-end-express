@@ -30,7 +30,7 @@ async function getAuthors(req: Request, res: Response): Promise<void> {
   const errors = validatePaginationQueryParameters(req.query);
 
   if (errors) {
-    res.status(400).json(errors);
+    res.status(400).json({ queryParameters: errors });
   } else {
     const authors = await prisma.author.findMany({
       ...createPaginationParameters(req.query),
