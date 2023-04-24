@@ -31,4 +31,14 @@ async function validateCreationData(
   return Object.keys(errors).length ? errors : undefined;
 }
 
-export { validateCreationData };
+function validateUpdateData(data: any): Record<string, string> | undefined {
+  const errors: Record<string, string> = {};
+
+  if ("description" in data && !isNotEmptyString(data.description)) {
+    errors.description = "must be not empty string";
+  }
+
+  return Object.keys(errors).length ? errors : undefined;
+}
+
+export { validateCreationData, validateUpdateData };

@@ -7,7 +7,7 @@ import {
 } from "shared/utils/pagination";
 import { validatePaginationQueryParameters } from "shared/utils/validation";
 
-import { validateCreationData } from "./utils";
+import { validateCreationData, validateUpdateData } from "./utils";
 
 async function createAuthor(req: Request, res: Response): Promise<void> {
   const errors = await validateCreationData(req.body);
@@ -53,21 +53,27 @@ async function getAuthors(req: Request, res: Response): Promise<void> {
 }
 
 async function updateAuthor(req: Request, res: Response): Promise<void> {
-  try {
-    await prisma.author.update({
-      where: {
-        id: Number(req.params.id),
-      },
-      data: {
-        description: req.body.description,
-      },
-    });
+  const errors = validateUpdateData(req.body);
 
-    res.status(204).end();
-  } catch (error) {
-    console.log(error);
+  if (errors) {
+    res.status(400).json(errors);
+  } else {
+    try {
+      await prisma.author.update({
+        where: {
+          id: Number(req.params.id),
+        },
+        data: {
+          description: req.body.description,
+        },
+      });
 
-    res.status(404).send("Author with this id wasn't found");
+      res.status(204).end();
+    } catch (error) {
+      console.log(error);
+
+      res.status(404).send("Author with this id wasn't found");
+    }
   }
 }
 
