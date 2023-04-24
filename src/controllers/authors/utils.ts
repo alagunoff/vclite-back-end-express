@@ -12,13 +12,7 @@ async function validateCreationData(
 
   if ("userId" in data) {
     if (isPositiveInteger(data.userId)) {
-      if (
-        !(await prisma.user.findUnique({
-          where: {
-            id: data.userId,
-          },
-        }))
-      ) {
+      if (!(await prisma.user.findUnique({ where: { id: data.userId } }))) {
         errors.userId = "user with this id wasn't found";
       }
     } else {
