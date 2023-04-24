@@ -4,8 +4,8 @@ import {
   isBase64ImageDataUrl,
 } from "shared/utils/validators";
 
-function validateRequestBody(data: any): ValidationResult {
-  const errors: Record<string, unknown> = {};
+function validateCreationData(data: any): ValidationResult {
+  const errors: Record<string, string> = {};
 
   if ("image" in data) {
     if (!isBase64ImageDataUrl(data.image)) {
@@ -44,4 +44,4 @@ function validateRequestBody(data: any): ValidationResult {
     : { isValid: true, errors: null };
 }
 
-export { validateRequestBody };
+export { validateCreationData };

@@ -8,10 +8,10 @@ import {
   deleteImageFromStaticFiles,
 } from "shared/utils/images";
 
-import { validateRequestBody } from "./utils";
+import { validateCreationData } from "./utils";
 
 async function createUser(req: Request, res: Response): Promise<void> {
-  const { isValid, errors } = validateRequestBody(req.body);
+  const { isValid, errors } = validateCreationData(req.body);
 
   if (isValid) {
     try {
@@ -67,7 +67,7 @@ async function deleteUser(req: Request, res: Response): Promise<void> {
   } catch (error) {
     console.log(error);
 
-    res.status(404).end();
+    res.status(404).send("User with this id wasn't found");
   }
 }
 

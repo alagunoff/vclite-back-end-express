@@ -2,7 +2,7 @@ import { type ValidationResult } from "shared/types/validation";
 import { isNotEmptyString, isPositiveInteger } from "shared/utils/validators";
 
 function validateRequestBody(data: any): ValidationResult {
-  const errors: Record<string, unknown> = {};
+  const errors: Record<string, string> = {};
 
   if ("description" in data && !isNotEmptyString(data.description)) {
     errors.description = "must be not empty string";

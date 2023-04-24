@@ -5,7 +5,7 @@ type ValidationResult =
     }
   | {
       isValid: false;
-      errors: Record<string, unknown>;
+      errors: Record<string, string>;
     };
 
 export type { ValidationResult };

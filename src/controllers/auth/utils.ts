@@ -2,7 +2,7 @@ import { type ValidationResult } from "shared/types/validation";
 import { isNotEmptyString } from "shared/utils/validators";
 
 function validateRequestBody(data: any): ValidationResult {
-  const errors: Record<string, unknown> = {};
+  const errors: Record<string, string> = {};
 
   if ("username" in data) {
     if (!isNotEmptyString(data.username)) {
