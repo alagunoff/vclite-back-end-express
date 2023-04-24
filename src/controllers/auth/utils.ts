@@ -1,22 +1,23 @@
-import { type Request } from "express";
+import { type ValidationResult } from "shared/types/validation";
+import { isNotEmptyString } from "shared/utils/validators";
 
-function validateRequestBody(req: Request):
-  | {
-      isValid: true;
-      errors: null;
-    }
-  | {
-      isValid: false;
-      errors: Record<string, unknown>;
-    } {
+function validateRequestBody(data: any): ValidationResult {
   const errors: Record<string, unknown> = {};
 
-  if (typeof req.body.username !== "string" || req.body.username === "") {
-    errors.username = "we expect it to be not empty string";
+  if ("username" in data) {
+    if (!isNotEmptyString(data.username)) {
+      errors.username = "must be not empty string";
+    }
+  } else {
+    errors.username = "required";
   }
 
-  if (typeof req.body.password !== "string" || req.body.password === "") {
-    errors.password = "we expect it to be not empty string";
+  if ("password" in data) {
+    if (!isNotEmptyString(data.password)) {
+      errors.password = "must be not empty string";
+    }
+  } else {
+    errors.password = "required";
   }
 
   return Object.keys(errors).length
