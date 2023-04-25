@@ -1,10 +1,21 @@
+import prisma from "prisma";
 import {
   isNotEmptyString,
   isBase64ImageDataUrl,
 } from "shared/utils/validation";
 
-function validateCreationData(data: any): Record<string, string> | undefined {
-  const errors: Record<string, string> = {};
+interface CreationDataValidationErrors {
+  image?: string;
+  username?: string;
+  password?: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+async function validateCreationData(
+  data: any
+): Promise<CreationDataValidationErrors | undefined> {
+  const errors: CreationDataValidationErrors = {};
 
   if ("image" in data) {
     if (!isBase64ImageDataUrl(data.image)) {
@@ -15,7 +26,13 @@ function validateCreationData(data: any): Record<string, string> | undefined {
   }
 
   if ("username" in data) {
-    if (!isNotEmptyString(data.username)) {
+    if (isNotEmptyString(data.username)) {
+      if (
+        await prisma.user.findUnique({ where: { username: data.username } })
+      ) {
+        errors.username = "user with the same username already exists";
+      }
+    } else {
       errors.username = "must be not empty string";
     }
   } else {
@@ -30,12 +47,16 @@ function validateCreationData(data: any): Record<string, string> | undefined {
     errors.password = "required";
   }
 
-  if ("firstName" in data && !isNotEmptyString(data.firstName)) {
-    errors.firstName = "must be not empty string";
+  if ("firstName" in data) {
+    if (!isNotEmptyString(data.firstName)) {
+      errors.firstName = "must be not empty string";
+    }
   }
 
-  if ("lastName" in data && !isNotEmptyString(data.lastName)) {
-    errors.lastName = "must be not empty string";
+  if ("lastName" in data) {
+    if (!isNotEmptyString(data.lastName)) {
+      errors.lastName = "must be not empty string";
+    }
   }
 
   return Object.keys(errors).length ? errors : undefined;

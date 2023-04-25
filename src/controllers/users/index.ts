@@ -8,10 +8,10 @@ import { saveImage, deleteImage } from "shared/utils/images";
 import { validateCreationData } from "./utils";
 
 async function createUser(req: Request, res: Response): Promise<void> {
-  const errors = validateCreationData(req.body);
+  const creationDataValidationErrors = await validateCreationData(req.body);
 
-  if (errors) {
-    res.status(400).json(errors);
+  if (creationDataValidationErrors) {
+    res.status(400).json(creationDataValidationErrors);
   } else {
     const createdUser = await prisma.user.create({
       data: {
