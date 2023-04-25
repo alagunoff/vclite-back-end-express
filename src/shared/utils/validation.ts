@@ -1,3 +1,5 @@
+import { type Request } from "express";
+
 function isNotEmptyString(value: unknown): boolean {
   return typeof value === "string" && value !== "";
 }
@@ -57,7 +59,7 @@ interface PaginationQueryParametersValidationErrors {
 }
 
 function validatePaginationQueryParameters(
-  queryParameters: Record<string, unknown>
+  queryParameters: Request["query"]
 ): PaginationQueryParametersValidationErrors | undefined {
   const errors: PaginationQueryParametersValidationErrors = {};
 

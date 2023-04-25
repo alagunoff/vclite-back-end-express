@@ -1,3 +1,5 @@
+import { type Request } from "express";
+
 import prisma from "prisma";
 import {
   isBase64ImageDataUrl,
@@ -111,7 +113,7 @@ interface FilterQueryParametersValidationErrors {
 }
 
 function validateFilterQueryParameters(
-  queryParameters: Record<string, unknown>
+  queryParameters: Request["query"]
 ): FilterQueryParametersValidationErrors | undefined {
   const errors: FilterQueryParametersValidationErrors = {};
 
@@ -179,25 +181,36 @@ function validateFilterQueryParameters(
 }
 
 function createFilterParameters(
-  queryParameters: Record<string, unknown>
+  queryParameters: {
+    titleContains?: string;
+    contentContains?: string;
+    authorFirstName?: string;
+    categoryId?: string;
+    tagId?: string;
+    tagIdIn?: string;
+    tagIdAll?: string;
+    createdAt?: string;
+    createdAtLt?: string;
+    createdAtGt?: string;
+  } & Request["query"]
 ): Record<string, unknown> {
   const filterParameters: Record<string, unknown> = {
     isDraft: false,
   };
 
-  if ("titleContains" in queryParameters) {
+  if (queryParameters.titleContains !== undefined) {
     filterParameters.title = {
       contains: queryParameters.titleContains,
     };
   }
 
-  if ("contentContains" in queryParameters) {
+  if (queryParameters.contentContains !== undefined) {
     filterParameters.content = {
       contains: queryParameters.contentContains,
     };
   }
 
-  if ("authorFirstName" in queryParameters) {
+  if (queryParameters.authorFirstName !== undefined) {
     filterParameters.author = {
       user: {
         firstName: queryParameters.authorFirstName,
@@ -205,13 +218,13 @@ function createFilterParameters(
     };
   }
 
-  if ("categoryId" in queryParameters) {
+  if (queryParameters.categoryId !== undefined) {
     filterParameters.category = {
       id: Number(queryParameters.categoryId),
     };
   }
 
-  if ("tagId" in queryParameters) {
+  if (queryParameters.tagId !== undefined) {
     filterParameters.tags = {
       some: {
         id: Number(queryParameters.tagId),
@@ -219,10 +232,7 @@ function createFilterParameters(
     };
   }
 
-  if (
-    "tagIdIn" in queryParameters &&
-    typeof queryParameters.tagIdIn === "string"
-  ) {
+  if (queryParameters.tagIdIn !== undefined) {
     filterParameters.OR = JSON.parse(queryParameters.tagIdIn).map(
       (tagId: number) => ({
         tags: {
@@ -234,10 +244,7 @@ function createFilterParameters(
     );
   }
 
-  if (
-    "tagIdAll" in queryParameters &&
-    typeof queryParameters.tagIdAll === "string"
-  ) {
+  if (queryParameters.tagIdAll !== undefined) {
     filterParameters.AND = JSON.parse(queryParameters.tagIdAll).map(
       (tagId: number) => ({
         tags: {
@@ -249,10 +256,7 @@ function createFilterParameters(
     );
   }
 
-  if (
-    "createdAt" in queryParameters &&
-    typeof queryParameters.createdAt === "string"
-  ) {
+  if (queryParameters.createdAt !== undefined) {
     const desiredDate = new Date(queryParameters.createdAt);
     const nextDayAfterDesiredDate = new Date(queryParameters.createdAt);
     nextDayAfterDesiredDate.setDate(nextDayAfterDesiredDate.getDate() + 1);
@@ -263,19 +267,13 @@ function createFilterParameters(
     };
   }
 
-  if (
-    "createdAtLt" in queryParameters &&
-    typeof queryParameters.createdAtLt === "string"
-  ) {
+  if (queryParameters.createdAtLt !== undefined) {
     filterParameters.createdAt = {
       lt: new Date(queryParameters.createdAtLt),
     };
   }
 
-  if (
-    "createdAtGt" in queryParameters &&
-    typeof queryParameters.createdAtGt === "string"
-  ) {
+  if (queryParameters.createdAtGt !== undefined) {
     const nextDayAfterDesiredDate = new Date(queryParameters.createdAtGt);
     nextDayAfterDesiredDate.setDate(nextDayAfterDesiredDate.getDate() + 1);
 
@@ -303,7 +301,7 @@ const orderValidValues = [
 ];
 
 function validateOrderQueryParameters(
-  queryParameters: Record<string, unknown>
+  queryParameters: Request["query"]
 ): OrderQueryParametersValidationErrors | undefined {
   const errors: OrderQueryParametersValidationErrors = {};
 
@@ -322,7 +320,9 @@ function validateOrderQueryParameters(
 }
 
 function createOrderParameters(
-  queryParameters: Record<string, unknown>
+  queryParameters: {
+    orderBy?: string;
+  } & Request["query"]
 ): Record<string, unknown> {
   const orderParams: Record<string, unknown> = {};
 
@@ -384,7 +384,7 @@ interface GetRequestValidationErrors {
 }
 
 function createGetRequestValidationErrors(
-  queryParameters: Record<string, unknown>
+  queryParameters: Request["query"]
 ): GetRequestValidationErrors | undefined {
   const filterQueryParametersValidationErrors =
     validateFilterQueryParameters(queryParameters);

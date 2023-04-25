@@ -156,36 +156,45 @@ async function updatePost(req: Request, res: Response): Promise<void> {
       },
       data: {
         imageUrl:
-          req.body.image &&
-          saveImageToStaticFiles(
-            req.body.image,
-            `posts/${transformStringToLowercasedKebabString(req.body.title)}`,
-            "main"
-          ),
+          "image" in req.body
+            ? saveImageToStaticFiles(
+                req.body.image,
+                `posts/${transformStringToLowercasedKebabString(
+                  req.body.title
+                )}`,
+                "main"
+              )
+            : undefined,
         title: req.body.title,
         content: req.body.content,
         authorId: req.body.authorId,
         categoryId: req.body.categoryId,
-        tags: req.body.tagsIds && {
-          connect: req.body.tagsIds.map((tagId: number) => ({
-            id: tagId,
-          })),
-        },
-        extraImages: req.body.extraImages && {
-          createMany: {
-            data: req.body.extraImages.map(
-              (extraImage: string, index: number) => ({
-                url: saveImageToStaticFiles(
-                  extraImage,
-                  `posts/${transformStringToLowercasedKebabString(
-                    req.body.title
-                  )}`,
-                  `extra-${index}`
-                ),
-              })
-            ),
-          },
-        },
+        tags:
+          "tagsIds" in req.body
+            ? {
+                connect: req.body.tagsIds.map((tagId: number) => ({
+                  id: tagId,
+                })),
+              }
+            : undefined,
+        extraImages:
+          "extraImages" in req.body
+            ? {
+                createMany: {
+                  data: req.body.extraImages?.map(
+                    (extraImage: string, index: number) => ({
+                      url: saveImageToStaticFiles(
+                        extraImage,
+                        `posts/${transformStringToLowercasedKebabString(
+                          req.body.title
+                        )}`,
+                        `extra-${index}`
+                      ),
+                    })
+                  ),
+                },
+              }
+            : undefined,
       },
     });
 
@@ -193,7 +202,7 @@ async function updatePost(req: Request, res: Response): Promise<void> {
   } catch (error) {
     console.log(error);
 
-    res.status(500).end();
+    res.status(404).send("Post with this id wasn't found");
   }
 }
 
