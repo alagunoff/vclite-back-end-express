@@ -383,7 +383,7 @@ interface GetRequestValidationErrors {
   orderQueryParameters?: OrderQueryParametersValidationErrors;
 }
 
-function createGetRequestValidationErrors(
+function validateGetRequest(
   queryParameters: Request["query"]
 ): GetRequestValidationErrors | undefined {
   const filterQueryParametersValidationErrors =
@@ -494,6 +494,6 @@ export {
   createFilterParameters,
   validateOrderQueryParameters,
   createOrderParameters,
-  createGetRequestValidationErrors,
+  validateGetRequest,
   validateUpdateData,
 };

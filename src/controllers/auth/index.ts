@@ -4,13 +4,13 @@ import bcrypt from "bcryptjs";
 
 import prisma from "prisma";
 
-import { validateRequestBody } from "./utils";
+import { validateLoginRequestData } from "./utils";
 
 async function login(req: Request, res: Response): Promise<void> {
-  const errors = validateRequestBody(req.body);
+  const validationErrors = await validateLoginRequestData(req.body);
 
-  if (errors) {
-    res.status(400).json(errors);
+  if (validationErrors) {
+    res.status(400).json(validationErrors);
   } else {
     const user = await prisma.user.findUnique({
       where: {
@@ -32,10 +32,8 @@ async function login(req: Request, res: Response): Promise<void> {
 
         res.send(userJwtToken);
       } else {
-        res.status(400).send("Password is incorrect");
+        res.status(403).send("Password is incorrect");
       }
-    } else {
-      res.status(404).send("User with this username wasn't found");
     }
   }
 }

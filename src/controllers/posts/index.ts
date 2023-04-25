@@ -16,7 +16,7 @@ import { includeSubcategories } from "shared/utils/categories";
 
 import {
   validateCreationData,
-  createGetRequestValidationErrors,
+  validateGetRequest,
   createFilterParameters,
   createOrderParameters,
   validateUpdateData,
@@ -74,9 +74,7 @@ async function createPost(req: Request, res: Response): Promise<void> {
 }
 
 async function getPosts(req: Request, res: Response): Promise<void> {
-  const getRequestValidationErrors = createGetRequestValidationErrors(
-    req.query
-  );
+  const getRequestValidationErrors = validateGetRequest(req.query);
 
   if (getRequestValidationErrors) {
     res.status(400).json(getRequestValidationErrors);
