@@ -19,7 +19,7 @@ router.patch(
   updateDraft
 );
 router.post(
-  "/:id(\\d+)",
+  "/:id(\\d+)/publish",
   [authenticateUser(), authenticateAuthor],
   publishDraft
 );
