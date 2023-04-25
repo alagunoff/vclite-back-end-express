@@ -6,13 +6,21 @@ function isPositiveInteger(value: unknown): boolean {
   return Number.isInteger(value) && (value as number) > 0;
 }
 
-function isBase64ImageDataUrl(value: unknown): value is `data:image/${string}` {
+function isBase64ImageDataUrl(value: unknown): boolean {
   return (
     typeof value === "string" && /^data:image\/(jpe?g|png);base64,/.test(value)
   );
 }
 
-function isNumericArray(value: unknown): value is number[] {
+function isDateString(value: unknown): boolean {
+  if (typeof value === "string") {
+    return !Number.isNaN(Date.parse(value));
+  }
+
+  return false;
+}
+
+function isPositiveIntegersArray(value: unknown): boolean {
   return (
     Array.isArray(value) &&
     !value.some(
@@ -21,36 +29,54 @@ function isNumericArray(value: unknown): value is number[] {
   );
 }
 
-function isBase64ImageDataUrlsArray(
-  value: unknown
-): value is Array<`data:image/${string}`> {
+function isPositiveIntegersArrayString(value: unknown): boolean {
+  if (typeof value === "string") {
+    const parsedValue = JSON.parse(value);
+
+    return (
+      Array.isArray(parsedValue) &&
+      !parsedValue.some(
+        (item: unknown) => !Number.isInteger(item) || (item as number) <= 0
+      )
+    );
+  }
+
+  return false;
+}
+
+function isBase64ImageDataUrlsArray(value: unknown): boolean {
   return (
     Array.isArray(value) &&
     !value.some((item: unknown) => !isBase64ImageDataUrl(item))
   );
 }
 
-function validatePaginationQueryParameters(
-  queryParams: Record<string, unknown>
-): Record<string, string> | undefined {
-  const errors: Record<string, string> = {};
+interface PaginationQueryParametersValidationErrors {
+  pageNumber?: string;
+  itemsNumber?: string;
+}
 
-  if ("pageNumber" in queryParams) {
-    if (!isPositiveInteger(Number(queryParams.pageNumber))) {
+function validatePaginationQueryParameters(
+  queryParameters: Record<string, unknown>
+): PaginationQueryParametersValidationErrors | undefined {
+  const errors: PaginationQueryParametersValidationErrors = {};
+
+  if ("pageNumber" in queryParameters) {
+    if (!isPositiveInteger(Number(queryParameters.pageNumber))) {
       errors.pageNumber = "must be positive integer";
     }
 
-    if (!("itemsNumber" in queryParams)) {
+    if (!("itemsNumber" in queryParameters)) {
       errors.itemsNumber = "required";
     }
   }
 
-  if ("itemsNumber" in queryParams) {
-    if (!isPositiveInteger(Number(queryParams.itemsNumber))) {
+  if ("itemsNumber" in queryParameters) {
+    if (!isPositiveInteger(Number(queryParameters.itemsNumber))) {
       errors.itemsNumber = "must be positive integer";
     }
 
-    if (!("pageNumber" in queryParams)) {
+    if (!("pageNumber" in queryParameters)) {
       errors.pageNumber = "required";
     }
   }
@@ -62,7 +88,10 @@ export {
   isNotEmptyString,
   isPositiveInteger,
   isBase64ImageDataUrl,
-  isNumericArray,
+  isDateString,
+  isPositiveIntegersArray,
+  isPositiveIntegersArrayString,
   isBase64ImageDataUrlsArray,
   validatePaginationQueryParameters,
 };
+export type { PaginationQueryParametersValidationErrors };

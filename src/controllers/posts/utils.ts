@@ -1,18 +1,29 @@
-import { type Request } from "express";
-
 import prisma from "prisma";
 import {
   isBase64ImageDataUrl,
   isNotEmptyString,
   isPositiveInteger,
-  isNumericArray,
+  isDateString,
+  isPositiveIntegersArray,
+  isPositiveIntegersArrayString,
   isBase64ImageDataUrlsArray,
+  validatePaginationQueryParameters,
+  type PaginationQueryParametersValidationErrors,
 } from "shared/utils/validation";
+
+interface CreationDataValidationErrors {
+  image?: string;
+  title?: string;
+  content?: string;
+  categoryId?: string;
+  tagsIds?: string | Record<number, string>;
+  extraImages?: string;
+}
 
 async function validateCreationData(
   data: any
-): Promise<Record<string, any> | undefined> {
-  const errors: Record<string, any> = {};
+): Promise<CreationDataValidationErrors | undefined> {
+  const errors: CreationDataValidationErrors = {};
 
   if ("image" in data) {
     if (!isBase64ImageDataUrl(data.image)) {
@@ -53,14 +64,14 @@ async function validateCreationData(
   if ("tagsIds" in data) {
     const tagsIds = data.tagsIds;
 
-    if (isNumericArray(tagsIds)) {
+    if (isPositiveIntegersArray(tagsIds)) {
       for (const tagId of tagsIds) {
         const tag = await prisma.tag.findUnique({
           where: { id: tagId },
         });
 
         if (!tag) {
-          if ("tagsIds" in errors) {
+          if ("tagsIds" in errors && typeof errors.tagsIds === "object") {
             errors.tagsIds[tagId] = "tag with this id wasn't found";
           } else {
             errors.tagsIds = {
@@ -70,7 +81,7 @@ async function validateCreationData(
         }
       }
     } else {
-      errors.tagsIds = "must be numeric array with values greater than 0";
+      errors.tagsIds = "must be numeric array with positive integers";
     }
   } else {
     errors.tagsIds = "required";
@@ -86,110 +97,244 @@ async function validateCreationData(
   return Object.keys(errors).length ? errors : undefined;
 }
 
-function createFilterParameters(req: Request): Record<string, unknown> {
-  const filterParams: Record<string, unknown> = {
+interface FilterQueryParametersValidationErrors {
+  titleContains?: string;
+  contentContains?: string;
+  authorFirstName?: string;
+  categoryId?: string;
+  tagId?: string;
+  tagIdIn?: string;
+  tagIdAll?: string;
+  createdAt?: string;
+  createdAtLt?: string;
+  createdAtGt?: string;
+}
+
+function validateFilterQueryParameters(
+  queryParameters: Record<string, unknown>
+): FilterQueryParametersValidationErrors | undefined {
+  const errors: FilterQueryParametersValidationErrors = {};
+
+  if ("titleContains" in queryParameters) {
+    if (!isNotEmptyString(queryParameters.titleContains)) {
+      errors.titleContains = "must be not empty string";
+    }
+  }
+
+  if ("contentContains" in queryParameters) {
+    if (!isNotEmptyString(queryParameters.contentContains)) {
+      errors.contentContains = "must be not empty string";
+    }
+  }
+
+  if ("authorFirstName" in queryParameters) {
+    if (!isNotEmptyString(queryParameters.authorFirstName)) {
+      errors.authorFirstName = "must be not empty string";
+    }
+  }
+
+  if ("categoryId" in queryParameters) {
+    if (!isPositiveInteger(Number(queryParameters.categoryId))) {
+      errors.categoryId = "must be positive integer";
+    }
+  }
+
+  if ("tagId" in queryParameters) {
+    if (!isPositiveInteger(Number(queryParameters.tagId))) {
+      errors.tagId = "must be positive integer";
+    }
+  }
+
+  if ("tagIdIn" in queryParameters) {
+    if (!isPositiveIntegersArrayString(queryParameters.tagIdIn)) {
+      errors.tagIdIn = "must be numeric array with positive integers";
+    }
+  }
+
+  if ("tagIdAll" in queryParameters) {
+    if (!isPositiveIntegersArrayString(queryParameters.tagIdAll)) {
+      errors.tagIdAll = "must be numeric array with positive integers";
+    }
+  }
+
+  if ("createdAt" in queryParameters) {
+    if (!isDateString(queryParameters.createdAt)) {
+      errors.createdAt = "must be string representation of a date";
+    }
+  }
+
+  if ("createdAtLt" in queryParameters) {
+    if (!isDateString(queryParameters.createdAtLt)) {
+      errors.createdAtLt = "must be string representation of a date";
+    }
+  }
+
+  if ("createdAtGt" in queryParameters) {
+    if (!isDateString(queryParameters.createdAtGt)) {
+      errors.createdAtGt = "must be string representation of a date";
+    }
+  }
+
+  return Object.keys(errors).length ? errors : undefined;
+}
+
+function createFilterParameters(
+  queryParameters: Record<string, unknown>
+): Record<string, unknown> {
+  const filterParameters: Record<string, unknown> = {
     isDraft: false,
   };
 
-  if (typeof req.query.titleContains === "string") {
-    filterParams.title = {
-      contains: req.query.titleContains,
+  if ("titleContains" in queryParameters) {
+    filterParameters.title = {
+      contains: queryParameters.titleContains,
     };
   }
 
-  if (typeof req.query.contentContains === "string") {
-    filterParams.content = {
-      contains: req.query.contentContains,
+  if ("contentContains" in queryParameters) {
+    filterParameters.content = {
+      contains: queryParameters.contentContains,
     };
   }
 
-  if (typeof req.query.authorFirstName === "string") {
-    filterParams.author = {
+  if ("authorFirstName" in queryParameters) {
+    filterParameters.author = {
       user: {
-        firstName: req.query.authorFirstName,
+        firstName: queryParameters.authorFirstName,
       },
     };
   }
 
-  if (typeof req.query.categoryId === "string") {
-    filterParams.category = {
-      id: Number(req.query.categoryId),
+  if ("categoryId" in queryParameters) {
+    filterParameters.category = {
+      id: Number(queryParameters.categoryId),
     };
   }
 
-  if (typeof req.query.tagId === "string") {
-    filterParams.tags = {
+  if ("tagId" in queryParameters) {
+    filterParameters.tags = {
       some: {
-        id: Number(req.query.tagId),
+        id: Number(queryParameters.tagId),
       },
     };
   }
 
-  if (typeof req.query.tagIdIn === "string") {
-    filterParams.OR = JSON.parse(req.query.tagIdIn).map(
-      (desiredTagId: number) => ({
+  if (
+    "tagIdIn" in queryParameters &&
+    typeof queryParameters.tagIdIn === "string"
+  ) {
+    filterParameters.OR = JSON.parse(queryParameters.tagIdIn).map(
+      (tagId: number) => ({
         tags: {
           some: {
-            id: desiredTagId,
+            id: tagId,
           },
         },
       })
     );
   }
 
-  if (typeof req.query.tagIdAll === "string") {
-    filterParams.AND = JSON.parse(req.query.tagIdAll).map(
-      (desiredTagId: number) => ({
+  if (
+    "tagIdAll" in queryParameters &&
+    typeof queryParameters.tagIdAll === "string"
+  ) {
+    filterParameters.AND = JSON.parse(queryParameters.tagIdAll).map(
+      (tagId: number) => ({
         tags: {
           some: {
-            id: desiredTagId,
+            id: tagId,
           },
         },
       })
     );
   }
 
-  if (typeof req.query.createdAt === "string") {
-    const desiredDate = new Date(req.query.createdAt);
-    const nextDayAfterDesiredDate = new Date(req.query.createdAt);
+  if (
+    "createdAt" in queryParameters &&
+    typeof queryParameters.createdAt === "string"
+  ) {
+    const desiredDate = new Date(queryParameters.createdAt);
+    const nextDayAfterDesiredDate = new Date(queryParameters.createdAt);
     nextDayAfterDesiredDate.setDate(nextDayAfterDesiredDate.getDate() + 1);
 
-    filterParams.createdAt = {
+    filterParameters.createdAt = {
       gte: desiredDate,
       lt: nextDayAfterDesiredDate,
     };
   }
 
-  if (typeof req.query.createdAtLt === "string") {
-    filterParams.createdAt = {
-      lt: new Date(req.query.createdAtLt),
+  if (
+    "createdAtLt" in queryParameters &&
+    typeof queryParameters.createdAtLt === "string"
+  ) {
+    filterParameters.createdAt = {
+      lt: new Date(queryParameters.createdAtLt),
     };
   }
 
-  if (typeof req.query.createdAtGt === "string") {
-    const nextDayAfterDesiredDate = new Date(req.query.createdAtGt);
+  if (
+    "createdAtGt" in queryParameters &&
+    typeof queryParameters.createdAtGt === "string"
+  ) {
+    const nextDayAfterDesiredDate = new Date(queryParameters.createdAtGt);
     nextDayAfterDesiredDate.setDate(nextDayAfterDesiredDate.getDate() + 1);
 
-    filterParams.createdAt = {
+    filterParameters.createdAt = {
       gte: nextDayAfterDesiredDate,
     };
   }
 
-  return filterParams;
+  return filterParameters;
 }
 
-function createOrderParameters(req: Request): Record<string, unknown> {
+interface OrderQueryParametersValidationErrors {
+  orderBy?: string;
+}
+
+const orderValidValues = [
+  "createdAt",
+  "-createdAt",
+  "authorFirstName",
+  "-authorFirstName",
+  "category",
+  "-category",
+  "imagesNumber",
+  "-imagesNumber",
+];
+
+function validateOrderQueryParameters(
+  queryParameters: Record<string, unknown>
+): OrderQueryParametersValidationErrors | undefined {
+  const errors: OrderQueryParametersValidationErrors = {};
+
+  if ("orderBy" in queryParameters) {
+    if (
+      queryParameters.orderBy !== "string" ||
+      !orderValidValues.includes(queryParameters.orderBy)
+    ) {
+      errors.orderBy = `must be one of the following values [${String(
+        orderValidValues
+      )}]`;
+    }
+  }
+
+  return Object.keys(errors).length ? errors : undefined;
+}
+
+function createOrderParameters(
+  queryParameters: Record<string, unknown>
+): Record<string, unknown> {
   const orderParams: Record<string, unknown> = {};
 
-  if (req.query.orderBy === "createdAt") {
+  if (queryParameters.orderBy === "createdAt") {
     orderParams.createdAt = "asc";
   }
 
-  if (req.query.orderBy === "-createdAt") {
+  if (queryParameters.orderBy === "-createdAt") {
     orderParams.createdAt = "desc";
   }
 
-  if (req.query.orderBy === "authorFirstName") {
+  if (queryParameters.orderBy === "authorFirstName") {
     orderParams.author = {
       user: {
         firstName: "asc",
@@ -197,7 +342,7 @@ function createOrderParameters(req: Request): Record<string, unknown> {
     };
   }
 
-  if (req.query.orderBy === "-authorFirstName") {
+  if (queryParameters.orderBy === "-authorFirstName") {
     orderParams.author = {
       user: {
         firstName: "desc",
@@ -205,25 +350,25 @@ function createOrderParameters(req: Request): Record<string, unknown> {
     };
   }
 
-  if (req.query.orderBy === "category") {
+  if (queryParameters.orderBy === "category") {
     orderParams.category = {
       category: "asc",
     };
   }
 
-  if (req.query.orderBy === "-category") {
+  if (queryParameters.orderBy === "-category") {
     orderParams.category = {
       category: "desc",
     };
   }
 
-  if (req.query.orderBy === "imagesNumber") {
+  if (queryParameters.orderBy === "imagesNumber") {
     orderParams.extraImages = {
       _count: "asc",
     };
   }
 
-  if (req.query.orderBy === "-imagesNumber") {
+  if (queryParameters.orderBy === "-imagesNumber") {
     orderParams.extraImages = {
       _count: "desc",
     };
@@ -232,4 +377,44 @@ function createOrderParameters(req: Request): Record<string, unknown> {
   return orderParams;
 }
 
-export { validateCreationData, createFilterParameters, createOrderParameters };
+interface GetRequestValidationErrors {
+  paginationQueryParameters?: PaginationQueryParametersValidationErrors;
+  filterQueryParameters?: FilterQueryParametersValidationErrors;
+  orderQueryParameters?: OrderQueryParametersValidationErrors;
+}
+
+function createGetRequestValidationErrors(
+  queryParameters: Record<string, unknown>
+): GetRequestValidationErrors | undefined {
+  const filterQueryParametersValidationErrors =
+    validateFilterQueryParameters(queryParameters);
+  const paginationQueryParametersValidationErrors =
+    validatePaginationQueryParameters(queryParameters);
+  const orderQueryParametersValidationErrors =
+    validateOrderQueryParameters(queryParameters);
+  const errors: GetRequestValidationErrors = {};
+
+  if (filterQueryParametersValidationErrors) {
+    errors.filterQueryParameters = filterQueryParametersValidationErrors;
+  }
+
+  if (paginationQueryParametersValidationErrors) {
+    errors.paginationQueryParameters =
+      paginationQueryParametersValidationErrors;
+  }
+
+  if (orderQueryParametersValidationErrors) {
+    errors.orderQueryParameters = orderQueryParametersValidationErrors;
+  }
+
+  return Object.keys(errors).length ? errors : undefined;
+}
+
+export {
+  validateCreationData,
+  validateFilterQueryParameters,
+  createFilterParameters,
+  validateOrderQueryParameters,
+  createOrderParameters,
+  createGetRequestValidationErrors,
+};

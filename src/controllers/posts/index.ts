@@ -11,19 +11,19 @@ import {
 } from "shared/utils/pagination";
 import { transformStringToLowercasedKebabString } from "shared/utils/strings";
 import { includeSubcategories } from "shared/utils/categories";
-import { validatePaginationQueryParameters } from "shared/utils/validation";
 
 import {
   validateCreationData,
+  createGetRequestValidationErrors,
   createFilterParameters,
   createOrderParameters,
 } from "./utils";
 
 async function createPost(req: Request, res: Response): Promise<void> {
-  const errors = await validateCreationData(req.body);
+  const creationDataValidationErrors = await validateCreationData(req.body);
 
-  if (errors) {
-    res.status(400).json(errors);
+  if (creationDataValidationErrors) {
+    res.status(400).json(creationDataValidationErrors);
   } else {
     await prisma.post.create({
       data: {
@@ -75,15 +75,17 @@ async function createPost(req: Request, res: Response): Promise<void> {
 }
 
 async function getPosts(req: Request, res: Response): Promise<void> {
-  const errors = validatePaginationQueryParameters(req.query);
+  const getRequestValidationErrors = createGetRequestValidationErrors(
+    req.query
+  );
 
-  if (errors) {
-    res.status(400).json(errors);
+  if (getRequestValidationErrors) {
+    res.status(400).json(getRequestValidationErrors);
   } else {
     const posts = await prisma.post.findMany({
-      where: createFilterParameters(req),
+      where: createFilterParameters(req.query),
       ...createPaginationParameters(req.query),
-      orderBy: createOrderParameters(req),
+      orderBy: createOrderParameters(req.query),
       select: {
         id: true,
         imageUrl: true,

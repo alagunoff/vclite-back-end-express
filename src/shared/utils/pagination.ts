@@ -1,4 +1,4 @@
-function createPaginationParameters(queryParams: {
+function createPaginationParameters(queryParameters: {
   pageNumber?: string;
   itemsNumber?: string;
   [k: string]: unknown;
@@ -8,11 +8,12 @@ function createPaginationParameters(queryParams: {
       take: number;
     }
   | undefined {
-  if ("pageNumber" in queryParams && "itemsNumber" in queryParams) {
+  if ("pageNumber" in queryParameters && "itemsNumber" in queryParameters) {
     return {
       skip:
-        (Number(queryParams.pageNumber) - 1) * Number(queryParams.itemsNumber),
-      take: Number(queryParams.itemsNumber),
+        (Number(queryParameters.pageNumber) - 1) *
+        Number(queryParameters.itemsNumber),
+      take: Number(queryParameters.itemsNumber),
     };
   }
 }
