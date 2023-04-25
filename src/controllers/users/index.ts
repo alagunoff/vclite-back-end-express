@@ -3,10 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 import prisma from "prisma";
-import {
-  saveImageToStaticFiles,
-  deleteImageFromStaticFiles,
-} from "shared/utils/images";
+import { saveImage, deleteImage } from "shared/utils/images";
 
 import { validateCreationData } from "./utils";
 
@@ -18,9 +15,9 @@ async function createUser(req: Request, res: Response): Promise<void> {
   } else {
     const createdUser = await prisma.user.create({
       data: {
-        image: saveImageToStaticFiles(
+        image: saveImage(
           req.body.image,
-          "users",
+          "static/images/users",
           req.body.username
         ),
         username: req.body.username,
@@ -55,7 +52,7 @@ async function deleteUser(req: Request, res: Response): Promise<void> {
         id: Number(req.params.id),
       },
     });
-    deleteImageFromStaticFiles(deletedUser.image);
+    deleteImage(deletedUser.image);
 
     res.status(204).end();
   } catch (error) {

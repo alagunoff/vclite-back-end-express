@@ -4,6 +4,7 @@ import {
   createDraft,
   getDrafts,
   updateDraft,
+  publishDraft,
   deleteDraft,
 } from "controllers/drafts";
 import { authenticateUser, authenticateAuthor } from "middlewares/auth";
@@ -16,6 +17,11 @@ router.patch(
   "/:id(\\d+)",
   [authenticateUser(), authenticateAuthor],
   updateDraft
+);
+router.post(
+  "/:id(\\d+)",
+  [authenticateUser(), authenticateAuthor],
+  publishDraft
 );
 router.delete(
   "/:id(\\d+)",

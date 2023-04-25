@@ -3,9 +3,9 @@ import fs from "fs";
 
 import { APP_HOST_NAME, PROJECT_ROOT_PATH } from "shared/constants";
 
-function saveImageToStaticFiles(
+function saveImage(
   base64ImageDataUrl: string,
-  folderNameToSave: string,
+  savePath: string,
   imageFileName: string
 ): string {
   const [imageMediatype, base64Image] = base64ImageDataUrl
@@ -14,45 +14,52 @@ function saveImageToStaticFiles(
   const imageFileNameWithExtension = `${imageFileName}.${
     imageMediatype.split("/")[1]
   }`;
-  const imageFilePathToSaveFromComputerRoot = path.join(
-    PROJECT_ROOT_PATH,
-    "static/images",
-    folderNameToSave
-  );
+  const savePathFromComputerRoot = path.join(PROJECT_ROOT_PATH, savePath);
 
-  fs.mkdirSync(imageFilePathToSaveFromComputerRoot, { recursive: true });
+  fs.mkdirSync(savePathFromComputerRoot, { recursive: true });
   fs.writeFileSync(
-    path.join(imageFilePathToSaveFromComputerRoot, imageFileNameWithExtension),
+    path.join(savePathFromComputerRoot, imageFileNameWithExtension),
     Buffer.from(base64Image, "base64")
   );
 
-  return `${APP_HOST_NAME}/${path.join(
-    "static/images",
-    folderNameToSave,
-    imageFileNameWithExtension
-  )}`;
+  return `${APP_HOST_NAME}/${path.join(savePath, imageFileNameWithExtension)}`;
 }
 
-function deleteImageFromStaticFiles(hostedImageUrl: string): void {
-  fs.unlinkSync(getImageLocalPathFromHostedImageUrl(hostedImageUrl));
+function getHostedImageSaveAbsolutePath(imageUrl: string): string {
+  return path.join(
+    PROJECT_ROOT_PATH,
+    imageUrl.replace(`${APP_HOST_NAME}/`, "")
+  );
 }
 
-function deleteImageFolderFromStaticFiles(hostedImageUrl: string): void {
-  fs.rmSync(path.dirname(getImageLocalPathFromHostedImageUrl(hostedImageUrl)), {
+function getHostedImageFolderAbsolutePath(imageUrl: string): string {
+  return path.dirname(getHostedImageSaveAbsolutePath(imageUrl));
+}
+
+function getHostedImageFolderName(imageUrl: string): string {
+  return path.basename(getHostedImageFolderAbsolutePath(imageUrl));
+}
+
+function deleteImage(hostedImageUrl: string): void {
+  fs.unlinkSync(getHostedImageSaveAbsolutePath(hostedImageUrl));
+}
+
+function deleteFolder(folderPath: string): void {
+  fs.rmSync(path.join(PROJECT_ROOT_PATH, folderPath), {
     recursive: true,
     force: true,
   });
 }
 
-function getImageLocalPathFromHostedImageUrl(hostedImageUrl: string): string {
-  return path.join(
-    PROJECT_ROOT_PATH,
-    hostedImageUrl.replace(`${APP_HOST_NAME}/`, "")
-  );
+function deleteImageFolder(hostedImageUrl: string): void {
+  deleteFolder(getHostedImageFolderAbsolutePath(hostedImageUrl));
 }
 
 export {
-  saveImageToStaticFiles,
-  deleteImageFromStaticFiles,
-  deleteImageFolderFromStaticFiles,
+  saveImage,
+  deleteImage,
+  getHostedImageSaveAbsolutePath,
+  getHostedImageFolderName,
+  deleteFolder,
+  deleteImageFolder,
 };

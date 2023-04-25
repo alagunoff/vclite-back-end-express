@@ -1,5 +1,4 @@
 import { type Request, type Response } from "express";
-import crypto from "crypto";
 
 import prisma from "prisma";
 import {
@@ -13,26 +12,23 @@ import {
   calculatePagesTotalNumber,
 } from "shared/utils/pagination";
 import { includeSubcategories } from "shared/utils/categories";
-
+import { validatePaginationQueryParameters } from "shared/utils/validation";
 import {
   validateCreationData,
-  createGetRequestValidationErrors,
-  createFilterParameters,
-  createOrderParameters,
   validateUpdateData,
-} from "./utils";
+} from "controllers/posts/utils";
 
-async function createPost(req: Request, res: Response): Promise<void> {
+async function createDraft(req: Request, res: Response): Promise<void> {
   const creationDataValidationErrors = await validateCreationData(req.body);
 
   if (creationDataValidationErrors) {
     res.status(400).json(creationDataValidationErrors);
   } else {
-    const postImagesSavePath = `static/images/posts/${crypto.randomUUID()}`;
+    const draftImagesSavePath = `static/images/posts/${crypto.randomUUID()}`;
 
     await prisma.post.create({
       data: {
-        imageUrl: saveImage(req.body.image, postImagesSavePath, "main"),
+        imageUrl: saveImage(req.body.image, draftImagesSavePath, "main"),
         title: req.body.title,
         content: req.body.content,
         author: {
@@ -58,7 +54,7 @@ async function createPost(req: Request, res: Response): Promise<void> {
                     (extraImage: string, index: number) => ({
                       url: saveImage(
                         extraImage,
-                        `${postImagesSavePath}/extra`,
+                        `${draftImagesSavePath}/extra`,
                         String(index)
                       ),
                     })
@@ -66,6 +62,7 @@ async function createPost(req: Request, res: Response): Promise<void> {
                 },
               }
             : undefined,
+        isDraft: true,
       },
     });
 
@@ -73,18 +70,23 @@ async function createPost(req: Request, res: Response): Promise<void> {
   }
 }
 
-async function getPosts(req: Request, res: Response): Promise<void> {
-  const getRequestValidationErrors = createGetRequestValidationErrors(
-    req.query
-  );
+async function getDrafts(req: Request, res: Response): Promise<void> {
+  const paginationQueryParametersValidationErrors =
+    validatePaginationQueryParameters(req.query);
 
-  if (getRequestValidationErrors) {
-    res.status(400).json(getRequestValidationErrors);
+  if (paginationQueryParametersValidationErrors) {
+    res
+      .status(400)
+      .json({ queryParameters: paginationQueryParametersValidationErrors });
   } else {
-    const posts = await prisma.post.findMany({
-      where: createFilterParameters(req.query),
+    const drafts = await prisma.post.findMany({
+      where: {
+        isDraft: true,
+        author: {
+          id: req.authenticatedAuthor?.id,
+        },
+      },
       ...createPaginationParameters(req.query),
-      orderBy: createOrderParameters(req.query),
       select: {
         id: true,
         imageUrl: true,
@@ -123,38 +125,42 @@ async function getPosts(req: Request, res: Response): Promise<void> {
         createdAt: true,
       },
     });
-    for (const post of posts) {
-      await includeSubcategories(post.category);
+    for (const draft of drafts) {
+      await includeSubcategories(draft.category);
     }
 
-    const postsTotalNumber = await prisma.post.count({
+    const draftsTotalNumber = await prisma.post.count({
       where: {
-        isDraft: false,
+        isDraft: true,
+        author: {
+          id: req.authenticatedAuthor?.id,
+        },
       },
     });
 
     res.json({
-      posts,
-      postsTotalNumber,
+      drafts,
+      draftsTotalNumber,
       pagesTotalNumber: calculatePagesTotalNumber(
-        postsTotalNumber,
-        posts.length
+        draftsTotalNumber,
+        drafts.length
       ),
     });
   }
 }
 
-async function updatePost(req: Request, res: Response): Promise<void> {
+async function updateDraft(req: Request, res: Response): Promise<void> {
   const updateDataValidationErrors = await validateUpdateData(req.body);
 
   if (updateDataValidationErrors) {
     res.status(400).json(updateDataValidationErrors);
   } else {
     try {
-      const updatedPost = await prisma.post.update({
+      const updatedDraft = await prisma.post.update({
         where: {
           id: Number(req.params.id),
-          isDraft: false,
+          isDraft: true,
+          authorId: req.authenticatedAuthor?.id,
         },
         data: {
           title: req.body.title,
@@ -173,14 +179,14 @@ async function updatePost(req: Request, res: Response): Promise<void> {
       });
 
       if ("image" in req.body || "extraImages" in req.body) {
-        const updatedPostImagesFolderName = getHostedImageFolderName(
-          updatedPost.imageUrl
+        const updatedDraftImagesFolderName = getHostedImageFolderName(
+          updatedDraft.imageUrl
         );
 
         if ("image" in req.body) {
           saveImage(
             req.body.image,
-            `static/images/posts/${updatedPostImagesFolderName}`,
+            `static/images/posts/${updatedDraftImagesFolderName}`,
             "main"
           );
         }
@@ -188,15 +194,15 @@ async function updatePost(req: Request, res: Response): Promise<void> {
         if ("extraImages" in req.body) {
           await prisma.postExtraImage.deleteMany({
             where: {
-              postId: updatedPost.id,
+              postId: updatedDraft.id,
             },
           });
           deleteFolder(
-            `static/images/posts/${updatedPostImagesFolderName}/extra`
+            `static/images/posts/${updatedDraftImagesFolderName}/extra`
           );
           await prisma.post.update({
             where: {
-              id: updatedPost.id,
+              id: updatedDraft.id,
             },
             data: {
               extraImages: {
@@ -204,7 +210,7 @@ async function updatePost(req: Request, res: Response): Promise<void> {
                   (extraImage: string, index: number) => ({
                     url: saveImage(
                       extraImage,
-                      `${updatedPostImagesFolderName}/extra`,
+                      `${updatedDraftImagesFolderName}/extra`,
                       String(index)
                     ),
                   })
@@ -219,27 +225,49 @@ async function updatePost(req: Request, res: Response): Promise<void> {
     } catch (error) {
       console.log(error);
 
-      res.status(404).send("Post with this id wasn't found");
+      res.status(404).send("Draft with this id wasn't found");
     }
   }
 }
 
-async function deletePost(req: Request, res: Response): Promise<void> {
+async function publishDraft(req: Request, res: Response): Promise<void> {
   try {
-    const deletedPost = await prisma.post.delete({
+    await prisma.post.update({
       where: {
         id: Number(req.params.id),
+        isDraft: true,
+        authorId: req.authenticatedAuthor?.id,
+      },
+      data: {
         isDraft: false,
       },
     });
-    deleteImageFolder(deletedPost.imageUrl);
 
     res.status(204).end();
   } catch (error) {
     console.log(error);
 
-    res.status(404).send("Post with this id wasn't found");
+    res.status(404).send("Draft with this id wasn't found");
   }
 }
 
-export { createPost, getPosts, updatePost, deletePost };
+async function deleteDraft(req: Request, res: Response): Promise<void> {
+  try {
+    const deletedDraft = await prisma.post.delete({
+      where: {
+        id: Number(req.params.id),
+        isDraft: true,
+        authorId: req.authenticatedAuthor?.id,
+      },
+    });
+    deleteImageFolder(deletedDraft.imageUrl);
+
+    res.status(204).end();
+  } catch (error) {
+    console.log(error);
+
+    res.status(404).send("Draft with this id wasn't found");
+  }
+}
+
+export { createDraft, getDrafts, updateDraft, publishDraft, deleteDraft };

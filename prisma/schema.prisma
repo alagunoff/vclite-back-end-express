@@ -4,8 +4,9 @@ datasource db {
 }
 
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-1.1.x"]
+  provider        = "prisma-client-js"
+  binaryTargets   = ["native", "debian-openssl-1.1.x"]
+  previewFeatures = ["extendedWhereUnique"]
 }
 
 model User {
@@ -84,7 +85,5 @@ model Post {
   comments    Comment[]
   extraImages PostExtraImage[]
 
-  @@unique([id, isDraft])
-  @@unique([id, isDraft, authorId])
   @@map("posts")
 }
