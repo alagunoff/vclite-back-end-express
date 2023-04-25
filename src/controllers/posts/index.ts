@@ -200,15 +200,17 @@ async function updatePost(req: Request, res: Response): Promise<void> {
             },
             data: {
               extraImages: {
-                createMany: req.body.extraImages.map(
-                  (extraImage: string, index: number) => ({
-                    url: saveImage(
-                      extraImage,
-                      `${updatedPostImagesFolderName}/extra`,
-                      String(index)
-                    ),
-                  })
-                ),
+                createMany: {
+                  data: req.body.extraImages.map(
+                    (extraImage: string, index: number) => ({
+                      url: saveImage(
+                        extraImage,
+                        `static/images/posts/${updatedPostImagesFolderName}/extra`,
+                        String(index)
+                      ),
+                    })
+                  ),
+                },
               },
             },
           });
@@ -232,6 +234,7 @@ async function deletePost(req: Request, res: Response): Promise<void> {
         isDraft: false,
       },
     });
+    console.log(deletedPost);
     deleteImageFolder(deletedPost.imageUrl);
 
     res.status(204).end();

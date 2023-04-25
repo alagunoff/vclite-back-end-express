@@ -44,15 +44,19 @@ function deleteImage(hostedImageUrl: string): void {
   fs.unlinkSync(getHostedImageSaveAbsolutePath(hostedImageUrl));
 }
 
-function deleteFolder(folderPath: string): void {
-  fs.rmSync(path.join(PROJECT_ROOT_PATH, folderPath), {
+function deleteFolderByAbsolutePath(folderAbsolutePath: string): void {
+  fs.rmSync(folderAbsolutePath, {
     recursive: true,
     force: true,
   });
 }
 
+function deleteFolder(folderPath: string): void {
+  deleteFolderByAbsolutePath(path.join(PROJECT_ROOT_PATH, folderPath));
+}
+
 function deleteImageFolder(hostedImageUrl: string): void {
-  deleteFolder(getHostedImageFolderAbsolutePath(hostedImageUrl));
+  deleteFolderByAbsolutePath(getHostedImageFolderAbsolutePath(hostedImageUrl));
 }
 
 export {

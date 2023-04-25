@@ -206,15 +206,17 @@ async function updateDraft(req: Request, res: Response): Promise<void> {
             },
             data: {
               extraImages: {
-                createMany: req.body.extraImages.map(
-                  (extraImage: string, index: number) => ({
-                    url: saveImage(
-                      extraImage,
-                      `${updatedDraftImagesFolderName}/extra`,
-                      String(index)
-                    ),
-                  })
-                ),
+                createMany: {
+                  data: req.body.extraImages.map(
+                    (extraImage: string, index: number) => ({
+                      url: saveImage(
+                        extraImage,
+                        `static/images/posts/${updatedDraftImagesFolderName}/extra`,
+                        String(index)
+                      ),
+                    })
+                  ),
+                },
               },
             },
           });
