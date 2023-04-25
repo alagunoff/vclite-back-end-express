@@ -17,6 +17,7 @@ import {
   createGetRequestValidationErrors,
   createFilterParameters,
   createOrderParameters,
+  validateUpdateData,
 } from "./utils";
 
 async function createPost(req: Request, res: Response): Promise<void> {
@@ -146,63 +147,69 @@ async function getPosts(req: Request, res: Response): Promise<void> {
 }
 
 async function updatePost(req: Request, res: Response): Promise<void> {
-  try {
-    await prisma.post.update({
-      where: {
-        id_isDraft: {
-          id: Number(req.params.id),
-          isDraft: false,
+  const updateDataValidationErrors = await validateUpdateData(req.body);
+
+  if (updateDataValidationErrors) {
+    res.status(400).json(updateDataValidationErrors);
+  } else {
+    try {
+      await prisma.post.update({
+        where: {
+          id_isDraft: {
+            id: Number(req.params.id),
+            isDraft: false,
+          },
         },
-      },
-      data: {
-        imageUrl:
-          "image" in req.body
-            ? saveImageToStaticFiles(
-                req.body.image,
-                `posts/${transformStringToLowercasedKebabString(
-                  req.body.title
-                )}`,
-                "main"
-              )
-            : undefined,
-        title: req.body.title,
-        content: req.body.content,
-        authorId: req.body.authorId,
-        categoryId: req.body.categoryId,
-        tags:
-          "tagsIds" in req.body
-            ? {
-                connect: req.body.tagsIds.map((tagId: number) => ({
-                  id: tagId,
-                })),
-              }
-            : undefined,
-        extraImages:
-          "extraImages" in req.body
-            ? {
-                createMany: {
-                  data: req.body.extraImages?.map(
-                    (extraImage: string, index: number) => ({
-                      url: saveImageToStaticFiles(
-                        extraImage,
-                        `posts/${transformStringToLowercasedKebabString(
-                          req.body.title
-                        )}`,
-                        `extra-${index}`
-                      ),
-                    })
-                  ),
-                },
-              }
-            : undefined,
-      },
-    });
+        data: {
+          imageUrl:
+            "image" in req.body
+              ? saveImageToStaticFiles(
+                  req.body.image,
+                  `posts/${transformStringToLowercasedKebabString(
+                    req.body.title
+                  )}`,
+                  "main"
+                )
+              : undefined,
+          title: req.body.title,
+          content: req.body.content,
+          authorId: req.body.authorId,
+          categoryId: req.body.categoryId,
+          tags:
+            "tagsIds" in req.body
+              ? {
+                  connect: req.body.tagsIds.map((tagId: number) => ({
+                    id: tagId,
+                  })),
+                }
+              : undefined,
+          extraImages:
+            "extraImages" in req.body
+              ? {
+                  createMany: {
+                    data: req.body.extraImages?.map(
+                      (extraImage: string, index: number) => ({
+                        url: saveImageToStaticFiles(
+                          extraImage,
+                          `posts/${transformStringToLowercasedKebabString(
+                            req.body.title
+                          )}`,
+                          `extra-${index}`
+                        ),
+                      })
+                    ),
+                  },
+                }
+              : undefined,
+        },
+      });
 
-    res.status(204).end();
-  } catch (error) {
-    console.log(error);
+      res.status(204).end();
+    } catch (error) {
+      console.log(error);
 
-    res.status(404).send("Post with this id wasn't found");
+      res.status(404).send("Post with this id wasn't found");
+    }
   }
 }
 

@@ -410,6 +410,84 @@ function createGetRequestValidationErrors(
   return Object.keys(errors).length ? errors : undefined;
 }
 
+interface UpdateDataValidationErrors {
+  image?: string;
+  title?: string;
+  content?: string;
+  categoryId?: string;
+  tagsIds?: string | Record<number, string>;
+  extraImages?: string;
+}
+
+async function validateUpdateData(
+  data: any
+): Promise<UpdateDataValidationErrors | undefined> {
+  const errors: UpdateDataValidationErrors = {};
+
+  if ("image" in data) {
+    if (!isBase64ImageDataUrl(data.image)) {
+      errors.image = "must be base64 image in data URL format with mediatype";
+    }
+  }
+
+  if ("title" in data) {
+    if (!isNotEmptyString(data.title)) {
+      errors.title = "must be not empty string";
+    }
+  }
+
+  if ("content" in data) {
+    if (!isNotEmptyString(data.content)) {
+      errors.content = "must be not empty string";
+    }
+  }
+
+  if ("categoryId" in data) {
+    if (isPositiveInteger(data.categoryId)) {
+      if (
+        !(await prisma.category.findUnique({ where: { id: data.categoryId } }))
+      ) {
+        errors.categoryId = "category with this id wasn't found";
+      }
+    } else {
+      errors.categoryId = "must be positive integer";
+    }
+  }
+
+  if ("tagsIds" in data) {
+    const tagsIds = data.tagsIds;
+
+    if (isPositiveIntegersArray(tagsIds)) {
+      for (const tagId of tagsIds) {
+        const tag = await prisma.tag.findUnique({
+          where: { id: tagId },
+        });
+
+        if (!tag) {
+          if ("tagsIds" in errors && typeof errors.tagsIds === "object") {
+            errors.tagsIds[tagId] = "tag with this id wasn't found";
+          } else {
+            errors.tagsIds = {
+              [tagId]: "tag with this id wasn't found",
+            };
+          }
+        }
+      }
+    } else {
+      errors.tagsIds = "must be numeric array with positive integers";
+    }
+  }
+
+  if ("extraImages" in data) {
+    if (!isBase64ImageDataUrlsArray(data.extraImages)) {
+      errors.extraImages =
+        "must be array of base64 images in data URL formats with mediatypes";
+    }
+  }
+
+  return Object.keys(errors).length ? errors : undefined;
+}
+
 export {
   validateCreationData,
   validateFilterQueryParameters,
@@ -417,4 +495,5 @@ export {
   validateOrderQueryParameters,
   createOrderParameters,
   createGetRequestValidationErrors,
+  validateUpdateData,
 };
