@@ -44,7 +44,7 @@ function authenticateUser(onlyAdmin?: true) {
         res
           .status(401)
           .send(
-            'You must provide "Authorization" header in the form "Bearer *token*"'
+            'You must provide "Authorization" header in the form "Bearer *jwt*"'
           );
       }
     }

@@ -1,0 +1,688 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Vclite API docs",
+    "version": "1.0.0",
+    "description": "Back end for a blog written in nodejs and express"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Login to account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "minLength": 1
+                  }
+                },
+                "required": ["username", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "format": "jwt"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/validationErrors"
+          },
+          "403": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "post": {
+        "tags": ["users"],
+        "summary": "Create new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "base64"
+                  },
+                  "username": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "minLength": 1
+                  },
+                  "firstName": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": ["image", "username", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "format": "jwt"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/validationErrors"
+          }
+        }
+      },
+      "get": {
+        "tags": ["users"],
+        "summary": "Get info about user by providing jwt in headers",
+        "security": [{ "JWT": [] }],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "image": {
+                      "type": "string",
+                      "format": "url"
+                    },
+                    "username": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "firstName": {
+                      "type": "string",
+                      "minLength": 1,
+                      "nullable": true
+                    },
+                    "lastName": {
+                      "type": "string",
+                      "minLength": 1,
+                      "nullable": true
+                    },
+                    "isAdmin": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "delete": {
+        "tags": ["users"],
+        "summary": "Delete user by id",
+        "security": [{ "JWT": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "204": {},
+          "404": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/authors": {
+      "post": {
+        "tags": ["authors"],
+        "summary": "Create new author",
+        "security": [{ "JWT": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "required": ["userId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {},
+          "400": {
+            "$ref": "#/components/responses/validationErrors"
+          },
+          "404": {}
+        }
+      },
+      "get": {
+        "tags": ["authors"],
+        "summary": "Get list of all authors",
+        "security": [{ "JWT": [] }],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "description": {
+                        "type": "string",
+                        "minLength": 1,
+                        "nullable": true
+                      },
+                      "userId": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {}
+        }
+      }
+    },
+    "/authors/{id}": {
+      "patch": {
+        "tags": ["authors"],
+        "summary": "Update author by id",
+        "security": [{ "JWT": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "userId": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {},
+          "404": {}
+        }
+      },
+      "delete": {
+        "tags": ["authors"],
+        "summary": "Delete author by id",
+        "security": [{ "JWT": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "204": {},
+          "404": {}
+        }
+      }
+    },
+    "/tags": {
+      "post": {
+        "tags": ["tags"],
+        "summary": "Create new tag",
+        "security": [{ "JWT": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {},
+          "400": {
+            "$ref": "#/components/responses/validationErrors"
+          },
+          "404": {}
+        }
+      },
+      "get": {
+        "tags": ["tags"],
+        "summary": "Get list of all tags",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {}
+        }
+      }
+    },
+    "/tags/{id}": {
+      "patch": {
+        "tags": ["tags"],
+        "summary": "Update tag by id",
+        "security": [{ "JWT": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {},
+          "404": {}
+        }
+      },
+      "delete": {
+        "tags": ["tags"],
+        "summary": "Delete tag by id",
+        "security": [{ "JWT": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "204": {},
+          "404": {}
+        }
+      }
+    },
+    "/categories": {
+      "post": {
+        "tags": ["categories"],
+        "summary": "Create new category",
+        "security": [{ "JWT": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Category"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {},
+          "400": {
+            "$ref": "#/components/responses/validationErrors"
+          },
+          "404": {}
+        }
+      },
+      "get": {
+        "tags": ["categories"],
+        "summary": "Get list of all categories",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Category"
+                  }
+                }
+              }
+            }
+          },
+          "404": {}
+        }
+      }
+    },
+    "/categories/{id}": {
+      "patch": {
+        "tags": ["categories"],
+        "summary": "Update category by id",
+        "security": [{ "JWT": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Category"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {},
+          "404": {}
+        }
+      },
+      "delete": {
+        "tags": ["categories"],
+        "summary": "Delete category by id",
+        "security": [{ "JWT": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {},
+          "404": {}
+        }
+      }
+    },
+    "/posts": {
+      "post": {
+        "tags": ["posts"],
+        "summary": "Create new post",
+        "security": [{ "JWT": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "base64"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "categoryId": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "tagsIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                  },
+                  "extraImages": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "base64"
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": ["image", "title", "categoryId", "tagsIds"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {},
+          "400": {
+            "$ref": "#/components/responses/validationErrors"
+          },
+          "404": {}
+        }
+      },
+      "get": {
+        "tags": ["posts"],
+        "summary": "Get list of all posts",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Category"
+                  }
+                }
+              }
+            }
+          },
+          "404": {}
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "JWT": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "parentCategoryId": {
+            "type": "integer",
+            "writeOnly": true
+          }
+        }
+      },
+      "PostProperties": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "parentCategoryId": {
+            "type": "integer",
+            "writeOnly": true
+          }
+        }
+      }
+    },
+    "responses": {
+      "validationErrors": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "description": "validation errors",
+              "type": "object",
+              "properties": {
+                "field1": {
+                  "type": "string"
+                },
+                "field2": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

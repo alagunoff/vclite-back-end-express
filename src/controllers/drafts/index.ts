@@ -29,7 +29,7 @@ async function createDraft(req: Request, res: Response): Promise<void> {
 
     await prisma.post.create({
       data: {
-        imageUrl: saveImage(req.body.image, draftImagesSavePath, "main"),
+        image: saveImage(req.body.image, draftImagesSavePath, "main"),
         title: req.body.title,
         content: req.body.content,
         author: {
@@ -90,7 +90,7 @@ async function getDrafts(req: Request, res: Response): Promise<void> {
       ...createPaginationParameters(req.query),
       select: {
         id: true,
-        imageUrl: true,
+        image: true,
         title: true,
         content: true,
         author: {
@@ -181,7 +181,7 @@ async function updateDraft(req: Request, res: Response): Promise<void> {
 
       if ("image" in req.body || "extraImages" in req.body) {
         const updatedDraftImagesFolderName = getHostedImageFolderName(
-          updatedDraft.imageUrl
+          updatedDraft.image
         );
 
         if ("image" in req.body) {
@@ -263,7 +263,7 @@ async function deleteDraft(req: Request, res: Response): Promise<void> {
         authorId: req.authenticatedAuthor?.id,
       },
     });
-    deleteImageFolder(deletedDraft.imageUrl);
+    deleteImageFolder(deletedDraft.image);
 
     res.status(204).end();
   } catch (error) {

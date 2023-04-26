@@ -6,9 +6,9 @@ import {
   isNotEmptyString,
   isPositiveInteger,
   isDateString,
-  isPositiveIntegersArray,
-  isPositiveIntegersArrayString,
-  isBase64ImageDataUrlsArray,
+  isPositiveIntegersNotEmptyArray,
+  isPositiveIntegersNotEmptyArrayString,
+  isBase64ImageDataUrlsNotEmptyArray,
   validatePaginationQueryParameters,
   type PaginationQueryParametersValidationErrors,
 } from "shared/utils/validation";
@@ -66,33 +66,35 @@ async function validateCreationData(
   if ("tagsIds" in data) {
     const tagsIds = data.tagsIds;
 
-    if (isPositiveIntegersArray(tagsIds)) {
+    if (isPositiveIntegersNotEmptyArray(tagsIds)) {
       for (const tagId of tagsIds) {
         const tag = await prisma.tag.findUnique({
           where: { id: tagId },
         });
 
         if (!tag) {
+          const errorMessage = "tag with this id wasn't found";
+
           if ("tagsIds" in errors && typeof errors.tagsIds === "object") {
-            errors.tagsIds[tagId] = "tag with this id wasn't found";
+            errors.tagsIds[tagId] = errorMessage;
           } else {
             errors.tagsIds = {
-              [tagId]: "tag with this id wasn't found",
+              [tagId]: errorMessage,
             };
           }
         }
       }
     } else {
-      errors.tagsIds = "must be numeric array with positive integers";
+      errors.tagsIds = "must be not empty numeric array with positive integers";
     }
   } else {
     errors.tagsIds = "required";
   }
 
   if ("extraImages" in data) {
-    if (!isBase64ImageDataUrlsArray(data.extraImages)) {
+    if (!isBase64ImageDataUrlsNotEmptyArray(data.extraImages)) {
       errors.extraImages =
-        "must be array of base64 images in data URL formats with mediatypes";
+        "must be not empty array of base64 images in data URL formats with mediatypes";
     }
   }
 
@@ -148,14 +150,15 @@ function validateFilterQueryParameters(
   }
 
   if ("tagIdIn" in queryParameters) {
-    if (!isPositiveIntegersArrayString(queryParameters.tagIdIn)) {
-      errors.tagIdIn = "must be numeric array with positive integers";
+    if (!isPositiveIntegersNotEmptyArrayString(queryParameters.tagIdIn)) {
+      errors.tagIdIn = "must be not empty numeric array with positive integers";
     }
   }
 
   if ("tagIdAll" in queryParameters) {
-    if (!isPositiveIntegersArrayString(queryParameters.tagIdAll)) {
-      errors.tagIdAll = "must be numeric array with positive integers";
+    if (!isPositiveIntegersNotEmptyArrayString(queryParameters.tagIdAll)) {
+      errors.tagIdAll =
+        "must be not empty numeric array with positive integers";
     }
   }
 
@@ -455,31 +458,31 @@ async function validateUpdateData(
   }
 
   if ("tagsIds" in data) {
-    const tagsIds = data.tagsIds;
-
-    if (isPositiveIntegersArray(tagsIds)) {
-      for (const tagId of tagsIds) {
+    if (isPositiveIntegersNotEmptyArray(data.tagsIds)) {
+      for (const tagId of data.tagsIds) {
         const tag = await prisma.tag.findUnique({
           where: { id: tagId },
         });
 
         if (!tag) {
+          const errorMessage = "tag with this id wasn't found";
+
           if ("tagsIds" in errors && typeof errors.tagsIds === "object") {
-            errors.tagsIds[tagId] = "tag with this id wasn't found";
+            errors.tagsIds[tagId] = errorMessage;
           } else {
             errors.tagsIds = {
-              [tagId]: "tag with this id wasn't found",
+              [tagId]: errorMessage,
             };
           }
         }
       }
     } else {
-      errors.tagsIds = "must be numeric array with positive integers";
+      errors.tagsIds = "must be not empty numeric array with positive integers";
     }
   }
 
   if ("extraImages" in data) {
-    if (!isBase64ImageDataUrlsArray(data.extraImages)) {
+    if (!isBase64ImageDataUrlsNotEmptyArray(data.extraImages)) {
       errors.extraImages =
         "must be array of base64 images in data URL formats with mediatypes";
     }

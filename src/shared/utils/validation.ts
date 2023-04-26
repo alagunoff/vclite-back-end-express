@@ -22,21 +22,23 @@ function isDateString(value: unknown): boolean {
   return false;
 }
 
-function isPositiveIntegersArray(value: unknown): boolean {
+function isPositiveIntegersNotEmptyArray(value: unknown): boolean {
   return (
     Array.isArray(value) &&
+    !!value.length &&
     !value.some(
       (item: unknown) => !Number.isInteger(item) || (item as number) <= 0
     )
   );
 }
 
-function isPositiveIntegersArrayString(value: unknown): boolean {
+function isPositiveIntegersNotEmptyArrayString(value: unknown): boolean {
   if (typeof value === "string") {
     const parsedValue = JSON.parse(value);
 
     return (
       Array.isArray(parsedValue) &&
+      !!parsedValue.length &&
       !parsedValue.some(
         (item: unknown) => !Number.isInteger(item) || (item as number) <= 0
       )
@@ -46,9 +48,10 @@ function isPositiveIntegersArrayString(value: unknown): boolean {
   return false;
 }
 
-function isBase64ImageDataUrlsArray(value: unknown): boolean {
+function isBase64ImageDataUrlsNotEmptyArray(value: unknown): boolean {
   return (
     Array.isArray(value) &&
+    !!value.length &&
     !value.some((item: unknown) => !isBase64ImageDataUrl(item))
   );
 }
@@ -91,9 +94,9 @@ export {
   isPositiveInteger,
   isBase64ImageDataUrl,
   isDateString,
-  isPositiveIntegersArray,
-  isPositiveIntegersArrayString,
-  isBase64ImageDataUrlsArray,
+  isPositiveIntegersNotEmptyArray,
+  isPositiveIntegersNotEmptyArrayString,
+  isBase64ImageDataUrlsNotEmptyArray,
   validatePaginationQueryParameters,
 };
 export type { PaginationQueryParametersValidationErrors };

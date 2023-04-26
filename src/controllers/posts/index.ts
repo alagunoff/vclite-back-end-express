@@ -32,7 +32,7 @@ async function createPost(req: Request, res: Response): Promise<void> {
 
     await prisma.post.create({
       data: {
-        imageUrl: saveImage(req.body.image, postImagesSavePath, "main"),
+        image: saveImage(req.body.image, postImagesSavePath, "main"),
         title: req.body.title,
         content: req.body.content,
         author: {
@@ -85,7 +85,7 @@ async function getPosts(req: Request, res: Response): Promise<void> {
       orderBy: createOrderParameters(req.query),
       select: {
         id: true,
-        imageUrl: true,
+        image: true,
         title: true,
         content: true,
         author: {
@@ -172,7 +172,7 @@ async function updatePost(req: Request, res: Response): Promise<void> {
 
       if ("image" in req.body || "extraImages" in req.body) {
         const updatedPostImagesFolderName = getHostedImageFolderName(
-          updatedPost.imageUrl
+          updatedPost.image
         );
 
         if ("image" in req.body) {
@@ -233,7 +233,7 @@ async function deletePost(req: Request, res: Response): Promise<void> {
       },
     });
     console.log(deletedPost);
-    deleteImageFolder(deletedPost.imageUrl);
+    deleteImageFolder(deletedPost.image);
 
     res.status(204).end();
   } catch (error) {
