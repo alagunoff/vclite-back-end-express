@@ -1,9 +1,8 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Vclite API docs",
-    "version": "1.0.0",
-    "description": "Back end for a blog written in nodejs and express"
+    "title": "API docs for Vclite",
+    "version": "1.0.0"
   },
   "servers": [
     {
@@ -14,7 +13,6 @@
     "/auth/login": {
       "post": {
         "tags": ["auth"],
-        "summary": "Login to account",
         "requestBody": {
           "required": true,
           "content": {
@@ -39,11 +37,13 @@
         },
         "responses": {
           "200": {
+            "description": "Credentials are correct",
             "content": {
               "text/plain": {
                 "schema": {
                   "type": "string",
-                  "format": "jwt"
+                  "format": "jwt",
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dmNsaXRl.p2ccOCLXgVZMiWp6ff1YJJ5emHNnlyq0uUxbm-hubCM"
                 }
               }
             }
@@ -52,13 +52,7 @@
             "$ref": "#/components/responses/ValidationErrors"
           },
           "403": {
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+            "description": "Password is incorrect"
           }
         }
       }
@@ -1186,7 +1180,7 @@
     },
     "responses": {
       "ValidationErrors": {
-        "description": "This can happen if request data or query parameters are invalid",
+        "description": "Request body or query parameters are invalid",
         "content": {
           "application/json": {
             "schema": {

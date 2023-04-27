@@ -32,7 +32,7 @@ async function login(req: Request, res: Response): Promise<void> {
 
         res.send(userJwtToken);
       } else {
-        res.status(403).send("Password is incorrect");
+        res.status(403).end();
       }
     }
   }
