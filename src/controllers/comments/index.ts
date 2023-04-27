@@ -68,7 +68,7 @@ async function getComments(req: Request, res: Response): Promise<void> {
       });
     }
   } else {
-    res.status(404).send("Post with this id wasn't found");
+    res.status(404).end();
   }
 }
 
@@ -88,7 +88,7 @@ async function deleteComments(req: Request, res: Response): Promise<void> {
 
     res.status(204).end();
   } else {
-    res.status(404).send("Post with this id wasn't found");
+    res.status(404).end();
   }
 }
 

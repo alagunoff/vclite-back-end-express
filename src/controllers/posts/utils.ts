@@ -15,11 +15,11 @@ import {
 
 interface CreationDataValidationErrors {
   image?: string;
+  extraImages?: string;
   title?: string;
   content?: string;
   categoryId?: string;
   tagsIds?: string | Record<number, string>;
-  extraImages?: string;
 }
 
 async function validateCreationData(
@@ -35,6 +35,13 @@ async function validateCreationData(
     errors.image = "required";
   }
 
+  if ("extraImages" in data) {
+    if (!isBase64ImageDataUrlsNotEmptyArray(data.extraImages)) {
+      errors.extraImages =
+        "must be not empty array of base64 images in data URL formats with mediatypes";
+    }
+  }
+
   if ("title" in data) {
     if (!isNotEmptyString(data.title)) {
       errors.title = "must be not empty string";
@@ -47,6 +54,8 @@ async function validateCreationData(
     if (!isNotEmptyString(data.content)) {
       errors.content = "must be not empty string";
     }
+  } else {
+    errors.content = "required";
   }
 
   if ("categoryId" in data) {
@@ -89,13 +98,6 @@ async function validateCreationData(
     }
   } else {
     errors.tagsIds = "required";
-  }
-
-  if ("extraImages" in data) {
-    if (!isBase64ImageDataUrlsNotEmptyArray(data.extraImages)) {
-      errors.extraImages =
-        "must be not empty array of base64 images in data URL formats with mediatypes";
-    }
   }
 
   return Object.keys(errors).length ? errors : undefined;
@@ -415,11 +417,11 @@ function validateGetRequest(
 
 interface UpdateDataValidationErrors {
   image?: string;
+  extraImages?: string;
   title?: string;
   content?: string;
   categoryId?: string;
   tagsIds?: string | Record<number, string>;
-  extraImages?: string;
 }
 
 async function validateUpdateData(
@@ -430,6 +432,13 @@ async function validateUpdateData(
   if ("image" in data) {
     if (!isBase64ImageDataUrl(data.image)) {
       errors.image = "must be base64 image in data URL format with mediatype";
+    }
+  }
+
+  if ("extraImages" in data) {
+    if (!isBase64ImageDataUrlsNotEmptyArray(data.extraImages)) {
+      errors.extraImages =
+        "must be array of base64 images in data URL formats with mediatypes";
     }
   }
 
@@ -478,13 +487,6 @@ async function validateUpdateData(
       }
     } else {
       errors.tagsIds = "must be not empty numeric array with positive integers";
-    }
-  }
-
-  if ("extraImages" in data) {
-    if (!isBase64ImageDataUrlsNotEmptyArray(data.extraImages)) {
-      errors.extraImages =
-        "must be array of base64 images in data URL formats with mediatypes";
     }
   }
 

@@ -86,6 +86,12 @@ async function getPosts(req: Request, res: Response): Promise<void> {
       select: {
         id: true,
         image: true,
+        extraImages: {
+          select: {
+            id: true,
+            url: true,
+          },
+        },
         title: true,
         content: true,
         author: {
@@ -110,12 +116,6 @@ async function getPosts(req: Request, res: Response): Promise<void> {
           select: {
             id: true,
             content: true,
-          },
-        },
-        extraImages: {
-          select: {
-            id: true,
-            url: true,
           },
         },
         createdAt: true,
@@ -219,7 +219,7 @@ async function updatePost(req: Request, res: Response): Promise<void> {
     } catch (error) {
       console.log(error);
 
-      res.status(404).send("Post with this id wasn't found");
+      res.status(404).end();
     }
   }
 }
@@ -239,7 +239,7 @@ async function deletePost(req: Request, res: Response): Promise<void> {
   } catch (error) {
     console.log(error);
 
-    res.status(404).send("Post with this id wasn't found");
+    res.status(404).end();
   }
 }
 

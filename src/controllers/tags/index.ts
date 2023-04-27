@@ -64,7 +64,7 @@ async function updateTag(req: Request, res: Response): Promise<void> {
     } catch (error) {
       console.log(error);
 
-      res.status(404).send("Tag with this id wasn't found");
+      res.status(404).end();
     }
   }
 }
@@ -81,7 +81,7 @@ async function deleteTag(req: Request, res: Response): Promise<void> {
   } catch (error) {
     console.log(error);
 
-    res.status(404).send("Tag with this id wasn't found");
+    res.status(404).end();
   }
 }
 

@@ -91,7 +91,7 @@ async function updateCategory(req: Request, res: Response): Promise<void> {
     } catch (error) {
       console.log(error);
 
-      res.status(404).send("Category with this id wasn't found");
+      res.status(404).end();
     }
   }
 }
@@ -108,7 +108,7 @@ async function deleteCategory(req: Request, res: Response): Promise<void> {
   } catch (error) {
     console.log(error);
 
-    res.status(404).send("Category with this id wasn't found");
+    res.status(404).end();
   }
 }
 

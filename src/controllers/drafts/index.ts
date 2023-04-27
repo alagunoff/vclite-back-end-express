@@ -228,7 +228,7 @@ async function updateDraft(req: Request, res: Response): Promise<void> {
     } catch (error) {
       console.log(error);
 
-      res.status(404).send("Draft with this id wasn't found");
+      res.status(404).end();
     }
   }
 }
@@ -250,7 +250,7 @@ async function publishDraft(req: Request, res: Response): Promise<void> {
   } catch (error) {
     console.log(error);
 
-    res.status(404).send("Draft with this id wasn't found");
+    res.status(404).end();
   }
 }
 
@@ -269,7 +269,7 @@ async function deleteDraft(req: Request, res: Response): Promise<void> {
   } catch (error) {
     console.log(error);
 
-    res.status(404).send("Draft with this id wasn't found");
+    res.status(404).end();
   }
 }
 

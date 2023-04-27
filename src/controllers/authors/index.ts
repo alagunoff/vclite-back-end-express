@@ -72,7 +72,7 @@ async function updateAuthor(req: Request, res: Response): Promise<void> {
     } catch (error) {
       console.log(error);
 
-      res.status(404).send("Author with this id wasn't found");
+      res.status(404).end();
     }
   }
 }
@@ -89,7 +89,7 @@ async function deleteAuthor(req: Request, res: Response): Promise<void> {
   } catch (error) {
     console.log(error);
 
-    res.status(404).send("Author with this id wasn't found");
+    res.status(404).end();
   }
 }
 
