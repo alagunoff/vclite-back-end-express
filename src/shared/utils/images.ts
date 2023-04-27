@@ -5,7 +5,7 @@ import { APP_HOST_NAME, PROJECT_ROOT_PATH } from "shared/constants";
 
 function saveImage(
   base64ImageDataUrl: string,
-  savePath: string,
+  folderName: string,
   imageFileName: string
 ): string {
   const [imageMediatype, base64Image] = base64ImageDataUrl
@@ -14,15 +14,13 @@ function saveImage(
   const imageFileNameWithExtension = `${imageFileName}.${
     imageMediatype.split("/")[1]
   }`;
-  const savePathFromComputerRoot = path.join(PROJECT_ROOT_PATH, savePath);
 
-  fs.mkdirSync(savePathFromComputerRoot, { recursive: true });
   fs.writeFileSync(
-    path.join(savePathFromComputerRoot, imageFileNameWithExtension),
+    `${PROJECT_ROOT_PATH}/static/images/${folderName}/${imageFileNameWithExtension}`,
     Buffer.from(base64Image, "base64")
   );
 
-  return `${APP_HOST_NAME}/${path.join(savePath, imageFileNameWithExtension)}`;
+  return `${APP_HOST_NAME}/${folderName}/${imageFileNameWithExtension}`;
 }
 
 function getHostedImageSaveAbsolutePath(imageUrl: string): string {

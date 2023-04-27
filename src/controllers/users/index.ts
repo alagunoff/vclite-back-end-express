@@ -15,11 +15,7 @@ async function createUser(req: Request, res: Response): Promise<void> {
   } else {
     const createdUser = await prisma.user.create({
       data: {
-        image: saveImage(
-          req.body.image,
-          "static/images/users",
-          req.body.username
-        ),
+        image: saveImage(req.body.image, "users", req.body.username),
         username: req.body.username,
         password: bcrypt.hashSync(req.body.password),
         firstName: req.body.firstName,
