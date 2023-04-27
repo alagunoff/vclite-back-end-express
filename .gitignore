@@ -2,5 +2,4 @@
 /.env
 /node_modules/
 /requests/
-/static/images/posts/**
-/static/images/users/*
+/static/

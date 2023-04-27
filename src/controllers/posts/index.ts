@@ -28,11 +28,11 @@ async function createPost(req: Request, res: Response): Promise<void> {
   if (creationDataValidationErrors) {
     res.status(400).json(creationDataValidationErrors);
   } else {
-    const postImagesSavePath = `static/images/posts/${crypto.randomUUID()}`;
+    const postImagesFolderName = `posts/${crypto.randomUUID()}`;
 
     await prisma.post.create({
       data: {
-        image: saveImage(req.body.image, postImagesSavePath, "main"),
+        image: saveImage(req.body.image, postImagesFolderName, "main"),
         title: req.body.title,
         content: req.body.content,
         author: {
@@ -58,7 +58,7 @@ async function createPost(req: Request, res: Response): Promise<void> {
                     (extraImage: string, index: number) => ({
                       url: saveImage(
                         extraImage,
-                        `${postImagesSavePath}/extra`,
+                        `${postImagesFolderName}/extra`,
                         String(index)
                       ),
                     })
@@ -171,16 +171,12 @@ async function updatePost(req: Request, res: Response): Promise<void> {
       });
 
       if ("image" in req.body || "extraImages" in req.body) {
-        const updatedPostImagesFolderName = getHostedImageFolderName(
+        const updatedPostImagesFolderName = `posts/${getHostedImageFolderName(
           updatedPost.image
-        );
+        )}`;
 
         if ("image" in req.body) {
-          saveImage(
-            req.body.image,
-            `static/images/posts/${updatedPostImagesFolderName}`,
-            "main"
-          );
+          saveImage(req.body.image, updatedPostImagesFolderName, "main");
         }
 
         if ("extraImages" in req.body) {
@@ -189,9 +185,7 @@ async function updatePost(req: Request, res: Response): Promise<void> {
               postId: updatedPost.id,
             },
           });
-          deleteFolder(
-            `static/images/posts/${updatedPostImagesFolderName}/extra`
-          );
+          deleteFolder(`static/images/${updatedPostImagesFolderName}/extra`);
           await prisma.post.update({
             where: {
               id: updatedPost.id,
@@ -203,7 +197,7 @@ async function updatePost(req: Request, res: Response): Promise<void> {
                     (extraImage: string, index: number) => ({
                       url: saveImage(
                         extraImage,
-                        `static/images/posts/${updatedPostImagesFolderName}/extra`,
+                        `${updatedPostImagesFolderName}/extra`,
                         String(index)
                       ),
                     })
@@ -232,7 +226,6 @@ async function deletePost(req: Request, res: Response): Promise<void> {
         isDraft: false,
       },
     });
-    console.log(deletedPost);
     deleteImageFolder(deletedPost.image);
 
     res.status(204).end();

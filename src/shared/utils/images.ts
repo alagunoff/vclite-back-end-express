@@ -14,20 +14,19 @@ function saveImage(
   const imageFileNameWithExtension = `${imageFileName}.${
     imageMediatype.split("/")[1]
   }`;
+  const folderAbsolutePath = `${PROJECT_ROOT_PATH}/static/images/${folderName}`;
 
+  fs.mkdirSync(folderAbsolutePath, { recursive: true });
   fs.writeFileSync(
-    `${PROJECT_ROOT_PATH}/static/images/${folderName}/${imageFileNameWithExtension}`,
+    `${folderAbsolutePath}/${imageFileNameWithExtension}`,
     Buffer.from(base64Image, "base64")
   );
 
-  return `${APP_HOST_NAME}/${folderName}/${imageFileNameWithExtension}`;
+  return `${APP_HOST_NAME}/static/images/${folderName}/${imageFileNameWithExtension}`;
 }
 
 function getHostedImageSaveAbsolutePath(imageUrl: string): string {
-  return path.join(
-    PROJECT_ROOT_PATH,
-    imageUrl.replace(`${APP_HOST_NAME}/`, "")
-  );
+  return `${PROJECT_ROOT_PATH}/${imageUrl.replace(`${APP_HOST_NAME}/`, "")}`;
 }
 
 function getHostedImageFolderAbsolutePath(imageUrl: string): string {
