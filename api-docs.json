@@ -37,10 +37,10 @@
         },
         "responses": {
           "200": {
-            "description": "Credentials are correct",
             "content": {
               "text/plain": {
                 "schema": {
+                  "description": "JWT for authentication",
                   "type": "string",
                   "format": "jwt",
                   "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dmNsaXRl.p2ccOCLXgVZMiWp6ff1YJJ5emHNnlyq0uUxbm-hubCM"
@@ -60,7 +60,6 @@
     "/users": {
       "post": {
         "tags": ["users"],
-        "summary": "Create new user",
         "requestBody": {
           "required": true,
           "content": {
@@ -100,8 +99,10 @@
             "content": {
               "text/plain": {
                 "schema": {
+                  "description": "JWT for authentication",
                   "type": "string",
-                  "format": "jwt"
+                  "format": "jwt",
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dmNsaXRl.p2ccOCLXgVZMiWp6ff1YJJ5emHNnlyq0uUxbm-hubCM"
                 }
               }
             }
@@ -113,7 +114,7 @@
       },
       "get": {
         "tags": ["users"],
-        "summary": "Get user by providing jwt in headers",
+        "summary": "Get info about the user assosiated with provided JWT",
         "security": [{ "JWT": [] }],
         "responses": {
           "200": {
@@ -128,21 +129,25 @@
                     },
                     "image": {
                       "type": "string",
-                      "format": "uri"
+                      "format": "uri",
+                      "example": "https://localhost:3000/static/images/users/oleg.jpg"
                     },
                     "username": {
                       "type": "string",
-                      "minLength": 1
+                      "minLength": 1,
+                      "example": "oleg"
                     },
                     "firstName": {
                       "type": "string",
                       "minLength": 1,
-                      "nullable": true
+                      "nullable": true,
+                      "example": null
                     },
                     "lastName": {
                       "type": "string",
                       "minLength": 1,
-                      "nullable": true
+                      "nullable": true,
+                      "example": null
                     },
                     "isAdmin": {
                       "type": "boolean"
@@ -151,19 +156,22 @@
                       "type": "string",
                       "format": "date-time"
                     }
-                  }
+                  },
+                  "required": [
+                    "id",
+                    "image",
+                    "username",
+                    "firstName",
+                    "lastName",
+                    "isAdmin",
+                    "createdAt"
+                  ]
                 }
               }
             }
           },
           "401": {
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+            "description": "JWT is missing or invalid. Or user assosiated with this JWT has been deleted"
           }
         }
       }
@@ -171,7 +179,6 @@
     "/users/{id}": {
       "delete": {
         "tags": ["users"],
-        "summary": "Delete user by id",
         "security": [{ "JWT": [] }],
         "parameters": [
           {
@@ -1180,10 +1187,10 @@
     },
     "responses": {
       "ValidationErrors": {
-        "description": "Request body or query parameters are invalid",
         "content": {
           "application/json": {
             "schema": {
+              "description": "Validation errors",
               "type": "object",
               "minProperties": 1,
               "example": {

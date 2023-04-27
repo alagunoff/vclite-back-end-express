@@ -31,33 +31,15 @@ function authenticateUser(onlyAdmin?: true) {
             next();
           }
         } else {
-          if (onlyAdmin) {
-            res.status(404).end();
-          } else {
-            res
-              .status(401)
-              .send("It seems that user with this token has been deleted");
-          }
+          res.status(onlyAdmin ? 404 : 401).end();
         }
       } catch (error) {
         console.log(error);
 
-        if (onlyAdmin) {
-          res.status(404).end();
-        } else {
-          res.status(401).send("Token is invalid");
-        }
+        res.status(onlyAdmin ? 404 : 401).end();
       }
     } else {
-      if (onlyAdmin) {
-        res.status(404).end();
-      } else {
-        res
-          .status(401)
-          .send(
-            'You must provide "Authorization" header in the form "Bearer *jwt*"'
-          );
-      }
+      res.status(onlyAdmin ? 404 : 401).end();
     }
   };
 }
