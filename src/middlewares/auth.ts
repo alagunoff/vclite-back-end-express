@@ -9,9 +9,10 @@ function authenticateUser(onlyAdmin?: true) {
       const token = req.headers.authorization.slice(7);
 
       try {
+        const decodedJwt = jwt.verify(token, process.env.JWT_SECRET_KEY);
         const authenticatedUser = await prisma.user.findUnique({
           where: {
-            id: Number(jwt.verify(token, process.env.JWT_SECRET_KEY)),
+            id: Number(decodedJwt),
           },
         });
 
@@ -30,12 +31,22 @@ function authenticateUser(onlyAdmin?: true) {
             next();
           }
         } else {
-          res.status(onlyAdmin ? 404 : 401).end();
+          if (onlyAdmin) {
+            res.status(404).end();
+          } else {
+            res
+              .status(401)
+              .send("It seems that user with this token has been deleted");
+          }
         }
       } catch (error) {
         console.log(error);
 
-        res.status(onlyAdmin ? 404 : 401).end();
+        if (onlyAdmin) {
+          res.status(404).end();
+        } else {
+          res.status(401).send("Token is invalid");
+        }
       }
     } else {
       if (onlyAdmin) {
