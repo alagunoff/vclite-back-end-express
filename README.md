@@ -1,3 +1,3 @@
-# Vclite
+# Back end for Vclite
 
-> Back end for a blog written in nodejs and express
+> Back end is written in express. API is documented using swagger

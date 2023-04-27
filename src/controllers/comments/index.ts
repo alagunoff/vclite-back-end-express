@@ -10,22 +10,30 @@ import { validatePaginationQueryParameters } from "shared/utils/validation";
 import { validateCreationData } from "./utils";
 
 async function createComment(req: Request, res: Response): Promise<void> {
-  const errors = await validateCreationData({
-    ...req.body,
-    postId: Number(req.params.postId),
+  const postToCreateCommentFor = await prisma.post.findUnique({
+    where: {
+      id: Number(req.params.postId),
+      isDraft: false,
+    },
   });
 
-  if (errors) {
-    res.status(400).json(errors);
-  } else {
-    await prisma.comment.create({
-      data: {
-        content: req.body.content,
-        postId: Number(req.params.postId),
-      },
-    });
+  if (postToCreateCommentFor) {
+    const creationDataValidationErrors = validateCreationData(req.body);
 
-    res.status(201).end();
+    if (creationDataValidationErrors) {
+      res.status(400).json(creationDataValidationErrors);
+    } else {
+      await prisma.comment.create({
+        data: {
+          content: req.body.content,
+          postId: postToCreateCommentFor.id,
+        },
+      });
+
+      res.status(201).end();
+    }
+  } else {
+    res.status(404).end();
   }
 }
 
@@ -33,18 +41,20 @@ async function getComments(req: Request, res: Response): Promise<void> {
   const postToGetCommentsFor = await prisma.post.findUnique({
     where: {
       id: Number(req.params.postId),
+      isDraft: false,
     },
   });
 
   if (postToGetCommentsFor) {
-    const errors = validatePaginationQueryParameters(req.query);
+    const paginationQueryParametersValidationErrors =
+      validatePaginationQueryParameters(req.query);
 
-    if (errors) {
-      res.status(400).json(errors);
+    if (paginationQueryParametersValidationErrors) {
+      res.status(400).json(paginationQueryParametersValidationErrors);
     } else {
       const comments = await prisma.comment.findMany({
         where: {
-          postId: postToGetCommentsFor?.id,
+          postId: postToGetCommentsFor.id,
         },
         ...createPaginationParameters(req.query),
         select: {
@@ -54,7 +64,7 @@ async function getComments(req: Request, res: Response): Promise<void> {
       });
       const commentsTotalNumber = await prisma.comment.count({
         where: {
-          postId: postToGetCommentsFor?.id,
+          postId: postToGetCommentsFor.id,
         },
       });
 
@@ -76,13 +86,14 @@ async function deleteComments(req: Request, res: Response): Promise<void> {
   const postToDeleteCommentsFrom = await prisma.post.findUnique({
     where: {
       id: Number(req.params.postId),
+      isDraft: false,
     },
   });
 
   if (postToDeleteCommentsFrom) {
     await prisma.comment.deleteMany({
       where: {
-        postId: Number(req.params.postId),
+        postId: postToDeleteCommentsFrom.id,
       },
     });
 
