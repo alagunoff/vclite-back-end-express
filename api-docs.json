@@ -134,7 +134,7 @@
                     },
                     "image": {
                       "type": "string",
-                      "format": "url"
+                      "format": "uri"
                     },
                     "username": {
                       "type": "string",
@@ -1127,13 +1127,13 @@
           },
           "image": {
             "type": "string",
-            "format": "base64"
+            "format": "uri"
           },
           "extraImages": {
             "type": "array",
             "items": {
               "type": "string",
-              "format": "base64"
+              "format": "uri"
             }
           },
           "title": {
@@ -1186,7 +1186,7 @@
     },
     "responses": {
       "ValidationErrors": {
-        "description": "This can happen if request data or query parameters invalid",
+        "description": "This can happen if request data or query parameters are invalid",
         "content": {
           "application/json": {
             "schema": {

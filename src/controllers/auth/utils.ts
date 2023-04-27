@@ -2,15 +2,15 @@ import { isNotEmptyString } from "shared/utils/validation";
 
 import prisma from "prisma";
 
-interface LoginRequestValidationErrors {
+interface LoginDataValidationErrors {
   username?: string;
   password?: string;
 }
 
-async function validateLoginRequestData(
+async function validateLoginData(
   data: any
-): Promise<LoginRequestValidationErrors | undefined> {
-  const errors: LoginRequestValidationErrors = {};
+): Promise<LoginDataValidationErrors | undefined> {
+  const errors: LoginDataValidationErrors = {};
 
   if ("username" in data) {
     if (isNotEmptyString(data.username)) {
@@ -37,4 +37,4 @@ async function validateLoginRequestData(
   return Object.keys(errors).length ? errors : undefined;
 }
 
-export { validateLoginRequestData };
+export { validateLoginData };

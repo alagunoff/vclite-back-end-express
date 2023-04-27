@@ -4,10 +4,10 @@ import bcrypt from "bcryptjs";
 
 import prisma from "prisma";
 
-import { validateLoginRequestData } from "./utils";
+import { validateLoginData } from "./utils";
 
 async function login(req: Request, res: Response): Promise<void> {
-  const validationErrors = await validateLoginRequestData(req.body);
+  const validationErrors = await validateLoginData(req.body);
 
   if (validationErrors) {
     res.status(400).json(validationErrors);
