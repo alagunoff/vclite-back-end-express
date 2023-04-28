@@ -7,7 +7,7 @@ import {
   isPositiveInteger,
   isDateString,
   isPositiveIntegersNotEmptyArray,
-  isPositiveIntegersNotEmptyArrayString,
+  isStringPositiveIntegersNotEmptyArray,
   isBase64ImageDataUrlsNotEmptyArray,
   validatePaginationQueryParameters,
   type PaginationQueryParametersValidationErrors,
@@ -150,14 +150,14 @@ function validateFilterQueryParameters(
   }
 
   if ("tagIdIn" in queryParameters) {
-    if (!isPositiveIntegersNotEmptyArrayString(queryParameters.tagIdIn)) {
-      errors.tagIdIn = "must be not empty positive integers array";
+    if (!isStringPositiveIntegersNotEmptyArray(queryParameters.tagIdIn)) {
+      errors.tagIdIn = "must be positive integers delimited by ampersand";
     }
   }
 
   if ("tagIdAll" in queryParameters) {
-    if (!isPositiveIntegersNotEmptyArrayString(queryParameters.tagIdAll)) {
-      errors.tagIdAll = "must be not empty positive integers array";
+    if (!isStringPositiveIntegersNotEmptyArray(queryParameters.tagIdAll)) {
+      errors.tagIdAll = "must be positive integers delimited by ampersand";
     }
   }
 
@@ -189,8 +189,8 @@ function createFilterParameters(
     authorFirstName?: string;
     categoryId?: string;
     tagId?: string;
-    tagIdIn?: string;
-    tagIdAll?: string;
+    tagIdIn?: string[];
+    tagIdAll?: string[];
     createdAt?: string;
     createdAtLt?: string;
     createdAtGt?: string;
@@ -235,27 +235,23 @@ function createFilterParameters(
   }
 
   if (queryParameters.tagIdIn !== undefined) {
-    filterParameters.OR = JSON.parse(queryParameters.tagIdIn).map(
-      (tagId: number) => ({
-        tags: {
-          some: {
-            id: tagId,
-          },
+    filterParameters.OR = queryParameters.tagIdIn.map((tagId) => ({
+      tags: {
+        some: {
+          id: Number(tagId),
         },
-      })
-    );
+      },
+    }));
   }
 
   if (queryParameters.tagIdAll !== undefined) {
-    filterParameters.AND = JSON.parse(queryParameters.tagIdAll).map(
-      (tagId: number) => ({
-        tags: {
-          some: {
-            id: tagId,
-          },
+    filterParameters.AND = queryParameters.tagIdAll.map((tagId) => ({
+      tags: {
+        some: {
+          id: Number(tagId),
         },
-      })
-    );
+      },
+    }));
   }
 
   if (queryParameters.createdAt !== undefined) {
@@ -306,13 +302,10 @@ function validateOrderQueryParameters(
   queryParameters: Request["query"]
 ): OrderQueryParametersValidationErrors | undefined {
   const errors: OrderQueryParametersValidationErrors = {};
-
+  console.log(orderValidValues.includes(queryParameters.orderBy as string));
   if ("orderBy" in queryParameters) {
-    if (
-      queryParameters.orderBy !== "string" ||
-      !orderValidValues.includes(queryParameters.orderBy)
-    ) {
-      errors.orderBy = `must be one of the following values [${String(
+    if (!orderValidValues.includes(String(queryParameters.orderBy))) {
+      errors.orderBy = `must be one of the following strings [${String(
         orderValidValues
       )}]`;
     }
