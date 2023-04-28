@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "API docs for Vclite",
+    "title": "API docs for VClite",
     "version": "1.0.0"
   },
   "servers": [
@@ -37,16 +37,7 @@
         },
         "responses": {
           "200": {
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "description": "JWT for authentication",
-                  "type": "string",
-                  "format": "jwt",
-                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dmNsaXRl.p2ccOCLXgVZMiWp6ff1YJJ5emHNnlyq0uUxbm-hubCM"
-                }
-              }
-            }
+            "$ref": "#/components/responses/JWT"
           },
           "400": {
             "$ref": "#/components/responses/ValidationErrors"
@@ -96,16 +87,7 @@
         },
         "responses": {
           "201": {
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "description": "JWT for authentication",
-                  "type": "string",
-                  "format": "jwt",
-                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dmNsaXRl.p2ccOCLXgVZMiWp6ff1YJJ5emHNnlyq0uUxbm-hubCM"
-                }
-              }
-            }
+            "$ref": "#/components/responses/JWT"
           },
           "400": {
             "$ref": "#/components/responses/ValidationErrors"
@@ -114,8 +96,8 @@
       },
       "get": {
         "tags": ["users"],
-        "summary": "Get info about the user assosiated with provided JWT",
         "security": [{ "JWT": [] }],
+        "description": "Get info about **the** user assosiated with provided JWT",
         "responses": {
           "200": {
             "content": {
@@ -180,25 +162,20 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "id",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            }
+            "$ref": "#/components/parameters/id"
           }
         ],
         "responses": {
           "204": {},
-          "404": {}
+          "404": {
+            "$ref": "#/components/responses/NotFoundOrNotAdmin"
+          }
         }
       }
     },
     "/authors": {
       "post": {
         "tags": ["authors"],
-        "summary": "Create new author",
         "security": [{ "JWT": [] }],
         "requestBody": {
           "required": true,
@@ -226,44 +203,66 @@
           "400": {
             "$ref": "#/components/responses/ValidationErrors"
           },
-          "404": {}
+          "404": {
+            "$ref": "#/components/responses/NotAdmin"
+          }
         }
       },
       "get": {
         "tags": ["authors"],
-        "summary": "Get list of all authors",
         "security": [{ "JWT": [] }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/itemsNumber"
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Author"
-                  }
+                  "type": "object",
+                  "properties": {
+                    "authors": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Author"
+                      }
+                    },
+                    "authorsTotalNumber": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "pagesTotalNumber": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "authors",
+                    "authorsTotalNumber",
+                    "pagesTotalNumber"
+                  ]
                 }
               }
             }
           },
-          "404": {}
+          "404": {
+            "$ref": "#/components/responses/NotAdmin"
+          }
         }
       }
     },
     "/authors/{id}": {
       "patch": {
         "tags": ["authors"],
-        "summary": "Update author by id",
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "id",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            }
+            "$ref": "#/components/parameters/id"
           }
         ],
         "requestBody": {
@@ -287,34 +286,33 @@
         },
         "responses": {
           "204": {},
-          "404": {}
+          "400": {
+            "$ref": "#/components/responses/ValidationErrors"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundOrNotAdmin"
+          }
         }
       },
       "delete": {
         "tags": ["authors"],
-        "summary": "Delete author by id",
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "id",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            }
+            "$ref": "#/components/parameters/id"
           }
         ],
         "responses": {
           "204": {},
-          "404": {}
+          "404": {
+            "$ref": "#/components/responses/NotFoundOrNotAdmin"
+          }
         }
       }
     },
     "/tags": {
       "post": {
         "tags": ["tags"],
-        "summary": "Create new tag",
         "security": [{ "JWT": [] }],
         "requestBody": {
           "required": true,
@@ -338,21 +336,44 @@
           "400": {
             "$ref": "#/components/responses/ValidationErrors"
           },
-          "404": {}
+          "404": {
+            "$ref": "#/components/responses/NotAdmin"
+          }
         }
       },
       "get": {
         "tags": ["tags"],
-        "summary": "Get list of all tags",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/itemsNumber"
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Tag"
-                  }
+                  "type": "object",
+                  "properties": {
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Tag"
+                      }
+                    },
+                    "tagsTotalNumber": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "pagesTotalNumber": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": ["tags", "tagsTotalNumber", "pagesTotalNumber"]
                 }
               }
             }
@@ -363,17 +384,10 @@
     "/tags/{id}": {
       "patch": {
         "tags": ["tags"],
-        "summary": "Update tag by id",
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "id",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            }
+            "$ref": "#/components/parameters/id"
           }
         ],
         "requestBody": {
@@ -393,34 +407,33 @@
         },
         "responses": {
           "204": {},
-          "404": {}
+          "400": {
+            "$ref": "#/components/responses/ValidationErrors"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundOrNotAdmin"
+          }
         }
       },
       "delete": {
         "tags": ["tags"],
-        "summary": "Delete tag by id",
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "id",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            }
+            "$ref": "#/components/parameters/id"
           }
         ],
         "responses": {
           "204": {},
-          "404": {}
+          "404": {
+            "$ref": "#/components/responses/NotFoundOrNotAdmin"
+          }
         }
       }
     },
     "/categories": {
       "post": {
         "tags": ["categories"],
-        "summary": "Create new category",
         "security": [{ "JWT": [] }],
         "requestBody": {
           "required": true,
@@ -448,21 +461,48 @@
           "400": {
             "$ref": "#/components/responses/ValidationErrors"
           },
-          "404": {}
+          "404": {
+            "$ref": "#/components/responses/NotAdmin"
+          }
         }
       },
       "get": {
         "tags": ["categories"],
-        "summary": "Get list of all categories",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/itemsNumber"
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Category"
-                  }
+                  "type": "object",
+                  "properties": {
+                    "categories": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Category"
+                      }
+                    },
+                    "categoriesTotalNumber": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "pagesTotalNumber": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "categories",
+                    "categoriesTotalNumber",
+                    "pagesTotalNumber"
+                  ]
                 }
               }
             }
@@ -473,17 +513,10 @@
     "/categories/{id}": {
       "patch": {
         "tags": ["categories"],
-        "summary": "Update category by id",
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "id",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            }
+            "$ref": "#/components/parameters/id"
           }
         ],
         "requestBody": {
@@ -508,27 +541,27 @@
         },
         "responses": {
           "204": {},
-          "404": {}
+          "400": {
+            "$ref": "#/components/responses/ValidationErrors"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundOrNotAdmin"
+          }
         }
       },
       "delete": {
         "tags": ["categories"],
-        "summary": "Delete category by id",
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "id",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            }
+            "$ref": "#/components/parameters/id"
           }
         ],
         "responses": {
           "204": {},
-          "404": {}
+          "404": {
+            "$ref": "#/components/responses/NotFoundOrNotAdmin"
+          }
         }
       }
     },
@@ -573,8 +606,7 @@
                       "type": "integer",
                       "minimum": 1
                     },
-                    "minItems": 1,
-                    "uniqueItems": true
+                    "minItems": 1
                   }
                 },
                 "required": [
@@ -601,6 +633,122 @@
       },
       "get": {
         "tags": ["posts"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/itemsNumber"
+          },
+          {
+            "in": "query",
+            "name": "titleContains",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "contentContains",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "authorFirstName",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "categoryId",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "tagId",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "tagIdIn",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "minItems": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "tagIdAll",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "minItems": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "createdAt",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "minLength": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "createdAtLt",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "minLength": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "createdAtGt",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "minLength": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "orderBy",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "createdAt",
+                "-createdAt",
+                "authorFirstName",
+                "-authorFirstName",
+                "category",
+                "-category",
+                "imagesNumber",
+                "-imagesNumber"
+              ]
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -615,7 +763,8 @@
                       }
                     },
                     "postsTotalNumber": {
-                      "type": "integer"
+                      "type": "integer",
+                      "minimum": 0
                     },
                     "pagesTotalNumber": {
                       "type": "integer",
@@ -636,13 +785,7 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "id",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            }
+            "$ref": "#/components/parameters/id"
           }
         ],
         "requestBody": {
@@ -681,8 +824,7 @@
                       "type": "integer",
                       "minimum": 1
                     },
-                    "minItems": 1,
-                    "uniqueItems": true
+                    "minItems": 1
                   }
                 }
               }
@@ -691,29 +833,27 @@
         },
         "responses": {
           "204": {},
+          "400": {
+            "$ref": "#/components/responses/ValidationErrors"
+          },
           "404": {
-            "description": "Post not found or you're not an admin"
+            "$ref": "#/components/responses/NotFoundOrNotAdmin"
           }
         }
       },
       "delete": {
         "tags": ["posts"],
-        "summary": "Delete post by id",
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "id",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            }
+            "$ref": "#/components/parameters/id"
           }
         ],
         "responses": {
           "204": {},
-          "404": {}
+          "404": {
+            "$ref": "#/components/responses/NotFoundOrNotAdmin"
+          }
         }
       }
     },
@@ -723,13 +863,7 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "id",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            }
+            "$ref": "#/components/parameters/id"
           }
         ],
         "requestBody": {
@@ -762,13 +896,7 @@
         "tags": ["comments"],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "id",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            }
+            "$ref": "#/components/parameters/id"
           }
         ],
         "responses": {
@@ -776,28 +904,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer",
-                        "minimum": 1
-                      },
-                      "content": {
-                        "type": "string",
-                        "minLength": 1,
-                        "example": "my comment"
+                  "type": "object",
+                  "properties": {
+                    "comments": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Comment"
                       }
                     },
-                    "required": ["id", "content"]
-                  }
+                    "commentsTotalNumber": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "pagesTotalNumber": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "comments",
+                    "commentsTotalNumber",
+                    "pagesTotalNumber"
+                  ]
                 }
               }
             }
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationErrors"
           },
           "404": {}
         }
@@ -818,21 +949,63 @@
         ],
         "responses": {
           "204": {},
-          "404": {}
+          "404": {
+            "$ref": "#/components/responses/NotFoundOrNotAdmin"
+          }
         }
       }
     },
     "/drafts": {
       "post": {
         "tags": ["drafts"],
-        "summary": "Create new draft",
         "security": [{ "JWT": [] }],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Post"
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "base64"
+                  },
+                  "extraImages": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "base64"
+                    },
+                    "minItems": 1
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "content": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "categoryId": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "tagsIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "image",
+                  "title",
+                  "content",
+                  "categoryId",
+                  "tagsIds"
+                ]
               }
             }
           }
@@ -842,40 +1015,58 @@
           "400": {
             "$ref": "#/components/responses/ValidationErrors"
           },
-          "401": {
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
+          "401": {},
           "403": {
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotAuthor"
           }
         }
       },
       "get": {
         "tags": ["drafts"],
-        "summary": "Get list of all author's drafts",
         "security": [{ "JWT": [] }],
+        "description": "Get all author's drafts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/itemsNumber"
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {}
+                  "type": "object",
+                  "properties": {
+                    "drafts": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Post"
+                      }
+                    },
+                    "draftsTotalNumber": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "pagesTotalNumber": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "drafts",
+                    "draftsTotalNumber",
+                    "pagesTotalNumber"
+                  ]
                 }
               }
             }
+          },
+          "401": {},
+          "403": {
+            "$ref": "#/components/responses/NotAuthor"
           }
         }
       }
@@ -883,17 +1074,10 @@
     "/drafts/{id}": {
       "patch": {
         "tags": ["drafts"],
-        "summary": "Update draft by id",
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "id",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            }
+            "$ref": "#/components/parameters/id"
           }
         ],
         "requestBody": {
@@ -932,8 +1116,7 @@
                       "type": "integer",
                       "minimum": 1
                     },
-                    "minItems": 1,
-                    "uniqueItems": true
+                    "minItems": 1
                   }
                 }
               }
@@ -942,61 +1125,29 @@
         },
         "responses": {
           "204": {},
-          "401": {
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
+          "401": {},
           "403": {
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotAuthor"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationErrors"
           },
           "404": {}
         }
       },
       "delete": {
         "tags": ["drafts"],
-        "summary": "Delete draft by id",
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "id",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            }
+            "$ref": "#/components/parameters/id"
           }
         ],
         "responses": {
           "204": {},
-          "401": {
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
+          "401": {},
           "403": {
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotAuthor"
           },
           "404": {}
         }
@@ -1005,38 +1156,17 @@
     "/drafts/{id}/publish": {
       "post": {
         "tags": ["drafts"],
-        "summary": "Publish draft",
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "id",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            }
+            "$ref": "#/components/parameters/id"
           }
         ],
         "responses": {
           "204": {},
-          "401": {
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
+          "401": {},
           "403": {
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotAuthor"
           },
           "404": {}
         }
@@ -1081,7 +1211,8 @@
           },
           "name": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "example": "popular"
           }
         },
         "required": ["id", "name"]
@@ -1124,20 +1255,30 @@
           "extraImages": {
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uri",
-              "example": "https://localhost:3000/static/images/posts/1/extra-1.jpg"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "image": {
+                  "type": "string",
+                  "format": "uri",
+                  "example": "https://localhost:3000/static/images/posts/1/extra-1.jpg"
+                }
+              },
+              "required": ["id", "image"]
             }
           },
           "title": {
             "type": "string",
             "minLength": 1,
-            "example": "My first post"
+            "example": "MetaLamp won a very good reward"
           },
           "content": {
             "type": "string",
             "minLength": 1,
-            "example": "here goes content of a post..."
+            "example": "once upon a time..."
           },
           "author": {
             "$ref": "#/components/schemas/Author"
@@ -1148,8 +1289,7 @@
           "tags": {
             "type": "array",
             "items": {
-              "type": "integer",
-              "minimum": 1
+              "$ref": "#/components/schemas/Tag"
             },
             "minItems": 1,
             "uniqueItems": true
@@ -1157,9 +1297,7 @@
           "comments": {
             "type": "array",
             "items": {
-              "type": "string",
-              "minLength": 1,
-              "example": "Comment from oleg"
+              "$ref": "#/components/schemas/Comment"
             }
           },
           "createdAt": {
@@ -1179,6 +1317,48 @@
           "comments",
           "createdAt"
         ]
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "content": {
+            "type": "string",
+            "minLength": 1,
+            "example": "Comment from oleg"
+          }
+        },
+        "required": ["id", "content"]
+      }
+    },
+    "parameters": {
+      "id": {
+        "in": "path",
+        "required": true,
+        "name": "id",
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "pageNumber": {
+        "in": "query",
+        "name": "pageNumber",
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "itemsNumber": {
+        "in": "query",
+        "name": "itemsNumber",
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     },
     "responses": {
@@ -1187,6 +1367,7 @@
           "application/json": {
             "schema": {
               "type": "object",
+              "description": "validation errors",
               "minProperties": 1,
               "example": {
                 "field1": "required",
@@ -1195,6 +1376,24 @@
             }
           }
         }
+      },
+      "JWT": {
+        "content": {
+          "text/plain": {
+            "schema": {
+              "description": "JWT for authentication",
+              "type": "string",
+              "format": "jwt",
+              "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dmNsaXRl.p2ccOCLXgVZMiWp6ff1YJJ5emHNnlyq0uUxbm-hubCM"
+            }
+          }
+        }
+      },
+      "NotFoundOrNotAdmin": {
+        "description": "Resource not found or user assosiated with provided JWT isn't an admin"
+      },
+      "NotAdmin": {
+        "description": "User assosiated with provided JWT isn't an admin"
       },
       "NotAuthor": {
         "description": "User assosiated with provided JWT isn't an author"
