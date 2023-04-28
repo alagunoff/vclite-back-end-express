@@ -1,10 +1,14 @@
 import prisma from "prisma";
 import { isNotEmptyString } from "shared/utils/validation";
 
+interface CreationDataValidationErrors {
+  name?: string;
+}
+
 async function validateCreationData(
   data: any
-): Promise<Record<string, string> | undefined> {
-  const errors: Record<string, string> = {};
+): Promise<CreationDataValidationErrors | undefined> {
+  const errors: CreationDataValidationErrors = {};
 
   if ("name" in data) {
     if (isNotEmptyString(data.name)) {
@@ -21,10 +25,14 @@ async function validateCreationData(
   return Object.keys(errors).length ? errors : undefined;
 }
 
+interface UpdateDataValidationErrors {
+  name?: string;
+}
+
 async function validateUpdateData(
   data: any
-): Promise<Record<string, string> | undefined> {
-  const errors: Record<string, string> = {};
+): Promise<UpdateDataValidationErrors | undefined> {
+  const errors: UpdateDataValidationErrors = {};
 
   if ("name" in data) {
     if (isNotEmptyString(data.name)) {

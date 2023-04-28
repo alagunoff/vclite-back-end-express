@@ -10,10 +10,10 @@ import { validatePaginationQueryParameters } from "shared/utils/validation";
 import { validateCreationData, validateUpdateData } from "./utils";
 
 async function createTag(req: Request, res: Response): Promise<void> {
-  const errors = await validateCreationData(req.body);
+  const creationDataValidationErrors = await validateCreationData(req.body);
 
-  if (errors) {
-    res.status(400).json(errors);
+  if (creationDataValidationErrors) {
+    res.status(400).json(creationDataValidationErrors);
   } else {
     await prisma.tag.create({
       data: {
@@ -26,10 +26,13 @@ async function createTag(req: Request, res: Response): Promise<void> {
 }
 
 async function getTags(req: Request, res: Response): Promise<void> {
-  const errors = validatePaginationQueryParameters(req.query);
+  const paginationQueryParametersValidationErrors =
+    validatePaginationQueryParameters(req.query);
 
-  if (errors) {
-    res.status(400).json({ queryParameters: errors });
+  if (paginationQueryParametersValidationErrors) {
+    res
+      .status(400)
+      .json({ queryParameters: paginationQueryParametersValidationErrors });
   } else {
     const tags = await prisma.tag.findMany({
       ...createPaginationParameters(req.query),
@@ -45,15 +48,21 @@ async function getTags(req: Request, res: Response): Promise<void> {
 }
 
 async function updateTag(req: Request, res: Response): Promise<void> {
-  const errors = await validateUpdateData(req.body);
+  const tagToUpdate = await prisma.tag.findUnique({
+    where: {
+      id: Number(req.params.id),
+    },
+  });
 
-  if (errors) {
-    res.status(400).json(errors);
-  } else {
-    try {
+  if (tagToUpdate) {
+    const updateDataValidationErrors = await validateUpdateData(req.body);
+
+    if (updateDataValidationErrors) {
+      res.status(400).json(updateDataValidationErrors);
+    } else {
       await prisma.tag.update({
         where: {
-          id: Number(req.params.id),
+          id: tagToUpdate.id,
         },
         data: {
           name: req.body.name,
@@ -61,11 +70,9 @@ async function updateTag(req: Request, res: Response): Promise<void> {
       });
 
       res.status(204).end();
-    } catch (error) {
-      console.log(error);
-
-      res.status(404).end();
     }
+  } else {
+    res.status(404).end();
   }
 }
 

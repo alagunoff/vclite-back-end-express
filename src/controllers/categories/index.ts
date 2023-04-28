@@ -11,10 +11,10 @@ import { validatePaginationQueryParameters } from "shared/utils/validation";
 import { validateCreationData, validateUpdateData } from "./utils";
 
 async function createCategory(req: Request, res: Response): Promise<void> {
-  const errors = await validateCreationData(req.body);
+  const creationDataValidationErrors = await validateCreationData(req.body);
 
-  if (errors) {
-    res.status(400).json(errors);
+  if (creationDataValidationErrors) {
+    res.status(400).json(creationDataValidationErrors);
   } else {
     await prisma.category.create({
       data: {
@@ -31,10 +31,13 @@ async function createCategory(req: Request, res: Response): Promise<void> {
 }
 
 async function getCategories(req: Request, res: Response): Promise<void> {
-  const errors = validatePaginationQueryParameters(req.query);
+  const paginationQueryParametersValidationErrors =
+    validatePaginationQueryParameters(req.query);
 
-  if (errors) {
-    res.status(400).json({ queryParameters: errors });
+  if (paginationQueryParametersValidationErrors) {
+    res
+      .status(400)
+      .json({ queryParameters: paginationQueryParametersValidationErrors });
   } else {
     const categories = await prisma.category.findMany({
       where: {
@@ -68,15 +71,21 @@ async function getCategories(req: Request, res: Response): Promise<void> {
 }
 
 async function updateCategory(req: Request, res: Response): Promise<void> {
-  const errors = await validateUpdateData(req.body);
+  const categoryToUpdate = await prisma.category.findUnique({
+    where: {
+      id: Number(req.params.id),
+    },
+  });
 
-  if (errors) {
-    res.status(400).json(errors);
-  } else {
-    try {
+  if (categoryToUpdate) {
+    const updateDataValidationErrors = await validateUpdateData(req.body);
+
+    if (updateDataValidationErrors) {
+      res.status(400).json(updateDataValidationErrors);
+    } else {
       await prisma.category.update({
         where: {
-          id: Number(req.params.id),
+          id: categoryToUpdate.id,
         },
         data: {
           name: req.body.name,
@@ -88,11 +97,9 @@ async function updateCategory(req: Request, res: Response): Promise<void> {
       });
 
       res.status(204).end();
-    } catch (error) {
-      console.log(error);
-
-      res.status(404).end();
     }
+  } else {
+    res.status(404).end();
   }
 }
 
