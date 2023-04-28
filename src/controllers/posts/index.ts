@@ -126,9 +126,7 @@ async function getPosts(req: Request, res: Response): Promise<void> {
     }
 
     const postsTotalNumber = await prisma.post.count({
-      where: {
-        isDraft: false,
-      },
+      where: createFilterParameters(req.query),
     });
 
     res.json({
