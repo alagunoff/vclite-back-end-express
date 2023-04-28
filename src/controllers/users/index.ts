@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 import prisma from "prisma";
-import { saveImage, deleteImage } from "shared/utils/images";
+import { saveImage, deleteHostedImage } from "shared/utils/images";
 
 import { validateCreationData } from "./utils";
 
@@ -48,7 +48,7 @@ async function deleteUser(req: Request, res: Response): Promise<void> {
         id: Number(req.params.id),
       },
     });
-    deleteImage(deletedUser.image);
+    deleteHostedImage(deletedUser.image);
 
     res.status(204).end();
   } catch (error) {

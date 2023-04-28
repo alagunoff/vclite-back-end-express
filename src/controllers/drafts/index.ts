@@ -4,9 +4,9 @@ import crypto from "crypto";
 import prisma from "prisma";
 import {
   saveImage,
-  deleteFolder,
-  deleteImageFolder,
   getHostedImageFolderName,
+  deleteHostedImage,
+  deleteHostedImageFolder,
 } from "shared/utils/images";
 import {
   createPaginationParameters,
@@ -53,10 +53,10 @@ async function createDraft(req: Request, res: Response): Promise<void> {
                 createMany: {
                   data: req.body.extraImages.map(
                     (extraImage: string, index: number) => ({
-                      url: saveImage(
+                      image: saveImage(
                         extraImage,
-                        `${draftImagesFolderName}/extra`,
-                        String(index)
+                        draftImagesFolderName,
+                        `extra-${index}`
                       ),
                     })
                   ),
@@ -91,6 +91,12 @@ async function getDrafts(req: Request, res: Response): Promise<void> {
       select: {
         id: true,
         image: true,
+        extraImages: {
+          select: {
+            id: true,
+            image: true,
+          },
+        },
         title: true,
         content: true,
         author: {
@@ -115,12 +121,6 @@ async function getDrafts(req: Request, res: Response): Promise<void> {
           select: {
             id: true,
             content: true,
-          },
-        },
-        extraImages: {
-          select: {
-            id: true,
-            url: true,
           },
         },
         createdAt: true,
@@ -151,17 +151,23 @@ async function getDrafts(req: Request, res: Response): Promise<void> {
 }
 
 async function updateDraft(req: Request, res: Response): Promise<void> {
-  const updateDataValidationErrors = await validateUpdateData(req.body);
+  const draftToUpdate = await prisma.post.findUnique({
+    where: {
+      id: Number(req.params.id),
+      isDraft: true,
+      authorId: req.authenticatedAuthor?.id,
+    },
+  });
 
-  if (updateDataValidationErrors) {
-    res.status(400).json(updateDataValidationErrors);
-  } else {
-    try {
-      const updatedDraft = await prisma.post.update({
+  if (draftToUpdate) {
+    const updateDataValidationErrors = await validateUpdateData(req.body);
+
+    if (updateDataValidationErrors) {
+      res.status(400).json(updateDataValidationErrors);
+    } else {
+      await prisma.post.update({
         where: {
-          id: Number(req.params.id),
-          isDraft: true,
-          authorId: req.authenticatedAuthor?.id,
+          id: draftToUpdate.id,
         },
         data: {
           title: req.body.title,
@@ -180,34 +186,43 @@ async function updateDraft(req: Request, res: Response): Promise<void> {
       });
 
       if ("image" in req.body || "extraImages" in req.body) {
-        const updatedDraftImagesFolderName = `posts/${getHostedImageFolderName(
-          updatedDraft.image
+        const draftToUpdateImagesFolderName = `posts/${getHostedImageFolderName(
+          draftToUpdate.image
         )}`;
 
         if ("image" in req.body) {
-          saveImage(req.body.image, updatedDraftImagesFolderName, "main");
+          saveImage(req.body.image, draftToUpdateImagesFolderName, "main");
         }
 
         if ("extraImages" in req.body) {
-          await prisma.postExtraImage.deleteMany({
+          const draftExtraImages = await prisma.postExtraImage.findMany({
             where: {
-              postId: updatedDraft.id,
+              postId: draftToUpdate.id,
             },
           });
-          deleteFolder(`static/images/${updatedDraftImagesFolderName}/extra`);
+
+          for (const draftExtraImage of draftExtraImages) {
+            deleteHostedImage(draftExtraImage.image);
+          }
+
+          await prisma.postExtraImage.deleteMany({
+            where: {
+              postId: draftToUpdate.id,
+            },
+          });
           await prisma.post.update({
             where: {
-              id: updatedDraft.id,
+              id: draftToUpdate.id,
             },
             data: {
               extraImages: {
                 createMany: {
                   data: req.body.extraImages.map(
                     (extraImage: string, index: number) => ({
-                      url: saveImage(
+                      image: saveImage(
                         extraImage,
-                        `${updatedDraftImagesFolderName}/extra`,
-                        String(index)
+                        draftToUpdateImagesFolderName,
+                        `extra-${index}`
                       ),
                     })
                   ),
@@ -219,11 +234,9 @@ async function updateDraft(req: Request, res: Response): Promise<void> {
       }
 
       res.status(204).end();
-    } catch (error) {
-      console.log(error);
-
-      res.status(404).end();
     }
+  } else {
+    res.status(404).end();
   }
 }
 
@@ -257,7 +270,7 @@ async function deleteDraft(req: Request, res: Response): Promise<void> {
         authorId: req.authenticatedAuthor?.id,
       },
     });
-    deleteImageFolder(deletedDraft.image);
+    deleteHostedImageFolder(deletedDraft.image);
 
     res.status(204).end();
   } catch (error) {

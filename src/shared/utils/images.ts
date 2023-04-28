@@ -25,42 +25,28 @@ function saveImage(
   return `${APP_HOST_NAME}/static/images/${folderName}/${imageFileNameWithExtension}`;
 }
 
-function getHostedImageSaveAbsolutePath(imageUrl: string): string {
+function getHostedImageAbsolutePath(imageUrl: string): string {
   return `${PROJECT_ROOT_PATH}/${imageUrl.replace(`${APP_HOST_NAME}/`, "")}`;
 }
 
-function getHostedImageFolderAbsolutePath(imageUrl: string): string {
-  return path.dirname(getHostedImageSaveAbsolutePath(imageUrl));
-}
-
 function getHostedImageFolderName(imageUrl: string): string {
-  return path.basename(getHostedImageFolderAbsolutePath(imageUrl));
+  return path.basename(path.dirname(getHostedImageAbsolutePath(imageUrl)));
 }
 
-function deleteImage(hostedImageUrl: string): void {
-  fs.unlinkSync(getHostedImageSaveAbsolutePath(hostedImageUrl));
+function deleteHostedImage(imageUrl: string): void {
+  fs.unlinkSync(getHostedImageAbsolutePath(imageUrl));
 }
 
-function deleteFolderByAbsolutePath(folderAbsolutePath: string): void {
-  fs.rmSync(folderAbsolutePath, {
+function deleteHostedImageFolder(imageUrl: string): void {
+  fs.rmSync(path.dirname(getHostedImageAbsolutePath(imageUrl)), {
     recursive: true,
     force: true,
   });
 }
 
-function deleteFolder(folderPath: string): void {
-  deleteFolderByAbsolutePath(path.join(PROJECT_ROOT_PATH, folderPath));
-}
-
-function deleteImageFolder(hostedImageUrl: string): void {
-  deleteFolderByAbsolutePath(getHostedImageFolderAbsolutePath(hostedImageUrl));
-}
-
 export {
   saveImage,
-  deleteImage,
-  getHostedImageSaveAbsolutePath,
+  deleteHostedImage,
+  deleteHostedImageFolder,
   getHostedImageFolderName,
-  deleteFolder,
-  deleteImageFolder,
 };

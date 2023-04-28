@@ -4,9 +4,9 @@ import crypto from "crypto";
 import prisma from "prisma";
 import {
   saveImage,
-  deleteFolder,
-  deleteImageFolder,
   getHostedImageFolderName,
+  deleteHostedImage,
+  deleteHostedImageFolder,
 } from "shared/utils/images";
 import {
   createPaginationParameters,
@@ -33,6 +33,22 @@ async function createPost(req: Request, res: Response): Promise<void> {
     await prisma.post.create({
       data: {
         image: saveImage(req.body.image, postImagesFolderName, "main"),
+        extraImages:
+          "extraImages" in req.body
+            ? {
+                createMany: {
+                  data: req.body.extraImages.map(
+                    (extraImage: string, index: number) => ({
+                      image: saveImage(
+                        extraImage,
+                        postImagesFolderName,
+                        `extra-${index}`
+                      ),
+                    })
+                  ),
+                },
+              }
+            : undefined,
         title: req.body.title,
         content: req.body.content,
         author: {
@@ -50,22 +66,6 @@ async function createPost(req: Request, res: Response): Promise<void> {
             id: tagId,
           })),
         },
-        extraImages:
-          "extraImages" in req.body
-            ? {
-                createMany: {
-                  data: req.body.extraImages.map(
-                    (extraImage: string, index: number) => ({
-                      url: saveImage(
-                        extraImage,
-                        `${postImagesFolderName}/extra`,
-                        String(index)
-                      ),
-                    })
-                  ),
-                },
-              }
-            : undefined,
       },
     });
 
@@ -89,7 +89,7 @@ async function getPosts(req: Request, res: Response): Promise<void> {
         extraImages: {
           select: {
             id: true,
-            url: true,
+            image: true,
           },
         },
         title: true,
@@ -143,16 +143,22 @@ async function getPosts(req: Request, res: Response): Promise<void> {
 }
 
 async function updatePost(req: Request, res: Response): Promise<void> {
-  const updateDataValidationErrors = await validateUpdateData(req.body);
+  const postToUpdate = await prisma.post.findUnique({
+    where: {
+      id: Number(req.params.id),
+      isDraft: false,
+    },
+  });
 
-  if (updateDataValidationErrors) {
-    res.status(400).json(updateDataValidationErrors);
-  } else {
-    try {
-      const updatedPost = await prisma.post.update({
+  if (postToUpdate) {
+    const updateDataValidationErrors = await validateUpdateData(req.body);
+
+    if (updateDataValidationErrors) {
+      res.status(400).json(updateDataValidationErrors);
+    } else {
+      await prisma.post.update({
         where: {
-          id: Number(req.params.id),
-          isDraft: false,
+          id: postToUpdate.id,
         },
         data: {
           title: req.body.title,
@@ -171,34 +177,43 @@ async function updatePost(req: Request, res: Response): Promise<void> {
       });
 
       if ("image" in req.body || "extraImages" in req.body) {
-        const updatedPostImagesFolderName = `posts/${getHostedImageFolderName(
-          updatedPost.image
+        const postToUpdateImagesFolderName = `posts/${getHostedImageFolderName(
+          postToUpdate.image
         )}`;
 
         if ("image" in req.body) {
-          saveImage(req.body.image, updatedPostImagesFolderName, "main");
+          saveImage(req.body.image, postToUpdateImagesFolderName, "main");
         }
 
         if ("extraImages" in req.body) {
-          await prisma.postExtraImage.deleteMany({
+          const postExtraImages = await prisma.postExtraImage.findMany({
             where: {
-              postId: updatedPost.id,
+              postId: postToUpdate.id,
             },
           });
-          deleteFolder(`static/images/${updatedPostImagesFolderName}/extra`);
+
+          for (const postExtraImage of postExtraImages) {
+            deleteHostedImage(postExtraImage.image);
+          }
+
+          await prisma.postExtraImage.deleteMany({
+            where: {
+              postId: postToUpdate.id,
+            },
+          });
           await prisma.post.update({
             where: {
-              id: updatedPost.id,
+              id: postToUpdate.id,
             },
             data: {
               extraImages: {
                 createMany: {
                   data: req.body.extraImages.map(
                     (extraImage: string, index: number) => ({
-                      url: saveImage(
+                      image: saveImage(
                         extraImage,
-                        `${updatedPostImagesFolderName}/extra`,
-                        String(index)
+                        postToUpdateImagesFolderName,
+                        `extra-${index}`
                       ),
                     })
                   ),
@@ -210,11 +225,9 @@ async function updatePost(req: Request, res: Response): Promise<void> {
       }
 
       res.status(204).end();
-    } catch (error) {
-      console.log(error);
-
-      res.status(404).end();
     }
+  } else {
+    res.status(404).end();
   }
 }
 
@@ -226,7 +239,7 @@ async function deletePost(req: Request, res: Response): Promise<void> {
         isDraft: false,
       },
     });
-    deleteImageFolder(deletedPost.image);
+    deleteHostedImageFolder(deletedPost.image);
 
     res.status(204).end();
   } catch (error) {

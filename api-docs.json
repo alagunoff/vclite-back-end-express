@@ -435,7 +435,7 @@
                   },
                   "parentCategoryId": {
                     "type": "integer",
-                    "minumum": 1
+                    "minimum": 1
                   }
                 },
                 "required": ["name"]
@@ -498,7 +498,7 @@
                   },
                   "parentCategoryId": {
                     "type": "integer",
-                    "minumum": 1,
+                    "minimum": 1,
                     "nullable": true
                   }
                 }
@@ -535,7 +535,6 @@
     "/posts": {
       "post": {
         "tags": ["posts"],
-        "summary": "Create new post",
         "security": [{ "JWT": [] }],
         "requestBody": {
           "required": true,
@@ -594,38 +593,36 @@
           "400": {
             "$ref": "#/components/responses/ValidationErrors"
           },
-          "401": {
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
+          "401": {},
           "403": {
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotAuthor"
           }
         }
       },
       "get": {
         "tags": ["posts"],
-        "summary": "Get list of all posts",
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Post"
-                  }
+                  "type": "object",
+                  "properties": {
+                    "posts": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Post"
+                      }
+                    },
+                    "postsTotalNumber": {
+                      "type": "integer"
+                    },
+                    "pagesTotalNumber": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": ["posts", "postsTotalNumber", "pagesTotalNumber"]
                 }
               }
             }
@@ -636,7 +633,6 @@
     "/posts/{id}": {
       "patch": {
         "tags": ["posts"],
-        "summary": "Update post by id",
         "security": [{ "JWT": [] }],
         "parameters": [
           {
@@ -695,7 +691,9 @@
         },
         "responses": {
           "204": {},
-          "404": {}
+          "404": {
+            "description": "Post not found or you're not an admin"
+          }
         }
       },
       "delete": {
@@ -1064,7 +1062,8 @@
           "description": {
             "type": "string",
             "minLength": 1,
-            "nullable": true
+            "nullable": true,
+            "example": null
           },
           "userId": {
             "type": "integer",
@@ -1096,13 +1095,16 @@
           },
           "name": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "example": "Sports"
           },
           "subcategories": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Category"
-            }
+            },
+            "minItems": 1,
+            "uniqueItems": true
           }
         },
         "required": ["id", "name"]
@@ -1116,22 +1118,26 @@
           },
           "image": {
             "type": "string",
-            "format": "uri"
+            "format": "uri",
+            "example": "https://localhost:3000/static/images/posts/1/main.jpg"
           },
           "extraImages": {
             "type": "array",
             "items": {
               "type": "string",
-              "format": "uri"
+              "format": "uri",
+              "example": "https://localhost:3000/static/images/posts/1/extra-1.jpg"
             }
           },
           "title": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "example": "My first post"
           },
           "content": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "example": "here goes content of a post..."
           },
           "author": {
             "$ref": "#/components/schemas/Author"
@@ -1151,7 +1157,9 @@
           "comments": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1,
+              "example": "Comment from oleg"
             }
           },
           "createdAt": {
@@ -1187,6 +1195,9 @@
             }
           }
         }
+      },
+      "NotAuthor": {
+        "description": "User assosiated with provided JWT isn't an author"
       }
     }
   }

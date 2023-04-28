@@ -60,7 +60,7 @@ async function authenticateAuthor(
 
     next();
   } else {
-    res.status(403).send("Only authors have access");
+    res.status(403).end();
   }
 }
 
