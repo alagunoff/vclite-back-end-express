@@ -168,6 +168,7 @@ async function updatePost(req: Request, res: Response): Promise<void> {
           tags:
             "tagsIds" in req.body
               ? {
+                  set: [],
                   connect: req.body.tagsIds.map((tagId: number) => ({
                     id: tagId,
                   })),

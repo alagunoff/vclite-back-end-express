@@ -73,10 +73,8 @@ async function validateCreationData(
   }
 
   if ("tagsIds" in data) {
-    const tagsIds = data.tagsIds;
-
-    if (isPositiveIntegersNotEmptyArray(tagsIds)) {
-      for (const tagId of tagsIds) {
+    if (isPositiveIntegersNotEmptyArray(data.tagsIds)) {
+      for (const tagId of data.tagsIds) {
         const tag = await prisma.tag.findUnique({
           where: { id: tagId },
         });
@@ -94,7 +92,7 @@ async function validateCreationData(
         }
       }
     } else {
-      errors.tagsIds = "must be not empty numeric array with positive integers";
+      errors.tagsIds = "must be not empty positive integers array";
     }
   } else {
     errors.tagsIds = "required";
@@ -153,14 +151,13 @@ function validateFilterQueryParameters(
 
   if ("tagIdIn" in queryParameters) {
     if (!isPositiveIntegersNotEmptyArrayString(queryParameters.tagIdIn)) {
-      errors.tagIdIn = "must be not empty numeric array with positive integers";
+      errors.tagIdIn = "must be not empty positive integers array";
     }
   }
 
   if ("tagIdAll" in queryParameters) {
     if (!isPositiveIntegersNotEmptyArrayString(queryParameters.tagIdAll)) {
-      errors.tagIdAll =
-        "must be not empty numeric array with positive integers";
+      errors.tagIdAll = "must be not empty positive integers array";
     }
   }
 
@@ -486,7 +483,7 @@ async function validateUpdateData(
         }
       }
     } else {
-      errors.tagsIds = "must be not empty numeric array with positive integers";
+      errors.tagsIds = "must be not empty positive integers array";
     }
   }
 
