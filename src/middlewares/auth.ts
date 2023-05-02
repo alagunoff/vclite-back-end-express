@@ -51,7 +51,7 @@ async function authenticateAuthor(
 ): Promise<void> {
   const authenticatedAuthor = await prisma.author.findUnique({
     where: {
-      userId: req.authenticatedUser?.id,
+      userId: req.authenticatedUser?.id as number,
     },
   });
 

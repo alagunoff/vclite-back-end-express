@@ -1,0 +1,69 @@
+import { type Tag } from "@prisma/client";
+
+import prisma from "prisma";
+import { type ValidatedPaginationQueryParameters } from "shared/pagination/types";
+import {
+  createPaginationParameters,
+  calculatePagesTotalNumber,
+} from "shared/pagination/utils";
+
+async function createTag(
+  { name }: { name: string },
+  onSuccess: () => void
+): Promise<void> {
+  await prisma.tag.create({ data: { name } });
+
+  onSuccess();
+}
+
+async function getTags(
+  validatedPaginationQueryParameters: ValidatedPaginationQueryParameters,
+  onSuccess: (
+    tags: Tag[],
+    tagsTotalNumber: number,
+    pagesTotalNumber: number
+  ) => void
+): Promise<void> {
+  const tags = await prisma.tag.findMany({
+    ...createPaginationParameters(validatedPaginationQueryParameters),
+  });
+  const tagsTotalNumber = await prisma.tag.count();
+
+  onSuccess(
+    tags,
+    tagsTotalNumber,
+    calculatePagesTotalNumber(tagsTotalNumber, tags.length)
+  );
+}
+
+async function updateTagById(
+  id: number,
+  {
+    name,
+  }: {
+    name: string | undefined;
+  },
+  onSuccess: () => void
+): Promise<void> {
+  await prisma.tag.update({ where: { id }, data: { name } });
+
+  onSuccess();
+}
+
+async function deleteTagById(
+  id: number,
+  onSuccess: () => void,
+  onFailure: () => void
+): Promise<void> {
+  try {
+    await prisma.tag.delete({ where: { id } });
+
+    onSuccess();
+  } catch (error) {
+    console.log(error);
+
+    onFailure();
+  }
+}
+
+export { createTag, getTags, updateTagById, deleteTagById };

@@ -2,15 +2,13 @@ import express from "express";
 import dotenv from "dotenv";
 import swaggerUi from "swagger-ui-express";
 
-import {
-  authRouter,
-  usersRouter,
-  authorsRouter,
-  tagsRouter,
-  categoriesRouter,
-  postsRouter,
-  draftsRouter,
-} from "routers";
+import authRouter from "components/auth/router";
+import usersRouter from "components/users/router";
+import authorsRouter from "components/authors/router";
+import tagsRouter from "components/tags/router";
+import categoriesRouter from "components/categories/router";
+import postsRouter from "components/posts/router";
+import draftsRouter from "components/drafts/router";
 
 import apiDocs from "../api-docs.json";
 
