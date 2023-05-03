@@ -3,7 +3,6 @@
 /.vscode/
 /node_modules/
 /requests/
-/.eslintrc.js
 /.gitignore
 /docker-compose.yml
 /Dockerfile

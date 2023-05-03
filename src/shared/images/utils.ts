@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 
-import { APP_HOST_NAME, PROJECT_ROOT_PATH } from "shared/constants";
+import { APP_HOST_NAME, projectAbsolutePath } from "shared/constants";
 
 function saveImage(
   base64ImageDataUrl: string,
@@ -14,7 +14,7 @@ function saveImage(
   const imageFileNameWithExtension = `${imageFileName}.${
     imageMediatype.split("/")[1]
   }`;
-  const folderAbsolutePath = `${PROJECT_ROOT_PATH}/static/images/${folderName}`;
+  const folderAbsolutePath = `${projectAbsolutePath}/static/images/${folderName}`;
 
   fs.mkdirSync(folderAbsolutePath, { recursive: true });
   fs.writeFileSync(
@@ -22,11 +22,14 @@ function saveImage(
     Buffer.from(base64Image, "base64")
   );
 
-  return `${APP_HOST_NAME}/static/images/${folderName}/${imageFileNameWithExtension}`;
+  return `${APP_HOST_NAME}/api/static/images/${folderName}/${imageFileNameWithExtension}`;
 }
 
 function getHostedImageAbsolutePath(imageUrl: string): string {
-  return `${PROJECT_ROOT_PATH}/${imageUrl.replace(`${APP_HOST_NAME}/`, "")}`;
+  return `${projectAbsolutePath}/${imageUrl.replace(
+    `${APP_HOST_NAME}/api/`,
+    ""
+  )}`;
 }
 
 function getHostedImageFolderName(imageUrl: string): string {

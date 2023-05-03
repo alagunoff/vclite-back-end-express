@@ -1,3 +1,6 @@
+/* eslint-disable import/first */
+import * as dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import swaggerUi from "swagger-ui-express";
 
@@ -11,16 +14,19 @@ import draftsRouter from "components/drafts/router";
 
 import apiDocs from "../api-docs.json";
 
+dotenv.config();
+
 const app = express();
 
 app.listen(3000);
+
 app.use(express.json());
-app.use("/static", express.static("static"));
-app.use("/auth", authRouter);
-app.use("/users", usersRouter);
-app.use("/authors", authorsRouter);
-app.use("/tags", tagsRouter);
-app.use("/categories", categoriesRouter);
-app.use("/posts", postsRouter);
-app.use("/drafts", draftsRouter);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(apiDocs));
+app.use("/api/static", express.static("static"));
+app.use("/api/auth", authRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/authors", authorsRouter);
+app.use("/api/tags", tagsRouter);
+app.use("/api/categories", categoriesRouter);
+app.use("/api/posts", postsRouter);
+app.use("/api/drafts", draftsRouter);
+app.use("/api/swagger", swaggerUi.serve, swaggerUi.setup(apiDocs));
