@@ -13,18 +13,27 @@ import {
 } from "shared/validation/utils";
 
 import {
-  type CreationDataValidationErrors,
-  type FilterQueryParametersValidationErrors,
+  type ValidatedCreationData,
+  type ValidatedUpdateData,
+  type ValidationErrors,
   type ValidatedFilterQueryParameters,
-  type OrderQueryParametersValidationErrors,
+  type FilterQueryParametersValidationErrors,
   type ValidatedOrderQueryParameters,
+  type OrderQueryParametersValidationErrors,
 } from "./types";
 import { ORDER_VALID_VALUES } from "./constants";
 
-async function validateCreationData(
-  data: any
-): Promise<CreationDataValidationErrors | undefined> {
-  const errors: CreationDataValidationErrors = {};
+async function validateCreationData(data: any): Promise<
+  | {
+      validatedData: ValidatedCreationData;
+      errors: undefined;
+    }
+  | {
+      validatedData: undefined;
+      errors: ValidationErrors;
+    }
+> {
+  const errors: ValidationErrors = {};
 
   if ("image" in data) {
     if (!isBase64ImageDataUrl(data.image)) {
@@ -97,7 +106,23 @@ async function validateCreationData(
     errors.tagsIds = "required";
   }
 
-  return Object.keys(errors).length ? errors : undefined;
+  return Object.keys(errors).length
+    ? {
+        validatedData: undefined,
+        errors,
+      }
+    : {
+        validatedData: {
+          image: data.image,
+          extraImages: data.extraImages,
+          title: data.title,
+          content: data.content,
+          authorId: data.authorId,
+          categoryId: data.categoryId,
+          tagsIds: data.tagsIds,
+        },
+        errors: undefined,
+      };
 }
 
 function validateFilterQueryParameters(queryParameters: Request["query"]):
@@ -109,85 +134,64 @@ function validateFilterQueryParameters(queryParameters: Request["query"]):
       validatedData: undefined;
       errors: FilterQueryParametersValidationErrors;
     } {
-  const validatedData: ValidatedFilterQueryParameters = {};
   const errors: FilterQueryParametersValidationErrors = {};
 
   if ("titleContains" in queryParameters) {
-    if (isNotEmptyString(queryParameters.titleContains)) {
-      validatedData.titleContains = queryParameters.titleContains;
-    } else {
+    if (!isNotEmptyString(queryParameters.titleContains)) {
       errors.titleContains = "must be not empty string";
     }
   }
 
   if ("contentContains" in queryParameters) {
-    if (isNotEmptyString(queryParameters.contentContains)) {
-      validatedData.contentContains = queryParameters.contentContains;
-    } else {
+    if (!isNotEmptyString(queryParameters.contentContains)) {
       errors.contentContains = "must be not empty string";
     }
   }
 
   if ("authorFirstName" in queryParameters) {
-    if (isNotEmptyString(queryParameters.authorFirstName)) {
-      validatedData.authorFirstName = queryParameters.authorFirstName;
-    } else {
+    if (!isNotEmptyString(queryParameters.authorFirstName)) {
       errors.authorFirstName = "must be not empty string";
     }
   }
 
   if ("categoryId" in queryParameters) {
-    if (isStringPositiveInteger(queryParameters.categoryId)) {
-      validatedData.categoryId = queryParameters.categoryId;
-    } else {
+    if (!isStringPositiveInteger(queryParameters.categoryId)) {
       errors.categoryId = "must be positive integer";
     }
   }
 
   if ("tagId" in queryParameters) {
-    if (isStringPositiveInteger(queryParameters.tagId)) {
-      validatedData.tagId = queryParameters.tagId;
-    } else {
+    if (!isStringPositiveInteger(queryParameters.tagId)) {
       errors.tagId = "must be positive integer";
     }
   }
 
   if ("tagIdIn" in queryParameters) {
-    if (isStringPositiveIntegersNotEmptyArray(queryParameters.tagIdIn)) {
-      validatedData.tagIdIn = queryParameters.tagIdIn;
-    } else {
+    if (!isStringPositiveIntegersNotEmptyArray(queryParameters.tagIdIn)) {
       errors.tagIdIn = "must be positive integers delimited by ampersand";
     }
   }
 
   if ("tagIdAll" in queryParameters) {
-    if (isStringPositiveIntegersNotEmptyArray(queryParameters.tagIdAll)) {
-      validatedData.tagIdAll = queryParameters.tagIdAll;
-    } else {
+    if (!isStringPositiveIntegersNotEmptyArray(queryParameters.tagIdAll)) {
       errors.tagIdAll = "must be positive integers delimited by ampersand";
     }
   }
 
   if ("createdAt" in queryParameters) {
-    if (isDateString(queryParameters.createdAt)) {
-      validatedData.createdAt = queryParameters.createdAt;
-    } else {
+    if (!isDateString(queryParameters.createdAt)) {
       errors.createdAt = "must be string representation of a date";
     }
   }
 
   if ("createdAtLt" in queryParameters) {
-    if (isDateString(queryParameters.createdAtLt)) {
-      validatedData.createdAtLt = queryParameters.createdAtLt;
-    } else {
+    if (!isDateString(queryParameters.createdAtLt)) {
       errors.createdAtLt = "must be string representation of a date";
     }
   }
 
   if ("createdAtGt" in queryParameters) {
-    if (isDateString(queryParameters.createdAtGt)) {
-      validatedData.createdAtGt = queryParameters.createdAtGt;
-    } else {
+    if (!isDateString(queryParameters.createdAtGt)) {
       errors.createdAtGt = "must be string representation of a date";
     }
   }
@@ -198,7 +202,22 @@ function validateFilterQueryParameters(queryParameters: Request["query"]):
         errors,
       }
     : {
-        validatedData,
+        validatedData: {
+          titleContains: queryParameters.titleContains as string | undefined,
+          contentContains: queryParameters.contentContains as
+            | string
+            | undefined,
+          authorFirstName: queryParameters.authorFirstName as
+            | string
+            | undefined,
+          categoryId: queryParameters.categoryId as string | undefined,
+          tagId: queryParameters.tagId as string | undefined,
+          tagIdIn: queryParameters.tagIdIn as string[] | undefined,
+          tagIdAll: queryParameters.tagIdAll as string[] | undefined,
+          createdAt: queryParameters.createdAt as string | undefined,
+          createdAtLt: queryParameters.createdAtLt as string | undefined,
+          createdAtGt: queryParameters.createdAtGt as string | undefined,
+        },
         errors: undefined,
       };
 }
@@ -311,16 +330,13 @@ function validateOrderQueryParameters(queryParameters: Request["query"]):
       validatedData: undefined;
       errors: OrderQueryParametersValidationErrors;
     } {
-  const validatedData: ValidatedOrderQueryParameters = {};
   const errors: OrderQueryParametersValidationErrors = {};
 
   if ("orderBy" in queryParameters) {
     if (
-      typeof queryParameters.orderBy === "string" &&
-      ORDER_VALID_VALUES.includes(queryParameters.orderBy)
+      typeof queryParameters.orderBy !== "string" ||
+      !ORDER_VALID_VALUES.includes(queryParameters.orderBy)
     ) {
-      validatedData.orderBy = queryParameters.orderBy;
-    } else {
       errors.orderBy = `must be one of the following strings [${String(
         ORDER_VALID_VALUES
       )}]`;
@@ -333,7 +349,11 @@ function validateOrderQueryParameters(queryParameters: Request["query"]):
         errors,
       }
     : {
-        validatedData,
+        validatedData: {
+          orderBy: queryParameters.orderBy as
+            | (typeof ORDER_VALID_VALUES)[number]
+            | undefined,
+        },
         errors: undefined,
       };
 }
@@ -394,20 +414,17 @@ function createOrderParameters({
   return orderParams;
 }
 
-interface UpdateDataValidationErrors {
-  image?: string;
-  extraImages?: string;
-  title?: string;
-  content?: string;
-  authorId?: string;
-  categoryId?: string;
-  tagsIds?: string | Record<number, string>;
-}
-
-async function validateUpdateData(
-  data: any
-): Promise<UpdateDataValidationErrors | undefined> {
-  const errors: UpdateDataValidationErrors = {};
+async function validateUpdateData(data: any): Promise<
+  | {
+      validatedData: ValidatedUpdateData;
+      errors: undefined;
+    }
+  | {
+      validatedData: undefined;
+      errors: ValidationErrors;
+    }
+> {
+  const errors: ValidationErrors = {};
 
   if ("image" in data) {
     if (!isBase64ImageDataUrl(data.image)) {
@@ -480,7 +497,23 @@ async function validateUpdateData(
     }
   }
 
-  return Object.keys(errors).length ? errors : undefined;
+  return Object.keys(errors).length
+    ? {
+        validatedData: undefined,
+        errors,
+      }
+    : {
+        validatedData: {
+          image: data.image,
+          extraImages: data.extraImages,
+          title: data.title,
+          content: data.content,
+          authorId: data.authorId,
+          categoryId: data.categoryId,
+          tagsIds: data.tagsIds,
+        },
+        errors: undefined,
+      };
 }
 
 export {

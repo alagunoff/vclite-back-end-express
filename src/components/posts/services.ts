@@ -16,6 +16,8 @@ import {
 import { includeSubcategories } from "components/categories/utils";
 
 import {
+  type ValidatedCreationData,
+  type ValidatedUpdateData,
   type ValidatedFilterQueryParameters,
   type ValidatedOrderQueryParameters,
 } from "./types";
@@ -30,15 +32,7 @@ async function createPost(
     authorId,
     categoryId,
     tagsIds,
-  }: {
-    image: string;
-    extraImages: string[] | undefined;
-    title: string;
-    content: string;
-    authorId: number;
-    categoryId: number;
-    tagsIds: number[];
-  },
+  }: ValidatedCreationData,
   onSuccess: () => void
 ): Promise<void> {
   const postImagesFolderName = `posts/${crypto.randomUUID()}`;
@@ -162,15 +156,7 @@ async function updatePostById(
     authorId,
     categoryId,
     tagsIds,
-  }: {
-    image?: string;
-    extraImages?: string[];
-    title?: string;
-    content?: string;
-    authorId?: number;
-    categoryId?: number;
-    tagsIds?: number[];
-  },
+  }: ValidatedUpdateData,
   onSuccess: () => void
 ): Promise<void> {
   const updatedPost = await prisma.post.update({

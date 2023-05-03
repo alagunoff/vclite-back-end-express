@@ -12,25 +12,20 @@ import {
 } from "./utils";
 
 async function createPost(req: Request, res: Response): Promise<void> {
-  const creationDataValidationErrors = await validateCreationData(req.body);
+  const {
+    validatedData: validatedCreationData,
+    errors: creationDataValidationErrors,
+  } = await validateCreationData({
+    ...req.body,
+    authorId: req.authenticatedAuthor?.id,
+  });
 
   if (creationDataValidationErrors) {
     res.status(400).json(creationDataValidationErrors);
   } else {
-    void services.createPost(
-      {
-        image: req.body.image,
-        extraImages: req.body.extraImages,
-        title: req.body.title,
-        content: req.body.content,
-        authorId: req.authenticatedAuthor?.id as number,
-        categoryId: req.body.categoryId,
-        tagsIds: req.body.tagsIds,
-      },
-      () => {
-        res.status(201).end();
-      }
-    );
+    void services.createPost(validatedCreationData, () => {
+      res.status(201).end();
+    });
   }
 }
 
@@ -81,26 +76,17 @@ async function updatePost(req: Request, res: Response): Promise<void> {
   });
 
   if (postToUpdate) {
-    const updateDataValidationErrors = await validateUpdateData(req.body);
+    const {
+      validatedData: validatedUpdateData,
+      errors: updateDataValidationErrors,
+    } = await validateUpdateData(req.body);
 
     if (updateDataValidationErrors) {
       res.status(400).json(updateDataValidationErrors);
     } else {
-      void services.updatePostById(
-        postToUpdate.id,
-        {
-          image: req.body.image,
-          extraImages: req.body.extraImages,
-          title: req.body.title,
-          content: req.body.content,
-          authorId: req.body.authorId,
-          categoryId: req.body.categoryId,
-          tagsIds: req.body.tagsIds,
-        },
-        () => {
-          res.status(204).end();
-        }
-      );
+      void services.updatePostById(postToUpdate.id, validatedUpdateData, () => {
+        res.status(204).end();
+      });
     }
   } else {
     res.status(404).end();
