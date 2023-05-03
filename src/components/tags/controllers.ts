@@ -7,12 +7,15 @@ import * as services from "./services";
 import { validateCreationData, validateUpdateData } from "./utils";
 
 async function createTag(req: Request, res: Response): Promise<void> {
-  const creationDataValidationErrors = await validateCreationData(req.body);
+  const {
+    validatedData: validatedCreationData,
+    errors: creationDataValidationErrors,
+  } = await validateCreationData(req.body);
 
   if (creationDataValidationErrors) {
     res.status(400).json(creationDataValidationErrors);
   } else {
-    void services.createTag({ name: req.body.name }, () => {
+    void services.createTag(validatedCreationData, () => {
       res.status(201).end();
     });
   }
@@ -44,18 +47,17 @@ async function updateTag(req: Request, res: Response): Promise<void> {
   });
 
   if (tagToUpdate) {
-    const updateDataValidationErrors = await validateUpdateData(req.body);
+    const {
+      validatedData: validatedUpdateData,
+      errors: updateDataValidationErrors,
+    } = await validateUpdateData(req.body);
 
     if (updateDataValidationErrors) {
       res.status(400).json(updateDataValidationErrors);
     } else {
-      void services.updateTagById(
-        tagToUpdate.id,
-        { name: req.body.name },
-        () => {
-          res.status(204).end();
-        }
-      );
+      void services.updateTagById(tagToUpdate.id, validatedUpdateData, () => {
+        res.status(204).end();
+      });
     }
   } else {
     res.status(404).end();

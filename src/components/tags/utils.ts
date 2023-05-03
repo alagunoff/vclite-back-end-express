@@ -1,13 +1,23 @@
 import prisma from "prisma";
 import { isNotEmptyString } from "shared/validation/utils";
 
-interface CreationDataValidationErrors {
-  name?: string;
-}
+import {
+  type ValidatedCreationData,
+  type CreationDataValidationErrors,
+  type ValidatedUpdateData,
+  type UpdateDataValidationErrors,
+} from "./types";
 
-async function validateCreationData(
-  data: any
-): Promise<CreationDataValidationErrors | undefined> {
+async function validateCreationData(data: any): Promise<
+  | {
+      validatedData: ValidatedCreationData;
+      errors: undefined;
+    }
+  | {
+      validatedData: undefined;
+      errors: CreationDataValidationErrors;
+    }
+> {
   const errors: CreationDataValidationErrors = {};
 
   if ("name" in data) {
@@ -22,16 +32,29 @@ async function validateCreationData(
     errors.name = "required";
   }
 
-  return Object.keys(errors).length ? errors : undefined;
+  return Object.keys(errors).length
+    ? {
+        validatedData: undefined,
+        errors,
+      }
+    : {
+        validatedData: {
+          name: data.name,
+        },
+        errors: undefined,
+      };
 }
 
-interface UpdateDataValidationErrors {
-  name?: string;
-}
-
-async function validateUpdateData(
-  data: any
-): Promise<UpdateDataValidationErrors | undefined> {
+async function validateUpdateData(data: any): Promise<
+  | {
+      validatedData: ValidatedUpdateData;
+      errors: undefined;
+    }
+  | {
+      validatedData: undefined;
+      errors: UpdateDataValidationErrors;
+    }
+> {
   const errors: UpdateDataValidationErrors = {};
 
   if ("name" in data) {
@@ -44,7 +67,17 @@ async function validateUpdateData(
     }
   }
 
-  return Object.keys(errors).length ? errors : undefined;
+  return Object.keys(errors).length
+    ? {
+        validatedData: undefined,
+        errors,
+      }
+    : {
+        validatedData: {
+          name: data.name,
+        },
+        errors: undefined,
+      };
 }
 
 export { validateCreationData, validateUpdateData };

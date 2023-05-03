@@ -7,8 +7,10 @@ import {
   calculatePagesTotalNumber,
 } from "shared/pagination/utils";
 
+import { type ValidatedCreationData, type ValidatedUpdateData } from "./types";
+
 async function createTag(
-  { name }: { name: string },
+  { name }: ValidatedCreationData,
   onSuccess: () => void
 ): Promise<void> {
   await prisma.tag.create({ data: { name } });
@@ -38,11 +40,7 @@ async function getTags(
 
 async function updateTagById(
   id: number,
-  {
-    name,
-  }: {
-    name: string | undefined;
-  },
+  { name }: ValidatedUpdateData,
   onSuccess: () => void
 ): Promise<void> {
   await prisma.tag.update({ where: { id }, data: { name } });
