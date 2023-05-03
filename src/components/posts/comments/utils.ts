@@ -29,6 +29,7 @@ function validateCreationData(data: any):
     : {
         validatedData: {
           content: data.content,
+          postId: data.postId,
         },
         errors: undefined,
       };
