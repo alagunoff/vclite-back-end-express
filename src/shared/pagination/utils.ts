@@ -16,13 +16,10 @@ function validatePaginationQueryParameters(queryParameters: Request["query"]):
       validatedData: undefined;
       errors: PaginationQueryParametersValidationErrors;
     } {
-  const validatedData: ValidatedPaginationQueryParameters = {};
   const errors: PaginationQueryParametersValidationErrors = {};
 
   if ("pageNumber" in queryParameters) {
-    if (isStringPositiveInteger(queryParameters.pageNumber)) {
-      validatedData.pageNumber = queryParameters.pageNumber;
-    } else {
+    if (!isStringPositiveInteger(queryParameters.pageNumber)) {
       errors.pageNumber = "must be positive integer";
     }
 
@@ -32,9 +29,7 @@ function validatePaginationQueryParameters(queryParameters: Request["query"]):
   }
 
   if ("itemsNumber" in queryParameters) {
-    if (isStringPositiveInteger(queryParameters.itemsNumber)) {
-      validatedData.itemsNumber = queryParameters.itemsNumber;
-    } else {
+    if (!isStringPositiveInteger(queryParameters.itemsNumber)) {
       errors.itemsNumber = "must be positive integer";
     }
 
@@ -49,7 +44,10 @@ function validatePaginationQueryParameters(queryParameters: Request["query"]):
         errors,
       }
     : {
-        validatedData,
+        validatedData: {
+          pageNumber: queryParameters.pageNumber as string | undefined,
+          itemsNumber: queryParameters.itemsNumber as string | undefined,
+        },
         errors: undefined,
       };
 }
