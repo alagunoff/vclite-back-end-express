@@ -2,7 +2,7 @@ import { type Request, type Response } from "express";
 
 import * as services from "./services";
 
-import { validateCreationData } from "./utils";
+import { validateCreationData } from "./validators";
 
 async function createUser(req: Request, res: Response): Promise<void> {
   const {

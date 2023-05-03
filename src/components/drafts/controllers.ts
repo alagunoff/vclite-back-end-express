@@ -6,7 +6,7 @@ import { validatePaginationQueryParameters } from "shared/pagination/utils";
 import {
   validateCreationData,
   validateUpdateData,
-} from "components/posts/utils";
+} from "components/posts/validators";
 
 import * as services from "./services";
 

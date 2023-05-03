@@ -4,7 +4,7 @@ import prisma from "prisma";
 import { validatePaginationQueryParameters } from "shared/pagination/utils";
 
 import * as services from "./services";
-import { validateCreationData } from "./utils";
+import { validateCreationData } from "./validators";
 
 async function createComment(req: Request, res: Response): Promise<void> {
   const postToCreateCommentFor = await prisma.post.findUnique({

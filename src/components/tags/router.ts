@@ -1,10 +1,10 @@
-import express from "express";
+import { Router } from "express";
 
 import { authenticateUser } from "middlewares/auth";
 
 import { createTag, getTags, updateTag, deleteTag } from "./controllers";
 
-const router = express.Router();
+const router = Router();
 
 router.post("", authenticateUser(true), createTag);
 router.get("", getTags);

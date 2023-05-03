@@ -4,7 +4,7 @@ import prisma from "prisma";
 import { validatePaginationQueryParameters } from "shared/pagination/utils";
 
 import * as services from "./services";
-import { validateCreationData, validateUpdateData } from "./utils";
+import { validateCreationData, validateUpdateData } from "./validators";
 
 async function createAuthor(req: Request, res: Response): Promise<void> {
   const {

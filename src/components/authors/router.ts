@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 
 import { authenticateUser } from "middlewares/auth";
 
@@ -9,7 +9,7 @@ import {
   deleteAuthor,
 } from "./controllers";
 
-const router = express.Router();
+const router = Router();
 
 router.post("", authenticateUser(true), createAuthor);
 router.get("", authenticateUser(true), getAuthors);

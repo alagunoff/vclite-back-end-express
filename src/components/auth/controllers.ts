@@ -1,7 +1,7 @@
 import { type Request, type Response } from "express";
 
 import * as services from "./services";
-import { validateLoginData } from "./utils";
+import { validateLoginData } from "./validators";
 
 async function logIn(req: Request, res: Response): Promise<void> {
   const {

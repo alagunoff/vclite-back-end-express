@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 
 import { authenticateUser, authenticateAuthor } from "middlewares/auth";
 
@@ -10,7 +10,7 @@ import {
   deleteDraft,
 } from "./controllers";
 
-const router = express.Router();
+const router = Router();
 
 router.post("", authenticateUser(), authenticateAuthor, createDraft);
 router.get("", authenticateUser(), authenticateAuthor, getDrafts);

@@ -9,7 +9,7 @@ import {
   validateFilterQueryParameters,
   validateOrderQueryParameters,
   validateUpdateData,
-} from "./utils";
+} from "./validators";
 
 async function createPost(req: Request, res: Response): Promise<void> {
   const {

@@ -53,7 +53,9 @@
     },
     "rules": {
       "@typescript-eslint/strict-boolean-expressions": 0,
-      "@typescript-eslint/no-misused-promises": 0
+      "@typescript-eslint/no-misused-promises": 0,
+      "import/exports-last": "error",
+      "import/group-exports": "error"
     }
   },
   "lint-staged": {

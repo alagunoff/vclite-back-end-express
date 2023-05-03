@@ -1,8 +1,8 @@
-import express from "express";
+import { Router } from "express";
 
 import { logIn } from "./controllers";
 
-const router = express.Router();
+const router = Router();
 
 router.post("/login", logIn);
 
