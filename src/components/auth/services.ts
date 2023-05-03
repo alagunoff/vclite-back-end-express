@@ -4,8 +4,10 @@ import bcrypt from "bcryptjs";
 
 import prisma from "prisma";
 
+import { type ValidatedLoginData } from "./types";
+
 async function logIn(
-  { username, password }: { username: string; password: string },
+  { username, password }: ValidatedLoginData,
   onSuccess: (userJwtToken: string) => void,
   onFailure: () => void
 ): Promise<void> {
