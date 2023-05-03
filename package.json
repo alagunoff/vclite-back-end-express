@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "nodemon --files -r tsconfig-paths/register -L ./src/index.ts",
     "prepare": "husky install",
-    "eslint": "eslint ./src --ext .ts"
+    "eslint": "eslint ./src --ext .ts",
+    "eslint:fix": "eslint ./src --ext .ts --fix"
   },
   "devDependencies": {
     "@types/bcryptjs": "2.4.2",

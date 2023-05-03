@@ -2,8 +2,8 @@ import { type User } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-import prisma from "prisma";
-import env from "env";
+import env from "shared/env";
+import prisma from "shared/prisma";
 
 import { type ValidatedLoginData } from "./types";
 

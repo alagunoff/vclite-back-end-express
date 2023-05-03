@@ -1,8 +1,8 @@
 import { type Request, type Response, type NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-import prisma from "prisma";
-import env from "env";
+import prisma from "shared/prisma";
+import env from "shared/env";
 
 function authenticateUser(onlyAdmin?: true) {
   return async function (req: Request, res: Response, next: NextFunction) {

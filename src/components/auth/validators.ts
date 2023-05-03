@@ -1,6 +1,6 @@
 import { isNotEmptyString } from "shared/validation/utils";
 
-import prisma from "prisma";
+import prisma from "shared/prisma";
 
 import { type ValidatedLoginData, type ValidationErrors } from "./types";
 

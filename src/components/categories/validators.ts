@@ -1,4 +1,4 @@
-import prisma from "prisma";
+import prisma from "shared/prisma";
 import { isNotEmptyString, isPositiveInteger } from "shared/validation/utils";
 
 import {

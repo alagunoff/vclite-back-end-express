@@ -1,6 +1,6 @@
 import { type Request, type Response } from "express";
 
-import prisma from "prisma";
+import prisma from "shared/prisma";
 import { validatePaginationQueryParameters } from "shared/pagination/utils";
 
 import * as services from "./services";

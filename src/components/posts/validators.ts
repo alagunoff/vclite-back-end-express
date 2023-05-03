@@ -1,6 +1,6 @@
 import { type Request } from "express";
 
-import prisma from "prisma";
+import prisma from "shared/prisma";
 import {
   isBase64ImageDataUrl,
   isNotEmptyString,

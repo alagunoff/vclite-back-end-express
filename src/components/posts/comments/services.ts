@@ -1,6 +1,6 @@
 import { type Comment } from "@prisma/client";
 
-import prisma from "prisma";
+import prisma from "shared/prisma";
 import { type ValidatedPaginationQueryParameters } from "shared/pagination/types";
 import {
   createPaginationParameters,
