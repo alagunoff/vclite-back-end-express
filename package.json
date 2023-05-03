@@ -2,7 +2,8 @@
   "private": true,
   "scripts": {
     "dev": "nodemon --files -r tsconfig-paths/register -L ./src/index.ts",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "eslint": "eslint ./src --ext .ts"
   },
   "devDependencies": {
     "@types/bcryptjs": "2.4.2",
@@ -29,7 +30,7 @@
   "dependencies": {
     "@prisma/client": "4.13.0",
     "bcryptjs": "2.4.3",
-    "dotenv": "16.0.3",
+    "envalid": "7.3.1",
     "express": "4.18.2",
     "jsonwebtoken": "9.0.0",
     "swagger-ui-express": "4.6.2"

@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 import prisma from "prisma";
+import env from "env";
 import { saveImage, deleteHostedImage } from "shared/images/utils";
 
 import { type ValidatedCreationData } from "./types";
@@ -20,7 +21,7 @@ async function createUser(
     },
   });
 
-  onSuccess(jwt.sign(String(createdUser.id), process.env.JWT_SECRET_KEY));
+  onSuccess(jwt.sign(String(createdUser.id), env.JWT_SECRET_KEY));
 }
 
 async function deleteUserById(

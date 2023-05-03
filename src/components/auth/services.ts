@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 import prisma from "prisma";
+import env from "env";
 
 import { type ValidatedLoginData } from "./types";
 
@@ -15,7 +16,7 @@ async function logIn(
   const isProvidedPasswordCorrect = bcrypt.compareSync(password, user.password);
 
   if (isProvidedPasswordCorrect) {
-    onSuccess(jwt.sign(String(user.id), process.env.JWT_SECRET_KEY));
+    onSuccess(jwt.sign(String(user.id), env.JWT_SECRET_KEY));
   } else {
     onFailure();
   }

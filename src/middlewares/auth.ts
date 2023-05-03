@@ -2,6 +2,7 @@ import { type Request, type Response, type NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 import prisma from "prisma";
+import env from "env";
 
 function authenticateUser(onlyAdmin?: true) {
   return async function (req: Request, res: Response, next: NextFunction) {
@@ -9,7 +10,7 @@ function authenticateUser(onlyAdmin?: true) {
       const token = req.headers.authorization.slice(7);
 
       try {
-        const decodedJwt = jwt.verify(token, process.env.JWT_SECRET_KEY);
+        const decodedJwt = jwt.verify(token, env.JWT_SECRET_KEY);
         const authenticatedUser = await prisma.user.findUnique({
           where: {
             id: Number(decodedJwt),

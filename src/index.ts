@@ -1,5 +1,4 @@
 import express from "express";
-import dotenv from "dotenv";
 import swaggerUi from "swagger-ui-express";
 
 import authRouter from "components/auth/router";
@@ -11,8 +10,6 @@ import postsRouter from "components/posts/router";
 import draftsRouter from "components/drafts/router";
 
 import apiDocs from "../api-docs.json";
-
-dotenv.config();
 
 const app = express();
 
