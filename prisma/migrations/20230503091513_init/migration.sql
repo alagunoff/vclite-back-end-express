@@ -33,7 +33,7 @@ CREATE TABLE "tags" (
 CREATE TABLE "categories" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "parentCategoryId" INTEGER,
+    "parent_category_id" INTEGER,
 
     CONSTRAINT "categories_pkey" PRIMARY KEY ("id")
 );
@@ -50,7 +50,7 @@ CREATE TABLE "comments" (
 -- CreateTable
 CREATE TABLE "post_extra_images" (
     "id" SERIAL NOT NULL,
-    "url" TEXT NOT NULL,
+    "image" TEXT NOT NULL,
     "post_id" INTEGER NOT NULL,
 
     CONSTRAINT "post_extra_images_pkey" PRIMARY KEY ("id")
@@ -59,7 +59,7 @@ CREATE TABLE "post_extra_images" (
 -- CreateTable
 CREATE TABLE "posts" (
     "id" SERIAL NOT NULL,
-    "imageUrl" TEXT NOT NULL,
+    "image" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "content" TEXT NOT NULL,
     "author_id" INTEGER NOT NULL,
@@ -89,12 +89,6 @@ CREATE UNIQUE INDEX "tags_name_key" ON "tags"("name");
 CREATE UNIQUE INDEX "categories_name_key" ON "categories"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "posts_title_key" ON "posts"("title");
-
--- CreateIndex
-CREATE UNIQUE INDEX "posts_id_is_draft_key" ON "posts"("id", "is_draft");
-
--- CreateIndex
 CREATE UNIQUE INDEX "_PostToTag_AB_unique" ON "_PostToTag"("A", "B");
 
 -- CreateIndex
@@ -104,7 +98,7 @@ CREATE INDEX "_PostToTag_B_index" ON "_PostToTag"("B");
 ALTER TABLE "authors" ADD CONSTRAINT "authors_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "categories" ADD CONSTRAINT "categories_parentCategoryId_fkey" FOREIGN KEY ("parentCategoryId") REFERENCES "categories"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "categories" ADD CONSTRAINT "categories_parent_category_id_fkey" FOREIGN KEY ("parent_category_id") REFERENCES "categories"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "comments" ADD CONSTRAINT "comments_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "posts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
