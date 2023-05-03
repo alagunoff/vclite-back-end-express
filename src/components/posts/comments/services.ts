@@ -7,9 +7,10 @@ import {
   calculatePagesTotalNumber,
 } from "shared/pagination/utils";
 
+import { type ValidatedCreationData } from "./types";
+
 async function createComment(
-  postId: number,
-  { content }: { content: string },
+  { content, postId }: ValidatedCreationData,
   onSuccess: () => void
 ): Promise<void> {
   await prisma.comment.create({ data: { content, postId } });
@@ -17,7 +18,7 @@ async function createComment(
   onSuccess();
 }
 
-async function getComments(
+async function getCommentsByPostId(
   postId: number,
   validatedPaginationQueryParameters: ValidatedPaginationQueryParameters,
   onSuccess: (
@@ -49,7 +50,7 @@ async function getComments(
   );
 }
 
-async function deleteComments(
+async function deleteCommentsByPostId(
   postId: number,
   onSuccess: () => void
 ): Promise<void> {
@@ -58,4 +59,4 @@ async function deleteComments(
   onSuccess();
 }
 
-export { createComment, getComments, deleteComments };
+export { createComment, getCommentsByPostId, deleteCommentsByPostId };

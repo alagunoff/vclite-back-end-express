@@ -15,18 +15,20 @@ async function createComment(req: Request, res: Response): Promise<void> {
   });
 
   if (postToCreateCommentFor) {
-    const creationDataValidationErrors = validateCreationData(req.body);
+    const {
+      validatedData: validatedCreationData,
+      errors: creationDataValidationErrors,
+    } = validateCreationData({
+      ...req.body,
+      postId: postToCreateCommentFor.id,
+    });
 
     if (creationDataValidationErrors) {
       res.status(400).json(creationDataValidationErrors);
     } else {
-      void services.createComment(
-        postToCreateCommentFor.id,
-        { content: req.body.content },
-        () => {
-          res.status(201).end();
-        }
-      );
+      void services.createComment(validatedCreationData, () => {
+        res.status(201).end();
+      });
     }
   } else {
     res.status(404).end();
@@ -50,7 +52,7 @@ async function getComments(req: Request, res: Response): Promise<void> {
     if (paginationQueryParametersValidationErrors) {
       res.status(400).json(paginationQueryParametersValidationErrors);
     } else {
-      void services.getComments(
+      void services.getCommentsByPostId(
         postToGetCommentsFor.id,
         validatedPaginationQueryParameters,
         (comments, commentsTotalNumber, pagesTotalNumber) => {
@@ -72,7 +74,7 @@ async function deleteComments(req: Request, res: Response): Promise<void> {
   });
 
   if (postToDeleteCommentsFrom) {
-    void services.deleteComments(postToDeleteCommentsFrom.id, () => {
+    void services.deleteCommentsByPostId(postToDeleteCommentsFrom.id, () => {
       res.status(204).end();
     });
   } else {

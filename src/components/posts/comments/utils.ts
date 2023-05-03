@@ -1,13 +1,17 @@
 import { isNotEmptyString } from "shared/validation/utils";
 
-interface CreationDataValidationErrors {
-  content?: string;
-}
+import { type ValidatedCreationData, type ValidationErrors } from "./types";
 
-function validateCreationData(
-  data: any
-): CreationDataValidationErrors | undefined {
-  const errors: CreationDataValidationErrors = {};
+function validateCreationData(data: any):
+  | {
+      validatedData: ValidatedCreationData;
+      errors: undefined;
+    }
+  | {
+      validatedData: undefined;
+      errors: ValidationErrors;
+    } {
+  const errors: ValidationErrors = {};
 
   if ("content" in data) {
     if (!isNotEmptyString(data.content)) {
@@ -17,7 +21,17 @@ function validateCreationData(
     errors.content = "required";
   }
 
-  return Object.keys(errors).length ? errors : undefined;
+  return Object.keys(errors).length
+    ? {
+        validatedData: undefined,
+        errors,
+      }
+    : {
+        validatedData: {
+          content: data.content,
+        },
+        errors: undefined,
+      };
 }
 
 export { validateCreationData };
