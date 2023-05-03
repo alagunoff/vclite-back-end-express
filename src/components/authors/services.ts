@@ -7,8 +7,10 @@ import {
   calculatePagesTotalNumber,
 } from "shared/pagination/utils";
 
+import { type ValidatedCreationData, type ValidatedUpdateData } from "./types";
+
 async function createAuthor(
-  { description, userId }: { description: string | undefined; userId: number },
+  { description, userId }: ValidatedCreationData,
   onSuccess: () => void
 ): Promise<void> {
   await prisma.author.create({ data: { description, userId } });
@@ -42,11 +44,7 @@ async function getAuthors(
 
 async function updateAuthorById(
   id: number,
-  {
-    description,
-  }: {
-    description: string | undefined;
-  },
+  { description }: ValidatedUpdateData,
   onSuccess: () => void
 ): Promise<void> {
   await prisma.author.update({ where: { id }, data: { description } });

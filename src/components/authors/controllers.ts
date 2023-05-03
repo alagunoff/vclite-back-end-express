@@ -7,17 +7,17 @@ import * as services from "./services";
 import { validateCreationData, validateUpdateData } from "./utils";
 
 async function createAuthor(req: Request, res: Response): Promise<void> {
-  const creationDataValidationErrors = await validateCreationData(req.body);
+  const {
+    validatedData: validatedCreationData,
+    errors: creationDataValidationErrors,
+  } = await validateCreationData(req.body);
 
   if (creationDataValidationErrors) {
     res.status(400).json(creationDataValidationErrors);
   } else {
-    void services.createAuthor(
-      { description: req.body.description, userId: req.body.userId },
-      () => {
-        res.status(201).end();
-      }
-    );
+    void services.createAuthor(validatedCreationData, () => {
+      res.status(201).end();
+    });
   }
 }
 
@@ -45,14 +45,17 @@ async function updateAuthor(req: Request, res: Response): Promise<void> {
   });
 
   if (authorToUpdate) {
-    const updateDataValidationErrors = validateUpdateData(req.body);
+    const {
+      validatedData: validatedUpdateData,
+      errors: updateDataValidationErrors,
+    } = validateUpdateData(req.body);
 
     if (updateDataValidationErrors) {
       res.status(400).json(updateDataValidationErrors);
     } else {
       void services.updateAuthorById(
         authorToUpdate.id,
-        { description: req.body.description },
+        validatedUpdateData,
         () => {
           res.status(204).end();
         }

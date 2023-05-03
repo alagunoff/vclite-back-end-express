@@ -3,12 +3,9 @@ interface ValidatedPaginationQueryParameters {
   itemsNumber?: string;
 }
 
-interface PaginationQueryParametersValidationErrors {
+interface ValidationErrors {
   pageNumber?: string;
   itemsNumber?: string;
 }
 
-export type {
-  ValidatedPaginationQueryParameters,
-  PaginationQueryParametersValidationErrors,
-};
+export type { ValidatedPaginationQueryParameters, ValidationErrors };

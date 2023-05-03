@@ -3,8 +3,8 @@ import { type Request } from "express";
 import { isStringPositiveInteger } from "shared/validation/utils";
 
 import {
-  type PaginationQueryParametersValidationErrors,
   type ValidatedPaginationQueryParameters,
+  type ValidationErrors,
 } from "./types";
 
 function validatePaginationQueryParameters(queryParameters: Request["query"]):
@@ -14,9 +14,9 @@ function validatePaginationQueryParameters(queryParameters: Request["query"]):
     }
   | {
       validatedData: undefined;
-      errors: PaginationQueryParametersValidationErrors;
+      errors: ValidationErrors;
     } {
-  const errors: PaginationQueryParametersValidationErrors = {};
+  const errors: ValidationErrors = {};
 
   if ("pageNumber" in queryParameters) {
     if (!isStringPositiveInteger(queryParameters.pageNumber)) {

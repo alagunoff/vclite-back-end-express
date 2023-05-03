@@ -2,10 +2,7 @@ import { isNotEmptyString } from "shared/validation/utils";
 
 import prisma from "prisma";
 
-import {
-  type ValidatedLoginData,
-  type LoginDataValidationErrors,
-} from "./types";
+import { type ValidatedLoginData, type ValidationErrors } from "./types";
 
 async function validateLoginData(data: any): Promise<
   | {
@@ -14,10 +11,10 @@ async function validateLoginData(data: any): Promise<
     }
   | {
       validatedData: undefined;
-      errors: LoginDataValidationErrors;
+      errors: ValidationErrors;
     }
 > {
-  const errors: LoginDataValidationErrors = {};
+  const errors: ValidationErrors = {};
 
   if ("username" in data) {
     if (isNotEmptyString(data.username)) {

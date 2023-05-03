@@ -4,10 +4,7 @@ import {
   isBase64ImageDataUrl,
 } from "shared/validation/utils";
 
-import {
-  type ValidatedCreationData,
-  type CreationDataValidationErrors,
-} from "./types";
+import { type ValidatedCreationData, type ValidationErrors } from "./types";
 
 async function validateCreationData(data: any): Promise<
   | {
@@ -16,10 +13,10 @@ async function validateCreationData(data: any): Promise<
     }
   | {
       validatedData: undefined;
-      errors: CreationDataValidationErrors;
+      errors: ValidationErrors;
     }
 > {
-  const errors: CreationDataValidationErrors = {};
+  const errors: ValidationErrors = {};
 
   if ("image" in data) {
     if (!isBase64ImageDataUrl(data.image)) {

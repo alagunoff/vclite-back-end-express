@@ -1,13 +1,15 @@
 interface ValidatedCreationData {
-  name: string;
+  description?: string;
+  userId: number;
 }
 
 interface ValidatedUpdateData {
-  name?: string;
+  description?: string;
 }
 
 interface ValidationErrors {
-  name?: string;
+  description?: string;
+  userId?: string;
 }
 
 export type { ValidatedCreationData, ValidatedUpdateData, ValidationErrors };

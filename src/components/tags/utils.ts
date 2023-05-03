@@ -3,9 +3,8 @@ import { isNotEmptyString } from "shared/validation/utils";
 
 import {
   type ValidatedCreationData,
-  type CreationDataValidationErrors,
   type ValidatedUpdateData,
-  type UpdateDataValidationErrors,
+  type ValidationErrors,
 } from "./types";
 
 async function validateCreationData(data: any): Promise<
@@ -15,10 +14,10 @@ async function validateCreationData(data: any): Promise<
     }
   | {
       validatedData: undefined;
-      errors: CreationDataValidationErrors;
+      errors: ValidationErrors;
     }
 > {
-  const errors: CreationDataValidationErrors = {};
+  const errors: ValidationErrors = {};
 
   if ("name" in data) {
     if (isNotEmptyString(data.name)) {
@@ -52,10 +51,10 @@ async function validateUpdateData(data: any): Promise<
     }
   | {
       validatedData: undefined;
-      errors: UpdateDataValidationErrors;
+      errors: ValidationErrors;
     }
 > {
-  const errors: UpdateDataValidationErrors = {};
+  const errors: ValidationErrors = {};
 
   if ("name" in data) {
     if (isNotEmptyString(data.name)) {

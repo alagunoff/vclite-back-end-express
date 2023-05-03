@@ -3,9 +3,9 @@ interface ValidatedLoginData {
   password: string;
 }
 
-interface LoginDataValidationErrors {
+interface ValidationErrors {
   username?: string;
   password?: string;
 }
 
-export type { ValidatedLoginData, LoginDataValidationErrors };
+export type { ValidatedLoginData, ValidationErrors };
