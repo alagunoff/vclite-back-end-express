@@ -1,15 +1,24 @@
 import prisma from "prisma";
 import { isNotEmptyString, isPositiveInteger } from "shared/validation/utils";
 
-interface CreationDataValidationErrors {
-  name?: string;
-  parentCategoryId?: string;
-}
+import {
+  type ValidatedCreationData,
+  type ValidatedUpdateData,
+  type ValidationErrors,
+  type CategoryWithSubcategories,
+} from "./types";
 
-async function validateCreationData(
-  data: any
-): Promise<CreationDataValidationErrors | undefined> {
-  const errors: CreationDataValidationErrors = {};
+async function validateCreationData(data: any): Promise<
+  | {
+      validatedData: ValidatedCreationData;
+      errors: undefined;
+    }
+  | {
+      validatedData: undefined;
+      errors: ValidationErrors;
+    }
+> {
+  const errors: ValidationErrors = {};
 
   if ("name" in data) {
     if (isNotEmptyString(data.name)) {
@@ -37,13 +46,18 @@ async function validateCreationData(
     }
   }
 
-  return Object.keys(errors).length ? errors : undefined;
-}
-
-interface CategoryWithSubcategories {
-  id: number;
-  name: string;
-  subcategories?: CategoryWithSubcategories[];
+  return Object.keys(errors).length
+    ? {
+        validatedData: undefined,
+        errors,
+      }
+    : {
+        validatedData: {
+          name: data.name,
+          parentCategoryId: data.parentCategoryId,
+        },
+        errors: undefined,
+      };
 }
 
 async function includeSubcategories(
@@ -68,15 +82,17 @@ async function includeSubcategories(
   }
 }
 
-interface UpdateDataValidationErrors {
-  name?: string;
-  parentCategoryId?: string;
-}
-
-async function validateUpdateData(
-  data: any
-): Promise<UpdateDataValidationErrors | undefined> {
-  const errors: UpdateDataValidationErrors = {};
+async function validateUpdateData(data: any): Promise<
+  | {
+      validatedData: ValidatedUpdateData;
+      errors: undefined;
+    }
+  | {
+      validatedData: undefined;
+      errors: ValidationErrors;
+    }
+> {
+  const errors: ValidationErrors = {};
 
   if ("name" in data) {
     if (isNotEmptyString(data.name)) {
@@ -107,7 +123,18 @@ async function validateUpdateData(
     }
   }
 
-  return Object.keys(errors).length ? errors : undefined;
+  return Object.keys(errors).length
+    ? {
+        validatedData: undefined,
+        errors,
+      }
+    : {
+        validatedData: {
+          name: data.name,
+          parentCategoryId: data.parentCategoryId,
+        },
+        errors: undefined,
+      };
 }
 
 export { validateCreationData, includeSubcategories, validateUpdateData };

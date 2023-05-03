@@ -7,13 +7,11 @@ import {
   calculatePagesTotalNumber,
 } from "shared/pagination/utils";
 
+import { type ValidatedCreationData, type ValidatedUpdateData } from "./types";
 import { includeSubcategories } from "./utils";
 
 async function createCategory(
-  {
-    name,
-    parentCategoryId,
-  }: { name: string; parentCategoryId: number | undefined },
+  { name, parentCategoryId }: ValidatedCreationData,
   onSuccess: () => void
 ): Promise<void> {
   await prisma.category.create({ data: { name, parentCategoryId } });
@@ -56,13 +54,7 @@ async function getCategories(
 
 async function updateCategoryById(
   id: number,
-  {
-    name,
-    parentCategoryId,
-  }: {
-    name: string | undefined;
-    parentCategoryId: number | undefined;
-  },
+  { name, parentCategoryId }: ValidatedUpdateData,
   onSuccess: () => void
 ): Promise<void> {
   await prisma.category.update({

@@ -7,20 +7,17 @@ import * as services from "./services";
 import { validateCreationData, validateUpdateData } from "./utils";
 
 async function createCategory(req: Request, res: Response): Promise<void> {
-  const creationDataValidationErrors = await validateCreationData(req.body);
+  const {
+    validatedData: validatedCreationData,
+    errors: creationDataValidationErrors,
+  } = await validateCreationData(req.body);
 
   if (creationDataValidationErrors) {
     res.status(400).json(creationDataValidationErrors);
   } else {
-    void services.createCategory(
-      {
-        name: req.body.name,
-        parentCategoryId: req.body.parentCategoryId,
-      },
-      () => {
-        res.status(201).end();
-      }
-    );
+    void services.createCategory(validatedCreationData, () => {
+      res.status(201).end();
+    });
   }
 }
 
@@ -50,14 +47,17 @@ async function updateCategory(req: Request, res: Response): Promise<void> {
   });
 
   if (categoryToUpdate) {
-    const updateDataValidationErrors = await validateUpdateData(req.body);
+    const {
+      validatedData: validatedUpdateData,
+      errors: updateDataValidationErrors,
+    } = await validateUpdateData(req.body);
 
     if (updateDataValidationErrors) {
       res.status(400).json(updateDataValidationErrors);
     } else {
       void services.updateCategoryById(
         categoryToUpdate.id,
-        { name: req.body.name, parentCategoryId: req.body.parentCategoryId },
+        validatedUpdateData,
         () => {
           res.status(204).end();
         }
