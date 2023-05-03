@@ -414,7 +414,10 @@ function createOrderParameters({
   return orderParams;
 }
 
-async function validateUpdateData(data: any): Promise<
+async function validateUpdateData(
+  data: any,
+  isPostBeingValidated: boolean = true
+): Promise<
   | {
       validatedData: ValidatedUpdateData;
       errors: undefined;
@@ -451,7 +454,7 @@ async function validateUpdateData(data: any): Promise<
     }
   }
 
-  if ("authorId" in data) {
+  if (isPostBeingValidated && "authorId" in data) {
     if (isPositiveInteger(data.authorId)) {
       if (!(await prisma.author.findUnique({ where: { id: data.authorId } }))) {
         errors.authorId = "author with this id doesn't exist";
@@ -508,7 +511,7 @@ async function validateUpdateData(data: any): Promise<
           extraImages: data.extraImages,
           title: data.title,
           content: data.content,
-          authorId: data.authorId,
+          authorId: isPostBeingValidated ? data.authorId : undefined,
           categoryId: data.categoryId,
           tagsIds: data.tagsIds,
         },

@@ -3,31 +3,28 @@ import { type Request, type Response } from "express";
 import prisma from "prisma";
 
 import { validatePaginationQueryParameters } from "shared/pagination/utils";
-import { validateCreationData } from "components/posts/utils";
+import {
+  validateCreationData,
+  validateUpdateData,
+} from "components/posts/utils";
 
 import * as services from "./services";
-import { validateUpdateData } from "./utils";
 
 async function createDraft(req: Request, res: Response): Promise<void> {
-  const creationDataValidationErrors = await validateCreationData(req.body);
+  const {
+    validatedData: validatedCreationData,
+    errors: creationDataValidationErrors,
+  } = await validateCreationData({
+    ...req.body,
+    authorId: req.authenticatedAuthor?.id,
+  });
 
   if (creationDataValidationErrors) {
     res.status(400).json(creationDataValidationErrors);
   } else {
-    void services.createDraft(
-      {
-        image: req.body.image,
-        extraImages: req.body.extraImages,
-        title: req.body.title,
-        content: req.body.content,
-        authorId: req.authenticatedAuthor?.id as number,
-        categoryId: req.body.categoryId,
-        tagsIds: req.body.tagsIds,
-      },
-      () => {
-        res.status(201).end();
-      }
-    );
+    void services.createDraft(validatedCreationData, () => {
+      res.status(201).end();
+    });
   }
 }
 
@@ -40,7 +37,7 @@ async function getDrafts(req: Request, res: Response): Promise<void> {
   if (paginationQueryParametersValidationErrors) {
     res.status(400).json(paginationQueryParametersValidationErrors);
   } else {
-    void services.getAuthorDrafts(
+    void services.getDraftsByAuthorId(
       req.authenticatedAuthor?.id as number,
       validatedPaginationQueryParameters,
       (drafts, draftsTotalNumber, pagesTotalNumber) => {
@@ -54,27 +51,23 @@ async function updateDraft(req: Request, res: Response): Promise<void> {
   const draftToUpdate = await prisma.post.findUnique({
     where: {
       id: Number(req.params.id),
-      authorId: req.authenticatedAuthor?.id,
       isDraft: true,
+      authorId: req.authenticatedAuthor?.id,
     },
   });
 
   if (draftToUpdate) {
-    const updateDataValidationErrors = await validateUpdateData(req.body);
+    const {
+      validatedData: validatedUpdateData,
+      errors: updateDataValidationErrors,
+    } = await validateUpdateData(req.body, false);
 
     if (updateDataValidationErrors) {
       res.status(400).json(updateDataValidationErrors);
     } else {
       void services.updateDraftById(
         draftToUpdate.id,
-        {
-          image: req.body.image,
-          extraImages: req.body.extraImages,
-          title: req.body.title,
-          content: req.body.content,
-          categoryId: req.body.categoryId,
-          tagsIds: req.body.tagsIds,
-        },
+        validatedUpdateData,
         () => {
           res.status(204).end();
         }
@@ -99,7 +92,7 @@ async function publishDraft(req: Request, res: Response): Promise<void> {
 }
 
 async function deleteDraft(req: Request, res: Response): Promise<void> {
-  void services.deleteAuthorDraftById(
+  void services.deleteAuthorDraft(
     Number(req.params.id),
     req.authenticatedAuthor?.id as number,
     () => {

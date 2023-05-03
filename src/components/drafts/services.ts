@@ -13,6 +13,10 @@ import {
   createPaginationParameters,
   calculatePagesTotalNumber,
 } from "shared/pagination/utils";
+import {
+  type ValidatedCreationData,
+  type ValidatedUpdateData,
+} from "components/posts/types";
 import { includeSubcategories } from "components/categories/utils";
 
 async function createDraft(
@@ -24,15 +28,7 @@ async function createDraft(
     authorId,
     categoryId,
     tagsIds,
-  }: {
-    image: string;
-    extraImages: string[] | undefined;
-    title: string;
-    content: string;
-    authorId: number;
-    categoryId: number;
-    tagsIds: number[];
-  },
+  }: ValidatedCreationData,
   onSuccess: () => void
 ): Promise<void> {
   const draftImagesFolderName = `posts/${crypto.randomUUID()}`;
@@ -77,7 +73,7 @@ async function createDraft(
   onSuccess();
 }
 
-async function getAuthorDrafts(
+async function getDraftsByAuthorId(
   authorId: number,
   validatedPaginationQueryParameters: ValidatedPaginationQueryParameters,
   onSuccess: (
@@ -161,14 +157,7 @@ async function updateDraftById(
     content,
     categoryId,
     tagsIds,
-  }: {
-    image?: string;
-    extraImages?: string[];
-    title?: string;
-    content?: string;
-    categoryId?: number;
-    tagsIds?: number[];
-  },
+  }: ValidatedUpdateData,
   onSuccess: () => void
 ): Promise<void> {
   const updatedDraft = await prisma.post.update({
@@ -251,8 +240,8 @@ async function publishAuthorDraft(
     await prisma.post.update({
       where: {
         id: draftId,
-        authorId,
         isDraft: true,
+        authorId,
       },
       data: {
         isDraft: false,
@@ -267,7 +256,7 @@ async function publishAuthorDraft(
   }
 }
 
-async function deleteAuthorDraftById(
+async function deleteAuthorDraft(
   draftId: number,
   authorId: number,
   onSuccess: () => void,
@@ -277,8 +266,8 @@ async function deleteAuthorDraftById(
     const deletedDraft = await prisma.post.delete({
       where: {
         id: draftId,
-        authorId,
         isDraft: true,
+        authorId,
       },
     });
     deleteHostedImageFolder(deletedDraft.image);
@@ -293,8 +282,8 @@ async function deleteAuthorDraftById(
 
 export {
   createDraft,
-  getAuthorDrafts,
+  getDraftsByAuthorId,
   updateDraftById,
   publishAuthorDraft,
-  deleteAuthorDraftById,
+  deleteAuthorDraft,
 };
