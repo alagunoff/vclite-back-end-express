@@ -5,23 +5,17 @@ import * as services from "./services";
 import { validateCreationData } from "./utils";
 
 async function createUser(req: Request, res: Response): Promise<void> {
-  const creationDataValidationErrors = await validateCreationData(req.body);
+  const {
+    validatedData: validatedCreationData,
+    errors: creationDataValidationErrors,
+  } = await validateCreationData(req.body);
 
   if (creationDataValidationErrors) {
     res.status(400).json(creationDataValidationErrors);
   } else {
-    void services.createUser(
-      {
-        image: req.body.image,
-        username: req.body.username,
-        password: req.body.password,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-      },
-      (userJwtToken) => {
-        res.status(201).send(userJwtToken);
-      }
-    );
+    void services.createUser(validatedCreationData, (userJwtToken) => {
+      res.status(201).send(userJwtToken);
+    });
   }
 }
 

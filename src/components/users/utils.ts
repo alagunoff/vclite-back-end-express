@@ -4,17 +4,21 @@ import {
   isBase64ImageDataUrl,
 } from "shared/validation/utils";
 
-interface CreationDataValidationErrors {
-  image?: string;
-  username?: string;
-  password?: string;
-  firstName?: string;
-  lastName?: string;
-}
+import {
+  type ValidatedCreationData,
+  type CreationDataValidationErrors,
+} from "./types";
 
-async function validateCreationData(
-  data: any
-): Promise<CreationDataValidationErrors | undefined> {
+async function validateCreationData(data: any): Promise<
+  | {
+      validatedData: ValidatedCreationData;
+      errors: undefined;
+    }
+  | {
+      validatedData: undefined;
+      errors: CreationDataValidationErrors;
+    }
+> {
   const errors: CreationDataValidationErrors = {};
 
   if ("image" in data) {
@@ -59,7 +63,21 @@ async function validateCreationData(
     }
   }
 
-  return Object.keys(errors).length ? errors : undefined;
+  return Object.keys(errors).length
+    ? {
+        validatedData: undefined,
+        errors,
+      }
+    : {
+        validatedData: {
+          image: data.image,
+          username: data.username,
+          password: data.password,
+          firstName: data.firstName,
+          lastName: data.lastName,
+        },
+        errors: undefined,
+      };
 }
 
 export { validateCreationData };

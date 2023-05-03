@@ -4,20 +4,10 @@ import bcrypt from "bcryptjs";
 import prisma from "prisma";
 import { saveImage, deleteHostedImage } from "shared/images/utils";
 
+import { type ValidatedCreationData } from "./types";
+
 async function createUser(
-  {
-    image,
-    username,
-    password,
-    firstName,
-    lastName,
-  }: {
-    image: string;
-    username: string;
-    password: string;
-    firstName: string | undefined;
-    lastName: string | undefined;
-  },
+  { image, username, password, firstName, lastName }: ValidatedCreationData,
   onSuccess: (userJwtToken: string) => void
 ): Promise<void> {
   const createdUser = await prisma.user.create({
