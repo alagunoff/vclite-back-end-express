@@ -9,4 +9,5 @@
 ## Starting dev server
 1. Install [docker](https://www.docker.com/) on your machine
 2. Run app's necessary services by `docker compose up` command in project's root folder
-3. Start dev server by `npm run dev` command
+3. Apply latest migration by `npx prisma migrate dev` command in project's root folder
+4. Start dev server by `npm run dev` command in project's root folder
