@@ -1,6 +1,3 @@
 /.vscode/
 /.env
 /node_modules/
-/requests/
-/static/
-/prisma/migrations/

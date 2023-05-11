@@ -2,7 +2,6 @@
 /.husky/
 /.vscode/
 /node_modules/
-/requests/
 /.gitignore
 /docker-compose.yml
 /Dockerfile
