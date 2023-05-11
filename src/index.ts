@@ -1,6 +1,3 @@
-/* eslint-disable import/first */
-import * as dotenv from "dotenv";
-dotenv.config();
 import express from "express";
 import swaggerUi from "swagger-ui-express";
 
@@ -13,8 +10,6 @@ import postsRouter from "src/components/posts/router";
 import draftsRouter from "src/components/drafts/router";
 
 import apiDocs from "../api-docs.json";
-
-dotenv.config();
 
 const app = express();
 

@@ -60,7 +60,6 @@ var __async = (__this, __arguments, generator) => {
 };
 
 // src/index.ts
-var dotenv = __toESM(require("dotenv"));
 var import_express9 = __toESM(require("express"));
 var import_swagger_ui_express = __toESM(require("swagger-ui-express"));
 
@@ -73,6 +72,8 @@ var import_bcryptjs = __toESM(require("bcryptjs"));
 
 // src/shared/env.ts
 var import_envalid = require("envalid");
+var dotenv = __toESM(require("dotenv"));
+dotenv.config();
 var env = (0, import_envalid.cleanEnv)(process.env, {
   JWT_SECRET_KEY: (0, import_envalid.str)(),
   DATABASE_URL: (0, import_envalid.str)()
@@ -3664,8 +3665,6 @@ var api_docs_default = {
 };
 
 // src/index.ts
-dotenv.config();
-dotenv.config();
 var app = (0, import_express9.default)();
 app.listen(3e3);
 app.use(import_express9.default.json());
