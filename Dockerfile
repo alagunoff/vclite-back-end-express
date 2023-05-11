@@ -1,6 +1,6 @@
 FROM node:18.15.0
 
-WORKDIR /vclite
+WORKDIR /app
 
 COPY . .
 
