@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { authenticateUser } from "middlewares/auth";
+import { authenticateUser } from "src/middlewares/auth";
 
 import {
   createAuthor,

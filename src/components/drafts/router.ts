@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { authenticateUser, authenticateAuthor } from "middlewares/auth";
+import { authenticateUser, authenticateAuthor } from "src/middlewares/auth";
 
 import {
   createDraft,

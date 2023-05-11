@@ -1,6 +1,6 @@
 import { type Request } from "express";
 
-import { isStringPositiveInteger } from "shared/validation/utils";
+import { isStringPositiveInteger } from "src/shared/validation/utils";
 
 import {
   type ValidatedPaginationQueryParameters,

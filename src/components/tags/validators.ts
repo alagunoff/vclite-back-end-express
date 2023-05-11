@@ -1,5 +1,5 @@
-import prisma from "shared/prisma";
-import { isNotEmptyString } from "shared/validation/utils";
+import prisma from "src/shared/prisma";
+import { isNotEmptyString } from "src/shared/validation/utils";
 
 import {
   type ValidatedCreationData,

@@ -1,4 +1,4 @@
-import { isNotEmptyString } from "shared/validation/utils";
+import { isNotEmptyString } from "src/shared/validation/utils";
 
 import { type ValidatedCreationData, type ValidationErrors } from "./types";
 

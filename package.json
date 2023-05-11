@@ -1,7 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "dev": "nodemon --files -r tsconfig-paths/register -L ./src/index.ts",
+    "dev": "tsup ./src/index.ts --watch --onSuccess 'node ./dist/index.js'",
+    "build": "tsup ./src/index.ts",
     "prepare": "husky install",
     "eslint": "eslint ./src --ext .ts",
     "eslint:fix": "eslint ./src --ext .ts --fix"
@@ -21,11 +22,9 @@
     "eslint-plugin-promise": "6.1.1",
     "husky": "8.0.3",
     "lint-staged": "13.2.2",
-    "nodemon": "2.0.22",
     "prettier": "2.8.8",
     "prisma": "4.14.0",
-    "ts-node": "10.9.1",
-    "tsconfig-paths": "4.2.0",
+    "tsup": "6.7.0",
     "typescript": "5.0.4"
   },
   "dependencies": {

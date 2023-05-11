@@ -1,8 +1,8 @@
-import prisma from "shared/prisma";
+import prisma from "src/shared/prisma";
 import {
   isNotEmptyString,
   isBase64ImageDataUrl,
-} from "shared/validation/utils";
+} from "src/shared/validation/utils";
 
 import { type ValidatedCreationData, type ValidationErrors } from "./types";
 

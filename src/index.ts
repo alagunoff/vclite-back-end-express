@@ -4,13 +4,13 @@ dotenv.config();
 import express from "express";
 import swaggerUi from "swagger-ui-express";
 
-import authRouter from "components/auth/router";
-import usersRouter from "components/users/router";
-import authorsRouter from "components/authors/router";
-import tagsRouter from "components/tags/router";
-import categoriesRouter from "components/categories/router";
-import postsRouter from "components/posts/router";
-import draftsRouter from "components/drafts/router";
+import authRouter from "src/components/auth/router";
+import usersRouter from "src/components/users/router";
+import authorsRouter from "src/components/authors/router";
+import tagsRouter from "src/components/tags/router";
+import categoriesRouter from "src/components/categories/router";
+import postsRouter from "src/components/posts/router";
+import draftsRouter from "src/components/drafts/router";
 
 import apiDocs from "../api-docs.json";
 

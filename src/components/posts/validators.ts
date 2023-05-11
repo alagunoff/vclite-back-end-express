@@ -1,6 +1,6 @@
 import { type Request } from "express";
 
-import prisma from "shared/prisma";
+import prisma from "src/shared/prisma";
 import {
   isBase64ImageDataUrl,
   isNotEmptyString,
@@ -10,7 +10,7 @@ import {
   isPositiveIntegersNotEmptyArray,
   isStringPositiveIntegersNotEmptyArray,
   isBase64ImageDataUrlsNotEmptyArray,
-} from "shared/validation/utils";
+} from "src/shared/validation/utils";
 
 import {
   type ValidatedCreationData,

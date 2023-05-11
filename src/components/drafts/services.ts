@@ -1,23 +1,23 @@
 import { type Post } from "@prisma/client";
 import crypto from "crypto";
 
-import prisma from "shared/prisma";
+import prisma from "src/shared/prisma";
 import {
   saveImage,
   getHostedImageFolderName,
   deleteHostedImage,
   deleteHostedImageFolder,
-} from "shared/images/utils";
-import { type ValidatedPaginationQueryParameters } from "shared/pagination/types";
+} from "src/shared/images/utils";
+import { type ValidatedPaginationQueryParameters } from "src/shared/pagination/types";
 import {
   createPaginationParameters,
   calculatePagesTotalNumber,
-} from "shared/pagination/utils";
+} from "src/shared/pagination/utils";
 import {
   type ValidatedCreationData,
   type ValidatedUpdateData,
-} from "components/posts/types";
-import { includeSubcategories } from "components/categories/utils";
+} from "src/components/posts/types";
+import { includeSubcategories } from "src/components/categories/utils";
 
 async function createDraft(
   {

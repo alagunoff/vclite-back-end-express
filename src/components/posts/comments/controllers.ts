@@ -1,7 +1,7 @@
 import { type Request, type Response } from "express";
 
-import prisma from "shared/prisma";
-import { validatePaginationQueryParameters } from "shared/pagination/utils";
+import prisma from "src/shared/prisma";
+import { validatePaginationQueryParameters } from "src/shared/pagination/utils";
 
 import * as services from "./services";
 import { validateCreationData } from "./validators";

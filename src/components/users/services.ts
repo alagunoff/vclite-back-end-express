@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-import prisma from "shared/prisma";
-import env from "shared/env";
-import { saveImage, deleteHostedImage } from "shared/images/utils";
+import prisma from "src/shared/prisma";
+import env from "src/shared/env";
+import { saveImage, deleteHostedImage } from "src/shared/images/utils";
 
 import { type ValidatedCreationData } from "./types";
 

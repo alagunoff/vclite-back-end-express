@@ -1,11 +1,11 @@
 import { type Tag } from "@prisma/client";
 
-import prisma from "shared/prisma";
-import { type ValidatedPaginationQueryParameters } from "shared/pagination/types";
+import prisma from "src/shared/prisma";
+import { type ValidatedPaginationQueryParameters } from "src/shared/pagination/types";
 import {
   createPaginationParameters,
   calculatePagesTotalNumber,
-} from "shared/pagination/utils";
+} from "src/shared/pagination/utils";
 
 import { type ValidatedCreationData, type ValidatedUpdateData } from "./types";
 
