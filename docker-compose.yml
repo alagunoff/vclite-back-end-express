@@ -9,7 +9,7 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
   pgadmin:
-    image: dpage/pgadmin4:7.0
+    image: dpage/pgadmin4:7.1
     environment:
       - PGADMIN_DEFAULT_EMAIL=oleg@oleg.com
       - PGADMIN_DEFAULT_PASSWORD=oleg

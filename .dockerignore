@@ -1,7 +1,0 @@
-/.git/
-/.husky/
-/.vscode/
-/node_modules/
-/.gitignore
-/docker-compose.yml
-/Dockerfile
