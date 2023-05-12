@@ -60,11 +60,9 @@ function updateTag(req: Request, res: Response): void {
       () => {
         res.status(204).end();
       },
-      (updateFailureReason) => {
+      (failureReason) => {
         res
-          .status(
-            UPDATE_FAILURE_REASON_TO_RESPONSE_STATUS_CODE[updateFailureReason]
-          )
+          .status(UPDATE_FAILURE_REASON_TO_RESPONSE_STATUS_CODE[failureReason])
           .end();
       }
     );

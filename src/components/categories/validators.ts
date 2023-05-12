@@ -1,4 +1,3 @@
-import prisma from "src/shared/prisma";
 import {
   isNotEmptyString,
   isPositiveInteger,
@@ -10,7 +9,7 @@ import {
   type ValidationErrors,
 } from "./types";
 
-async function validateCreationData(data: any): Promise<
+function validateCreationData(data: any):
   | {
       validatedData: ValidatedCreationData;
       errors: undefined;
@@ -18,16 +17,11 @@ async function validateCreationData(data: any): Promise<
   | {
       validatedData: undefined;
       errors: ValidationErrors;
-    }
-> {
+    } {
   const errors: ValidationErrors = {};
 
   if ("name" in data) {
-    if (isNotEmptyString(data.name)) {
-      if (await prisma.category.findUnique({ where: { name: data.name } })) {
-        errors.name = "category with the same name already exists";
-      }
-    } else {
+    if (!isNotEmptyString(data.name)) {
       errors.name = "must be not empty string";
     }
   } else {
@@ -35,15 +29,7 @@ async function validateCreationData(data: any): Promise<
   }
 
   if ("parentCategoryId" in data) {
-    if (isPositiveInteger(data.parentCategoryId)) {
-      if (
-        !(await prisma.category.findUnique({
-          where: { id: data.parentCategoryId },
-        }))
-      ) {
-        errors.parentCategoryId = "parent category with this id doesn't exist";
-      }
-    } else {
+    if (!isPositiveInteger(data.parentCategoryId)) {
       errors.parentCategoryId = "must be positive integer";
     }
   }
@@ -62,7 +48,7 @@ async function validateCreationData(data: any): Promise<
       };
 }
 
-async function validateUpdateData(data: any): Promise<
+function validateUpdateData(data: any):
   | {
       validatedData: ValidatedUpdateData;
       errors: undefined;
@@ -70,35 +56,20 @@ async function validateUpdateData(data: any): Promise<
   | {
       validatedData: undefined;
       errors: ValidationErrors;
-    }
-> {
+    } {
   const errors: ValidationErrors = {};
 
   if ("name" in data) {
-    if (isNotEmptyString(data.name)) {
-      if (await prisma.category.findUnique({ where: { name: data.name } })) {
-        errors.name = "category with the same name already exists";
-      }
-    } else {
+    if (!isNotEmptyString(data.name)) {
       errors.name = "must be not empty string";
     }
   }
 
   if ("parentCategoryId" in data) {
-    const isParentCategoryIdPositiveInteger = isPositiveInteger(
-      data.parentCategoryId
-    );
-
-    if (isParentCategoryIdPositiveInteger || data.parentCategoryId === null) {
-      if (
-        isParentCategoryIdPositiveInteger &&
-        !(await prisma.category.findUnique({
-          where: { id: data.parentCategoryId },
-        }))
-      ) {
-        errors.parentCategoryId = "parent category with this id doesn't exist";
-      }
-    } else {
+    if (
+      data.parentCategoryId !== null &&
+      !isPositiveInteger(data.parentCategoryId)
+    ) {
       errors.parentCategoryId = "must be positive integer or null";
     }
   }

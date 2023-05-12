@@ -1,27 +1,44 @@
 import { type Request, type Response } from "express";
 
-import prisma from "src/shared/prisma";
 import { validatePaginationQueryParameters } from "src/shared/pagination/utils";
 
 import * as services from "./services";
 import { validateCreationData, validateUpdateData } from "./validators";
+import {
+  CREATION_FAILURE_REASON_TO_RESPONSE_STATUS_CODE,
+  CREATION_FAILURE_REASON_TO_RESPONSE_MESSAGE,
+  UPDATE_FAILURE_REASON_TO_RESPONSE_STATUS_CODE,
+  UPDATE_FAILURE_REASON_TO_RESPONSE_MESSAGE,
+  DELETION_FAILURE_REASON_TO_RESPONSE_STATUS_CODE,
+  DELETION_FAILURE_REASON_TO_RESPONSE_MESSAGE,
+} from "./constants";
 
-async function createCategory(req: Request, res: Response): Promise<void> {
+function createCategory(req: Request, res: Response): void {
   const {
     validatedData: validatedCreationData,
     errors: creationDataValidationErrors,
-  } = await validateCreationData(req.body);
+  } = validateCreationData(req.body);
 
   if (creationDataValidationErrors) {
     res.status(400).json(creationDataValidationErrors);
   } else {
-    void services.createCategory(validatedCreationData, () => {
-      res.status(201).end();
-    });
+    void services.createCategory(
+      validatedCreationData,
+      () => {
+        res.status(201).end();
+      },
+      (failureReason) => {
+        res
+          .status(
+            CREATION_FAILURE_REASON_TO_RESPONSE_STATUS_CODE[failureReason]
+          )
+          .send(CREATION_FAILURE_REASON_TO_RESPONSE_MESSAGE[failureReason]);
+      }
+    );
   }
 }
 
-async function getCategories(req: Request, res: Response): Promise<void> {
+function getCategories(req: Request, res: Response): void {
   const {
     validatedData: validatedPaginationQueryParameters,
     errors: paginationQueryParametersValidationErrors,
@@ -39,43 +56,40 @@ async function getCategories(req: Request, res: Response): Promise<void> {
   }
 }
 
-async function updateCategory(req: Request, res: Response): Promise<void> {
-  const categoryToUpdate = await prisma.category.findUnique({
-    where: {
-      id: Number(req.params.id),
-    },
-  });
+function updateCategory(req: Request, res: Response): void {
+  const {
+    validatedData: validatedUpdateData,
+    errors: updateDataValidationErrors,
+  } = validateUpdateData(req.body);
 
-  if (categoryToUpdate) {
-    const {
-      validatedData: validatedUpdateData,
-      errors: updateDataValidationErrors,
-    } = await validateUpdateData(req.body);
-
-    if (updateDataValidationErrors) {
-      res.status(400).json(updateDataValidationErrors);
-    } else {
-      void services.updateCategoryById(
-        categoryToUpdate.id,
-        validatedUpdateData,
-        () => {
-          res.status(204).end();
-        }
-      );
-    }
+  if (updateDataValidationErrors) {
+    res.status(400).json(updateDataValidationErrors);
   } else {
-    res.status(404).end();
+    void services.updateCategoryById(
+      Number(req.params.id),
+      validatedUpdateData,
+      () => {
+        res.status(204).end();
+      },
+      (failureReason) => {
+        res
+          .status(UPDATE_FAILURE_REASON_TO_RESPONSE_STATUS_CODE[failureReason])
+          .send(UPDATE_FAILURE_REASON_TO_RESPONSE_MESSAGE[failureReason]);
+      }
+    );
   }
 }
 
-async function deleteCategory(req: Request, res: Response): Promise<void> {
+function deleteCategory(req: Request, res: Response): void {
   void services.deleteCategoryById(
     Number(req.params.id),
     () => {
       res.status(204).end();
     },
-    () => {
-      res.status(404).end();
+    (failureReason) => {
+      res
+        .status(DELETION_FAILURE_REASON_TO_RESPONSE_STATUS_CODE[failureReason])
+        .send(DELETION_FAILURE_REASON_TO_RESPONSE_MESSAGE[failureReason]);
     }
   );
 }

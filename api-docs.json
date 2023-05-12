@@ -466,12 +466,12 @@
         },
         "responses": {
           "201": {},
-          "400": {
-            "$ref": "#/components/responses/ValidationErrors"
-          },
+          "400": {},
           "404": {
             "$ref": "#/components/responses/NotAdmin"
-          }
+          },
+          "422": {},
+          "500": {}
         }
       },
       "get": {
@@ -549,12 +549,12 @@
         },
         "responses": {
           "204": {},
-          "400": {
-            "$ref": "#/components/responses/ValidationErrors"
-          },
+          "400": {},
           "404": {
             "$ref": "#/components/responses/NotFoundOrNotAdmin"
-          }
+          },
+          "422": {},
+          "500": {}
         }
       },
       "delete": {
