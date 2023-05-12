@@ -1,4 +1,3 @@
-import prisma from "src/shared/prisma";
 import { isNotEmptyString } from "src/shared/validation/utils";
 
 import {
@@ -7,7 +6,7 @@ import {
   type ValidationErrors,
 } from "./types";
 
-async function validateCreationData(data: any): Promise<
+function validateCreationData(data: any):
   | {
       validatedData: ValidatedCreationData;
       errors: undefined;
@@ -15,16 +14,11 @@ async function validateCreationData(data: any): Promise<
   | {
       validatedData: undefined;
       errors: ValidationErrors;
-    }
-> {
+    } {
   const errors: ValidationErrors = {};
 
   if ("name" in data) {
-    if (isNotEmptyString(data.name)) {
-      if (await prisma.tag.findUnique({ where: { name: data.name } })) {
-        errors.name = "tag with the same name already exists";
-      }
-    } else {
+    if (!isNotEmptyString(data.name)) {
       errors.name = "must be not empty string";
     }
   } else {
@@ -44,7 +38,7 @@ async function validateCreationData(data: any): Promise<
       };
 }
 
-async function validateUpdateData(data: any): Promise<
+function validateUpdateData(data: any):
   | {
       validatedData: ValidatedUpdateData;
       errors: undefined;
@@ -52,16 +46,11 @@ async function validateUpdateData(data: any): Promise<
   | {
       validatedData: undefined;
       errors: ValidationErrors;
-    }
-> {
+    } {
   const errors: ValidationErrors = {};
 
   if ("name" in data) {
-    if (isNotEmptyString(data.name)) {
-      if (await prisma.tag.findUnique({ where: { name: data.name } })) {
-        errors.name = "tag with the same name already exists";
-      }
-    } else {
+    if (!isNotEmptyString(data.name)) {
       errors.name = "must be not empty string";
     }
   }

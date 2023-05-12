@@ -340,6 +340,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotAdmin"
+          },
+          "422": {
+            "$ref": "#/components/responses/TagAlreadyExists"
           }
         }
       },
@@ -414,6 +417,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFoundOrNotAdmin"
+          },
+          "422": {
+            "$ref": "#/components/responses/TagAlreadyExists"
           }
         }
       },
@@ -1399,6 +1405,9 @@
       },
       "NotAuthor": {
         "description": "User assosiated with provided JWT isn't an author"
+      },
+      "TagAlreadyExists": {
+        "description": "Tag already exists"
       }
     }
   }

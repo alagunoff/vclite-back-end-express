@@ -1,27 +1,33 @@
 import { type Request, type Response } from "express";
 
-import prisma from "src/shared/prisma";
 import { validatePaginationQueryParameters } from "src/shared/pagination/utils";
 
-import * as services from "./services";
 import { validateCreationData, validateUpdateData } from "./validators";
+import * as services from "./services";
+import { UPDATE_FAILURE_REASON_TO_RESPONSE_STATUS_CODE } from "./constants";
 
-async function createTag(req: Request, res: Response): Promise<void> {
+function createTag(req: Request, res: Response): void {
   const {
     validatedData: validatedCreationData,
     errors: creationDataValidationErrors,
-  } = await validateCreationData(req.body);
+  } = validateCreationData(req.body);
 
   if (creationDataValidationErrors) {
     res.status(400).json(creationDataValidationErrors);
   } else {
-    void services.createTag(validatedCreationData, () => {
-      res.status(201).end();
-    });
+    void services.createTag(
+      validatedCreationData,
+      () => {
+        res.status(201).end();
+      },
+      () => {
+        res.status(422).end();
+      }
+    );
   }
 }
 
-async function getTags(req: Request, res: Response): Promise<void> {
+function getTags(req: Request, res: Response): void {
   const {
     validatedData: validatedPaginationQueryParameters,
     errors: paginationQueryParametersValidationErrors,
@@ -39,32 +45,33 @@ async function getTags(req: Request, res: Response): Promise<void> {
   }
 }
 
-async function updateTag(req: Request, res: Response): Promise<void> {
-  const tagToUpdate = await prisma.tag.findUnique({
-    where: {
-      id: Number(req.params.id),
-    },
-  });
+function updateTag(req: Request, res: Response): void {
+  const {
+    validatedData: validatedUpdateData,
+    errors: updateDataValidationErrors,
+  } = validateUpdateData(req.body);
 
-  if (tagToUpdate) {
-    const {
-      validatedData: validatedUpdateData,
-      errors: updateDataValidationErrors,
-    } = await validateUpdateData(req.body);
-
-    if (updateDataValidationErrors) {
-      res.status(400).json(updateDataValidationErrors);
-    } else {
-      void services.updateTagById(tagToUpdate.id, validatedUpdateData, () => {
-        res.status(204).end();
-      });
-    }
+  if (updateDataValidationErrors) {
+    res.status(400).json(updateDataValidationErrors);
   } else {
-    res.status(404).end();
+    void services.updateTagById(
+      Number(req.params.id),
+      validatedUpdateData,
+      () => {
+        res.status(204).end();
+      },
+      (updateFailureReason) => {
+        res
+          .status(
+            UPDATE_FAILURE_REASON_TO_RESPONSE_STATUS_CODE[updateFailureReason]
+          )
+          .end();
+      }
+    );
   }
 }
 
-async function deleteTag(req: Request, res: Response): Promise<void> {
+function deleteTag(req: Request, res: Response): void {
   void services.deleteTagById(
     Number(req.params.id),
     () => {

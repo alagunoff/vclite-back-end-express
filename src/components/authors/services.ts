@@ -14,13 +14,11 @@ async function createAuthor(
   onSuccess: () => void,
   onFailure: () => void
 ): Promise<void> {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-
-  if (user) {
-    await prisma.author.create({ data: { description, userId: user.id } });
+  try {
+    await prisma.author.create({ data: { description, userId } });
 
     onSuccess();
-  } else {
+  } catch {
     onFailure();
   }
 }

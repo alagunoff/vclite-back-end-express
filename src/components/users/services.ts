@@ -12,11 +12,7 @@ async function createUser(
   onSuccess: (userJwtToken: string) => void,
   onFailure: () => void
 ): Promise<void> {
-  const user = await prisma.user.findUnique({ where: { username } });
-
-  if (user) {
-    onFailure();
-  } else {
+  try {
     const createdUser = await prisma.user.create({
       data: {
         image: saveImage(image, "users", username),
@@ -28,6 +24,8 @@ async function createUser(
     });
 
     onSuccess(jwt.sign(String(createdUser.id), env.JWT_SECRET_KEY));
+  } catch {
+    onFailure();
   }
 }
 

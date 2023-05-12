@@ -8,14 +8,20 @@ import {
 } from "src/shared/pagination/utils";
 
 import { type ValidatedCreationData, type ValidatedUpdateData } from "./types";
+import { type UPDATE_FAILURE_REASON_TO_RESPONSE_STATUS_CODE } from "./constants";
 
 async function createTag(
   { name }: ValidatedCreationData,
-  onSuccess: () => void
+  onSuccess: () => void,
+  onFailure: () => void
 ): Promise<void> {
-  await prisma.tag.create({ data: { name } });
+  try {
+    await prisma.tag.create({ data: { name } });
 
-  onSuccess();
+    onSuccess();
+  } catch {
+    onFailure();
+  }
 }
 
 async function getTags(
@@ -41,11 +47,24 @@ async function getTags(
 async function updateTagById(
   id: number,
   { name }: ValidatedUpdateData,
-  onSuccess: () => void
+  onSuccess: () => void,
+  onFailure: (
+    reason: keyof typeof UPDATE_FAILURE_REASON_TO_RESPONSE_STATUS_CODE
+  ) => void
 ): Promise<void> {
-  await prisma.tag.update({ where: { id }, data: { name } });
+  const tagToUpdate = await prisma.tag.findUnique({ where: { id } });
 
-  onSuccess();
+  if (tagToUpdate) {
+    try {
+      await prisma.tag.update({ where: { id }, data: { name } });
+
+      onSuccess();
+    } catch {
+      onFailure("tagAlreadyExists");
+    }
+  } else {
+    onFailure("tagNotFound");
+  }
 }
 
 async function deleteTagById(
