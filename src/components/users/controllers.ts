@@ -1,8 +1,7 @@
 import { type Request, type Response } from "express";
 
-import * as services from "./services";
-
 import { validateCreationData } from "./validators";
+import * as services from "./services";
 
 function createUser(req: Request, res: Response): void {
   const {

@@ -1,4 +1,3 @@
-import prisma from "src/shared/prisma";
 import {
   isNotEmptyString,
   isPositiveInteger,
@@ -10,7 +9,7 @@ import {
   type ValidationErrors,
 } from "./types";
 
-async function validateCreationData(data: any): Promise<
+function validateCreationData(data: any):
   | {
       validatedData: ValidatedCreationData;
       errors: undefined;
@@ -18,8 +17,7 @@ async function validateCreationData(data: any): Promise<
   | {
       validatedData: undefined;
       errors: ValidationErrors;
-    }
-> {
+    } {
   const errors: ValidationErrors = {};
 
   if ("description" in data) {
@@ -29,11 +27,7 @@ async function validateCreationData(data: any): Promise<
   }
 
   if ("userId" in data) {
-    if (isPositiveInteger(data.userId)) {
-      if (!(await prisma.user.findUnique({ where: { id: data.userId } }))) {
-        errors.userId = "user with this id doesn't exist";
-      }
-    } else {
+    if (!isPositiveInteger(data.userId)) {
       errors.userId = "must be positive integer";
     }
   } else {

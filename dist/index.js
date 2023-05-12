@@ -274,6 +274,9 @@ var api_docs_default = {
           },
           "404": {
             $ref: "#/components/responses/NotAdmin"
+          },
+          "422": {
+            description: "User with this userId doesn't exist"
           }
         }
       },
@@ -343,10 +346,6 @@ var api_docs_default = {
                   description: {
                     type: "string",
                     minLength: 1
-                  },
-                  userId: {
-                    type: "integer",
-                    minimum: 1
                   }
                 }
               }
@@ -1665,6 +1664,55 @@ function authenticateAuthor(req, res, next) {
   });
 }
 
+// src/components/users/validators.ts
+function validateCreationData(data) {
+  const errors = {};
+  if ("image" in data) {
+    if (!isBase64ImageDataUrl(data.image)) {
+      errors.image = "must be base64 image in data URL format with mediatype";
+    }
+  } else {
+    errors.image = "required";
+  }
+  if ("username" in data) {
+    if (!isNotEmptyString(data.username)) {
+      errors.username = "must be not empty string";
+    }
+  } else {
+    errors.username = "required";
+  }
+  if ("password" in data) {
+    if (!isNotEmptyString(data.password)) {
+      errors.password = "must be not empty string";
+    }
+  } else {
+    errors.password = "required";
+  }
+  if ("firstName" in data) {
+    if (!isNotEmptyString(data.firstName)) {
+      errors.firstName = "must be not empty string";
+    }
+  }
+  if ("lastName" in data) {
+    if (!isNotEmptyString(data.lastName)) {
+      errors.lastName = "must be not empty string";
+    }
+  }
+  return Object.keys(errors).length ? {
+    validatedData: void 0,
+    errors
+  } : {
+    validatedData: {
+      image: data.image,
+      username: data.username,
+      password: data.password,
+      firstName: data.firstName,
+      lastName: data.lastName
+    },
+    errors: void 0
+  };
+}
+
 // src/components/users/services.ts
 var import_jsonwebtoken3 = __toESM(require("jsonwebtoken"));
 var import_bcryptjs2 = __toESM(require("bcryptjs"));
@@ -1739,55 +1787,6 @@ function deleteUserById(id, onSuccess, onFailure) {
       onFailure();
     }
   });
-}
-
-// src/components/users/validators.ts
-function validateCreationData(data) {
-  const errors = {};
-  if ("image" in data) {
-    if (!isBase64ImageDataUrl(data.image)) {
-      errors.image = "must be base64 image in data URL format with mediatype";
-    }
-  } else {
-    errors.image = "required";
-  }
-  if ("username" in data) {
-    if (!isNotEmptyString(data.username)) {
-      errors.username = "must be not empty string";
-    }
-  } else {
-    errors.username = "required";
-  }
-  if ("password" in data) {
-    if (!isNotEmptyString(data.password)) {
-      errors.password = "must be not empty string";
-    }
-  } else {
-    errors.password = "required";
-  }
-  if ("firstName" in data) {
-    if (!isNotEmptyString(data.firstName)) {
-      errors.firstName = "must be not empty string";
-    }
-  }
-  if ("lastName" in data) {
-    if (!isNotEmptyString(data.lastName)) {
-      errors.lastName = "must be not empty string";
-    }
-  }
-  return Object.keys(errors).length ? {
-    validatedData: void 0,
-    errors
-  } : {
-    validatedData: {
-      image: data.image,
-      username: data.username,
-      password: data.password,
-      firstName: data.firstName,
-      lastName: data.lastName
-    },
-    errors: void 0
-  };
 }
 
 // src/components/users/controllers.ts
@@ -1890,78 +1889,31 @@ function calculatePagesTotalNumber(itemsTotalNumber, filteredItemsTotalNumber) {
   return itemsTotalNumber && filteredItemsTotalNumber ? Math.ceil(itemsTotalNumber / filteredItemsTotalNumber) : 1;
 }
 
-// src/components/authors/services.ts
-function createAuthor(_0, _1) {
-  return __async(this, arguments, function* ({ description, userId }, onSuccess) {
-    yield prisma_default.author.create({ data: { description, userId } });
-    onSuccess();
-  });
-}
-function getAuthors(validatedPaginationQueryParameters, onSuccess) {
-  return __async(this, null, function* () {
-    const authors = yield prisma_default.author.findMany(__spreadProps(__spreadValues({}, createPaginationParameters(validatedPaginationQueryParameters)), {
-      select: {
-        id: true,
-        description: true
-      }
-    }));
-    const authorsTotalNumber = yield prisma_default.author.count();
-    onSuccess(
-      authors,
-      authorsTotalNumber,
-      calculatePagesTotalNumber(authorsTotalNumber, authors.length)
-    );
-  });
-}
-function updateAuthorById(_0, _1, _2) {
-  return __async(this, arguments, function* (id, { description }, onSuccess) {
-    yield prisma_default.author.update({ where: { id }, data: { description } });
-    onSuccess();
-  });
-}
-function deleteAuthorById(id, onSuccess, onFailure) {
-  return __async(this, null, function* () {
-    try {
-      yield prisma_default.author.delete({ where: { id } });
-      onSuccess();
-    } catch (error) {
-      console.log(error);
-      onFailure();
-    }
-  });
-}
-
 // src/components/authors/validators.ts
 function validateCreationData2(data) {
-  return __async(this, null, function* () {
-    const errors = {};
-    if ("description" in data) {
-      if (!isNotEmptyString(data.description)) {
-        errors.description = "must be not empty string";
-      }
+  const errors = {};
+  if ("description" in data) {
+    if (!isNotEmptyString(data.description)) {
+      errors.description = "must be not empty string";
     }
-    if ("userId" in data) {
-      if (isPositiveInteger(data.userId)) {
-        if (!(yield prisma_default.user.findUnique({ where: { id: data.userId } }))) {
-          errors.userId = "user with this id doesn't exist";
-        }
-      } else {
-        errors.userId = "must be positive integer";
-      }
-    } else {
-      errors.userId = "required";
+  }
+  if ("userId" in data) {
+    if (!isPositiveInteger(data.userId)) {
+      errors.userId = "must be positive integer";
     }
-    return Object.keys(errors).length ? {
-      validatedData: void 0,
-      errors
-    } : {
-      validatedData: {
-        description: data.description,
-        userId: data.userId
-      },
-      errors: void 0
-    };
-  });
+  } else {
+    errors.userId = "required";
+  }
+  return Object.keys(errors).length ? {
+    validatedData: void 0,
+    errors
+  } : {
+    validatedData: {
+      description: data.description,
+      userId: data.userId
+    },
+    errors: void 0
+  };
 }
 function validateUpdateData(data) {
   const errors = {};
@@ -1981,70 +1933,102 @@ function validateUpdateData(data) {
   };
 }
 
+// src/components/authors/services.ts
+function createAuthor(_0, _1, _2) {
+  return __async(this, arguments, function* ({ description, userId }, onSuccess, onFailure) {
+    const user = yield prisma_default.user.findUnique({ where: { id: userId } });
+    if (user) {
+      yield prisma_default.author.create({ data: { description, userId: user.id } });
+      onSuccess();
+    } else {
+      onFailure();
+    }
+  });
+}
+function getAuthors(validatedPaginationQueryParameters, onSuccess) {
+  return __async(this, null, function* () {
+    const authors = yield prisma_default.author.findMany(__spreadProps(__spreadValues({}, createPaginationParameters(validatedPaginationQueryParameters)), {
+      select: {
+        id: true,
+        description: true
+      }
+    }));
+    const authorsTotalNumber = yield prisma_default.author.count();
+    onSuccess(
+      authors,
+      authorsTotalNumber,
+      calculatePagesTotalNumber(authorsTotalNumber, authors.length)
+    );
+  });
+}
+function updateAuthorById(_0, _1, _2, _3) {
+  return __async(this, arguments, function* (id, { description }, onSuccess, onFailure) {
+    try {
+      yield prisma_default.author.update({ where: { id }, data: { description } });
+      onSuccess();
+    } catch (e) {
+      onFailure();
+    }
+  });
+}
+function deleteAuthorById(id, onSuccess, onFailure) {
+  return __async(this, null, function* () {
+    try {
+      yield prisma_default.author.delete({ where: { id } });
+      onSuccess();
+    } catch (e) {
+      onFailure();
+    }
+  });
+}
+
 // src/components/authors/controllers.ts
 function createAuthor2(req, res) {
-  return __async(this, null, function* () {
-    const {
-      validatedData: validatedCreationData,
-      errors: creationDataValidationErrors
-    } = yield validateCreationData2(req.body);
-    if (creationDataValidationErrors) {
-      res.status(400).json(creationDataValidationErrors);
-    } else {
-      void createAuthor(validatedCreationData, () => {
+  const {
+    validatedData: validatedCreationData,
+    errors: creationDataValidationErrors
+  } = validateCreationData2(req.body);
+  if (creationDataValidationErrors) {
+    res.status(400).json(creationDataValidationErrors);
+  } else {
+    void createAuthor(
+      validatedCreationData,
+      () => {
         res.status(201).end();
-      });
-    }
-  });
+      },
+      () => {
+        res.status(422).end();
+      }
+    );
+  }
 }
 function getAuthors2(req, res) {
-  return __async(this, null, function* () {
-    const {
-      validatedData: validatedPaginationQueryParameters,
-      errors: paginationQueryParametersValidationErrors
-    } = validatePaginationQueryParameters(req.query);
-    if (paginationQueryParametersValidationErrors) {
-      res.status(400).json(paginationQueryParametersValidationErrors);
-    } else {
-      void getAuthors(
-        validatedPaginationQueryParameters,
-        (authors, authorsTotalNumber, pagesTotalNumber) => {
-          res.json({ authors, authorsTotalNumber, pagesTotalNumber });
-        }
-      );
-    }
-  });
+  const {
+    validatedData: validatedPaginationQueryParameters,
+    errors: paginationQueryParametersValidationErrors
+  } = validatePaginationQueryParameters(req.query);
+  if (paginationQueryParametersValidationErrors) {
+    res.status(400).json(paginationQueryParametersValidationErrors);
+  } else {
+    void getAuthors(
+      validatedPaginationQueryParameters,
+      (authors, authorsTotalNumber, pagesTotalNumber) => {
+        res.json({ authors, authorsTotalNumber, pagesTotalNumber });
+      }
+    );
+  }
 }
 function updateAuthor(req, res) {
-  return __async(this, null, function* () {
-    const authorToUpdate = yield prisma_default.author.findUnique({
-      where: { id: Number(req.params.id) }
-    });
-    if (authorToUpdate) {
-      const {
-        validatedData: validatedUpdateData,
-        errors: updateDataValidationErrors
-      } = validateUpdateData(req.body);
-      if (updateDataValidationErrors) {
-        res.status(400).json(updateDataValidationErrors);
-      } else {
-        void updateAuthorById(
-          authorToUpdate.id,
-          validatedUpdateData,
-          () => {
-            res.status(204).end();
-          }
-        );
-      }
-    } else {
-      res.status(404).end();
-    }
-  });
-}
-function deleteAuthor(req, res) {
-  return __async(this, null, function* () {
-    void deleteAuthorById(
+  const {
+    validatedData: validatedUpdateData,
+    errors: updateDataValidationErrors
+  } = validateUpdateData(req.body);
+  if (updateDataValidationErrors) {
+    res.status(400).json(updateDataValidationErrors);
+  } else {
+    void updateAuthorById(
       Number(req.params.id),
+      validatedUpdateData,
       () => {
         res.status(204).end();
       },
@@ -2052,7 +2036,18 @@ function deleteAuthor(req, res) {
         res.status(404).end();
       }
     );
-  });
+  }
+}
+function deleteAuthor(req, res) {
+  void deleteAuthorById(
+    Number(req.params.id),
+    () => {
+      res.status(204).end();
+    },
+    () => {
+      res.status(404).end();
+    }
+  );
 }
 
 // src/components/authors/router.ts

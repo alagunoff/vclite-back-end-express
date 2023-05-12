@@ -1,27 +1,32 @@
 import { type Request, type Response } from "express";
 
-import prisma from "src/shared/prisma";
 import { validatePaginationQueryParameters } from "src/shared/pagination/utils";
 
-import * as services from "./services";
 import { validateCreationData, validateUpdateData } from "./validators";
+import * as services from "./services";
 
-async function createAuthor(req: Request, res: Response): Promise<void> {
+function createAuthor(req: Request, res: Response): void {
   const {
     validatedData: validatedCreationData,
     errors: creationDataValidationErrors,
-  } = await validateCreationData(req.body);
+  } = validateCreationData(req.body);
 
   if (creationDataValidationErrors) {
     res.status(400).json(creationDataValidationErrors);
   } else {
-    void services.createAuthor(validatedCreationData, () => {
-      res.status(201).end();
-    });
+    void services.createAuthor(
+      validatedCreationData,
+      () => {
+        res.status(201).end();
+      },
+      () => {
+        res.status(422).end();
+      }
+    );
   }
 }
 
-async function getAuthors(req: Request, res: Response): Promise<void> {
+function getAuthors(req: Request, res: Response): void {
   const {
     validatedData: validatedPaginationQueryParameters,
     errors: paginationQueryParametersValidationErrors,
@@ -39,34 +44,29 @@ async function getAuthors(req: Request, res: Response): Promise<void> {
   }
 }
 
-async function updateAuthor(req: Request, res: Response): Promise<void> {
-  const authorToUpdate = await prisma.author.findUnique({
-    where: { id: Number(req.params.id) },
-  });
+function updateAuthor(req: Request, res: Response): void {
+  const {
+    validatedData: validatedUpdateData,
+    errors: updateDataValidationErrors,
+  } = validateUpdateData(req.body);
 
-  if (authorToUpdate) {
-    const {
-      validatedData: validatedUpdateData,
-      errors: updateDataValidationErrors,
-    } = validateUpdateData(req.body);
-
-    if (updateDataValidationErrors) {
-      res.status(400).json(updateDataValidationErrors);
-    } else {
-      void services.updateAuthorById(
-        authorToUpdate.id,
-        validatedUpdateData,
-        () => {
-          res.status(204).end();
-        }
-      );
-    }
+  if (updateDataValidationErrors) {
+    res.status(400).json(updateDataValidationErrors);
   } else {
-    res.status(404).end();
+    void services.updateAuthorById(
+      Number(req.params.id),
+      validatedUpdateData,
+      () => {
+        res.status(204).end();
+      },
+      () => {
+        res.status(404).end();
+      }
+    );
   }
 }
 
-async function deleteAuthor(req: Request, res: Response): Promise<void> {
+function deleteAuthor(req: Request, res: Response): void {
   void services.deleteAuthorById(
     Number(req.params.id),
     () => {

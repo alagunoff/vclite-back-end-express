@@ -11,11 +11,18 @@ import { type ValidatedCreationData, type ValidatedUpdateData } from "./types";
 
 async function createAuthor(
   { description, userId }: ValidatedCreationData,
-  onSuccess: () => void
+  onSuccess: () => void,
+  onFailure: () => void
 ): Promise<void> {
-  await prisma.author.create({ data: { description, userId } });
+  const user = await prisma.user.findUnique({ where: { id: userId } });
 
-  onSuccess();
+  if (user) {
+    await prisma.author.create({ data: { description, userId: user.id } });
+
+    onSuccess();
+  } else {
+    onFailure();
+  }
 }
 
 async function getAuthors(
@@ -45,11 +52,16 @@ async function getAuthors(
 async function updateAuthorById(
   id: number,
   { description }: ValidatedUpdateData,
-  onSuccess: () => void
+  onSuccess: () => void,
+  onFailure: () => void
 ): Promise<void> {
-  await prisma.author.update({ where: { id }, data: { description } });
+  try {
+    await prisma.author.update({ where: { id }, data: { description } });
 
-  onSuccess();
+    onSuccess();
+  } catch {
+    onFailure();
+  }
 }
 
 async function deleteAuthorById(
@@ -61,9 +73,7 @@ async function deleteAuthorById(
     await prisma.author.delete({ where: { id } });
 
     onSuccess();
-  } catch (error) {
-    console.log(error);
-
+  } catch {
     onFailure();
   }
 }

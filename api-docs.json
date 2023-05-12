@@ -208,6 +208,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotAdmin"
+          },
+          "422": {
+            "description": "User with this userId doesn't exist"
           }
         }
       },
@@ -277,10 +280,6 @@
                   "description": {
                     "type": "string",
                     "minLength": 1
-                  },
-                  "userId": {
-                    "type": "integer",
-                    "minimum": 1
                   }
                 }
               }
