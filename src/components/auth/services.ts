@@ -5,14 +5,11 @@ import env from "src/shared/env";
 import prisma from "src/shared/prisma";
 
 import { type ValidatedLoginData } from "./types";
-import { type LOGIN_FAILURE_REASON_TO_RESPONSE_STATUS_CODE } from "./constants";
 
 async function logIn(
   { username, password }: ValidatedLoginData,
   onSuccess: (userJwtToken: string) => void,
-  onFailure: (
-    reason: keyof typeof LOGIN_FAILURE_REASON_TO_RESPONSE_STATUS_CODE
-  ) => void
+  onFailure: (reason: "userNotFound" | "incorrectPassword") => void
 ): Promise<void> {
   const userToLogIn = await prisma.user.findUnique({ where: { username } });
 

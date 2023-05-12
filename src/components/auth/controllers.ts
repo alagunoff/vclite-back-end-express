@@ -2,7 +2,6 @@ import { type Request, type Response } from "express";
 
 import { validateLoginData } from "./validators";
 import * as services from "./services";
-import { LOGIN_FAILURE_REASON_TO_RESPONSE_STATUS_CODE } from "./constants";
 
 function logIn(req: Request, res: Response): void {
   const {
@@ -19,9 +18,14 @@ function logIn(req: Request, res: Response): void {
         res.send(userJwtToken);
       },
       (failureReason) => {
-        res
-          .status(LOGIN_FAILURE_REASON_TO_RESPONSE_STATUS_CODE[failureReason])
-          .end();
+        switch (failureReason) {
+          case "userNotFound":
+            res.status(404).end();
+            break;
+          case "incorrectPassword":
+            res.status(403).end();
+            break;
+        }
       }
     );
   }

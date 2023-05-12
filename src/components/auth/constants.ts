@@ -1,6 +1,0 @@
-const LOGIN_FAILURE_REASON_TO_RESPONSE_STATUS_CODE = {
-  incorrectPassword: 403,
-  userNotFound: 404,
-};
-
-export { LOGIN_FAILURE_REASON_TO_RESPONSE_STATUS_CODE };

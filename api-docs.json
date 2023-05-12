@@ -39,11 +39,12 @@
           "200": {
             "$ref": "#/components/responses/JWT"
           },
-          "400": {
-            "$ref": "#/components/responses/ValidationErrors"
-          },
+          "400": {},
           "403": {
             "description": "Password is incorrect"
+          },
+          "404": {
+            "description": "User with this username not found"
           }
         }
       }
@@ -551,7 +552,7 @@
           "204": {},
           "400": {},
           "404": {
-            "$ref": "#/components/responses/NotFoundOrNotAdmin"
+            "$ref": "#/components/responses/CategoryNotFoundOrNotAdmin"
           },
           "422": {},
           "500": {}
@@ -568,7 +569,7 @@
         "responses": {
           "204": {},
           "404": {
-            "description": "Category not found or user assosiated with provided JWT isn't an admin"
+            "$ref": "#/components/responses/CategoryNotFoundOrNotAdmin"
           },
           "500": {}
         }
@@ -1400,6 +1401,9 @@
       },
       "NotFoundOrNotAdmin": {
         "description": "Resource not found or user assosiated with provided JWT isn't an admin"
+      },
+      "CategoryNotFoundOrNotAdmin": {
+        "description": "Category not found or user assosiated with provided JWT isn't an admin"
       },
       "NotAdmin": {
         "description": "User assosiated with provided JWT isn't an admin"
