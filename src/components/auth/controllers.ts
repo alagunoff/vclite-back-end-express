@@ -1,13 +1,14 @@
 import { type Request, type Response } from "express";
 
-import * as services from "./services";
 import { validateLoginData } from "./validators";
+import * as services from "./services";
+import { FAILURE_REASON_TO_RESPONSE_STATUS_CODE } from "./constants";
 
 async function logIn(req: Request, res: Response): Promise<void> {
   const {
     validatedData: validatedLoginData,
     errors: loginDataValidationErrors,
-  } = await validateLoginData(req.body);
+  } = validateLoginData(req.body);
 
   if (loginDataValidationErrors) {
     res.status(400).json(loginDataValidationErrors);
@@ -17,8 +18,8 @@ async function logIn(req: Request, res: Response): Promise<void> {
       (userJwtToken) => {
         res.send(userJwtToken);
       },
-      () => {
-        res.status(403).end();
+      (failureReason) => {
+        res.status(FAILURE_REASON_TO_RESPONSE_STATUS_CODE[failureReason]).end();
       }
     );
   }

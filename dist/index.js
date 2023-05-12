@@ -66,38 +66,6 @@ var import_swagger_ui_express = __toESM(require("swagger-ui-express"));
 // src/components/auth/router.ts
 var import_express = require("express");
 
-// src/components/auth/services.ts
-var import_jsonwebtoken = __toESM(require("jsonwebtoken"));
-var import_bcryptjs = __toESM(require("bcryptjs"));
-
-// src/shared/env.ts
-var import_envalid = require("envalid");
-var dotenv = __toESM(require("dotenv"));
-dotenv.config();
-var env = (0, import_envalid.cleanEnv)(process.env, {
-  JWT_SECRET_KEY: (0, import_envalid.str)(),
-  DATABASE_URL: (0, import_envalid.str)()
-});
-var env_default = env;
-
-// src/shared/prisma.ts
-var import_client = require("@prisma/client");
-var prisma = new import_client.PrismaClient();
-var prisma_default = prisma;
-
-// src/components/auth/services.ts
-function logIn(_0, _1, _2) {
-  return __async(this, arguments, function* ({ username, password }, onSuccess, onFailure) {
-    const user = yield prisma_default.user.findUnique({ where: { username } });
-    const isProvidedPasswordCorrect = import_bcryptjs.default.compareSync(password, user.password);
-    if (isProvidedPasswordCorrect) {
-      onSuccess(import_jsonwebtoken.default.sign(String(user.id), env_default.JWT_SECRET_KEY));
-    } else {
-      onFailure();
-    }
-  });
-}
-
 // src/shared/validation/utils.ts
 function isNotEmptyString(value) {
   return typeof value === "string" && value !== "";
@@ -132,38 +100,77 @@ function isBase64ImageDataUrlsNotEmptyArray(value) {
 
 // src/components/auth/validators.ts
 function validateLoginData(data) {
-  return __async(this, null, function* () {
-    const errors = {};
-    if ("username" in data) {
-      if (isNotEmptyString(data.username)) {
-        if (!(yield prisma_default.user.findUnique({ where: { username: data.username } }))) {
-          errors.username = "user with this username doesn't exist";
-        }
+  const errors = {};
+  if ("username" in data) {
+    if (!isNotEmptyString(data.username)) {
+      errors.username = "must be not empty string";
+    }
+  } else {
+    errors.username = "required";
+  }
+  if ("password" in data) {
+    if (!isNotEmptyString(data.password)) {
+      errors.password = "must be not empty string";
+    }
+  } else {
+    errors.password = "required";
+  }
+  return Object.keys(errors).length ? {
+    validatedData: void 0,
+    errors
+  } : {
+    validatedData: {
+      username: data.username,
+      password: data.password
+    },
+    errors: void 0
+  };
+}
+
+// src/components/auth/services.ts
+var import_jsonwebtoken = __toESM(require("jsonwebtoken"));
+var import_bcryptjs = __toESM(require("bcryptjs"));
+
+// src/shared/env.ts
+var import_envalid = require("envalid");
+var dotenv = __toESM(require("dotenv"));
+dotenv.config();
+var env = (0, import_envalid.cleanEnv)(process.env, {
+  JWT_SECRET_KEY: (0, import_envalid.str)(),
+  DATABASE_URL: (0, import_envalid.str)()
+});
+var env_default = env;
+
+// src/shared/prisma.ts
+var import_client = require("@prisma/client");
+var prisma = new import_client.PrismaClient();
+var prisma_default = prisma;
+
+// src/components/auth/services.ts
+function logIn(_0, _1, _2) {
+  return __async(this, arguments, function* ({ username, password }, onSuccess, onFailure) {
+    const user = yield prisma_default.user.findUnique({ where: { username } });
+    if (user) {
+      const isProvidedPasswordCorrect = import_bcryptjs.default.compareSync(
+        password,
+        user.password
+      );
+      if (isProvidedPasswordCorrect) {
+        onSuccess(import_jsonwebtoken.default.sign(String(user.id), env_default.JWT_SECRET_KEY));
       } else {
-        errors.username = "must be not empty string";
+        onFailure("incorrectPassword");
       }
     } else {
-      errors.username = "required";
+      onFailure("userNotFound");
     }
-    if ("password" in data) {
-      if (!isNotEmptyString(data.password)) {
-        errors.password = "must be not empty string";
-      }
-    } else {
-      errors.password = "required";
-    }
-    return Object.keys(errors).length ? {
-      validatedData: void 0,
-      errors
-    } : {
-      validatedData: {
-        username: data.username,
-        password: data.password
-      },
-      errors: void 0
-    };
   });
 }
+
+// src/components/auth/constants.ts
+var FAILURE_REASON_TO_RESPONSE_STATUS_CODE = {
+  incorrectPassword: 403,
+  userNotFound: 404
+};
 
 // src/components/auth/controllers.ts
 function logIn2(req, res) {
@@ -171,7 +178,7 @@ function logIn2(req, res) {
     const {
       validatedData: validatedLoginData,
       errors: loginDataValidationErrors
-    } = yield validateLoginData(req.body);
+    } = validateLoginData(req.body);
     if (loginDataValidationErrors) {
       res.status(400).json(loginDataValidationErrors);
     } else {
@@ -180,8 +187,8 @@ function logIn2(req, res) {
         (userJwtToken) => {
           res.send(userJwtToken);
         },
-        () => {
-          res.status(403).end();
+        (failureReason) => {
+          res.status(FAILURE_REASON_TO_RESPONSE_STATUS_CODE[failureReason]).end();
         }
       );
     }

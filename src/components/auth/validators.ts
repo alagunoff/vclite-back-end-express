@@ -1,10 +1,8 @@
 import { isNotEmptyString } from "src/shared/validation/utils";
 
-import prisma from "src/shared/prisma";
-
 import { type ValidatedLoginData, type ValidationErrors } from "./types";
 
-async function validateLoginData(data: any): Promise<
+function validateLoginData(data: any):
   | {
       validatedData: ValidatedLoginData;
       errors: undefined;
@@ -12,18 +10,11 @@ async function validateLoginData(data: any): Promise<
   | {
       validatedData: undefined;
       errors: ValidationErrors;
-    }
-> {
+    } {
   const errors: ValidationErrors = {};
 
   if ("username" in data) {
-    if (isNotEmptyString(data.username)) {
-      if (
-        !(await prisma.user.findUnique({ where: { username: data.username } }))
-      ) {
-        errors.username = "user with this username doesn't exist";
-      }
-    } else {
+    if (!isNotEmptyString(data.username)) {
       errors.username = "must be not empty string";
     }
   } else {
