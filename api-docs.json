@@ -286,15 +286,20 @@
           }
         },
         "responses": {
-          "201": {},
+          "201": {
+            "description": "Tag has been created"
+          },
           "400": {
-            "$ref": "#/components/responses/ValidationErrors"
+            "$ref": "#/components/responses/InvalidCreationData"
           },
           "404": {
             "$ref": "#/components/responses/NotAdmin"
           },
           "422": {
             "$ref": "#/components/responses/TagAlreadyExists"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
           }
         }
       },
@@ -310,30 +315,7 @@
         ],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "tags": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Tag"
-                      }
-                    },
-                    "tagsTotalNumber": {
-                      "type": "integer",
-                      "minimum": 0
-                    },
-                    "pagesTotalNumber": {
-                      "type": "integer",
-                      "minimum": 1
-                    }
-                  },
-                  "required": ["tags", "tagsTotalNumber", "pagesTotalNumber"]
-                }
-              }
-            }
+            "description": "OK"
           }
         }
       }
@@ -363,15 +345,20 @@
           }
         },
         "responses": {
-          "204": {},
+          "204": {
+            "description": "Tag has been updated"
+          },
           "400": {
-            "$ref": "#/components/responses/ValidationErrors"
+            "$ref": "#/components/responses/InvalidUpdateData"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundOrNotAdmin"
+            "$ref": "#/components/responses/TagNotFoundOrNotAdmin"
           },
           "422": {
             "$ref": "#/components/responses/TagAlreadyExists"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
           }
         }
       },
@@ -384,9 +371,14 @@
           }
         ],
         "responses": {
-          "204": {},
+          "204": {
+            "description": "Tag has been deleted"
+          },
           "404": {
-            "$ref": "#/components/responses/NotFoundOrNotAdmin"
+            "$ref": "#/components/responses/TagNotFoundOrNotAdmin"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
           }
         }
       }
@@ -1340,9 +1332,6 @@
       "NotAuthor": {
         "description": "User assosiated with provided JWT isn't an author"
       },
-      "UnknownError": {
-        "description": "Unknown error"
-      },
       "InvalidCreationData": {
         "description": "Creation data is invalid"
       },
@@ -1359,7 +1348,13 @@
         "description": "Author not found or user assosiated with provided JWT isn't an admin"
       },
       "TagAlreadyExists": {
-        "description": "Tag already exists"
+        "description": "Tag with this name already exists"
+      },
+      "TagNotFoundOrNotAdmin": {
+        "description": "Tag not found or user assosiated with provided JWT isn't an admin"
+      },
+      "UnknownError": {
+        "description": "Unknown error"
       }
     }
   }

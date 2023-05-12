@@ -4,7 +4,6 @@ import { validatePaginationQueryParameters } from "src/shared/pagination/utils";
 
 import { validateCreationData, validateUpdateData } from "./validators";
 import * as services from "./services";
-import { UPDATE_FAILURE_REASON_TO_RESPONSE_STATUS_CODE } from "./constants";
 
 function createTag(req: Request, res: Response): void {
   const {
@@ -20,8 +19,14 @@ function createTag(req: Request, res: Response): void {
       () => {
         res.status(201).end();
       },
-      () => {
-        res.status(422).end();
+      (failureReason) => {
+        switch (failureReason) {
+          case "tagAlreadyExists":
+            res.status(422).end();
+            break;
+          default:
+            res.status(500).end();
+        }
       }
     );
   }
@@ -61,9 +66,16 @@ function updateTag(req: Request, res: Response): void {
         res.status(204).end();
       },
       (failureReason) => {
-        res
-          .status(UPDATE_FAILURE_REASON_TO_RESPONSE_STATUS_CODE[failureReason])
-          .end();
+        switch (failureReason) {
+          case "tagNotFound":
+            res.status(404).end();
+            break;
+          case "tagAlreadyExists":
+            res.status(422).end();
+            break;
+          default:
+            res.status(500).end();
+        }
       }
     );
   }
@@ -75,8 +87,14 @@ function deleteTag(req: Request, res: Response): void {
     () => {
       res.status(204).end();
     },
-    () => {
-      res.status(404).end();
+    (failureReason) => {
+      switch (failureReason) {
+        case "tagNotFound":
+          res.status(404).end();
+          break;
+        default:
+          res.status(500).end();
+      }
     }
   );
 }

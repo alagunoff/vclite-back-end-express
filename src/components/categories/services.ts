@@ -116,15 +116,15 @@ async function updateCategoryById(
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       switch (error.code) {
-        case "P2002":
-          onFailure("categoryAlreadyExists");
-          break;
         case "P2025":
           onFailure(
             error.meta?.cause === "Record to update not found."
               ? "categoryNotFound"
               : "parentCategoryNotFound"
           );
+          break;
+        case "P2002":
+          onFailure("categoryAlreadyExists");
           break;
         default:
           onFailure();

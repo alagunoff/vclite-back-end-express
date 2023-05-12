@@ -1,6 +1,0 @@
-const UPDATE_FAILURE_REASON_TO_RESPONSE_STATUS_CODE = {
-  tagNotFound: 404,
-  tagAlreadyExists: 422,
-};
-
-export { UPDATE_FAILURE_REASON_TO_RESPONSE_STATUS_CODE };

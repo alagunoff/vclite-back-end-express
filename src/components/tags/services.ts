@@ -1,4 +1,4 @@
-import { type Tag } from "@prisma/client";
+import { Prisma, type Tag } from "@prisma/client";
 
 import prisma from "src/shared/prisma";
 import { type ValidatedPaginationQueryParameters } from "src/shared/pagination/types";
@@ -8,19 +8,28 @@ import {
 } from "src/shared/pagination/utils";
 
 import { type ValidatedCreationData, type ValidatedUpdateData } from "./types";
-import { type UPDATE_FAILURE_REASON_TO_RESPONSE_STATUS_CODE } from "./constants";
 
 async function createTag(
   { name }: ValidatedCreationData,
   onSuccess: () => void,
-  onFailure: () => void
+  onFailure: (reason?: "tagAlreadyExists") => void
 ): Promise<void> {
   try {
     await prisma.tag.create({ data: { name } });
 
     onSuccess();
-  } catch {
-    onFailure();
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2002":
+          onFailure("tagAlreadyExists");
+          break;
+        default:
+          onFailure();
+      }
+    } else {
+      onFailure();
+    }
   }
 }
 
@@ -48,36 +57,51 @@ async function updateTagById(
   id: number,
   { name }: ValidatedUpdateData,
   onSuccess: () => void,
-  onFailure: (
-    reason: keyof typeof UPDATE_FAILURE_REASON_TO_RESPONSE_STATUS_CODE
-  ) => void
+  onFailure: (reason?: "tagNotFound" | "tagAlreadyExists") => void
 ): Promise<void> {
-  const tagToUpdate = await prisma.tag.findUnique({ where: { id } });
+  try {
+    await prisma.tag.update({ where: { id }, data: { name } });
 
-  if (tagToUpdate) {
-    try {
-      await prisma.tag.update({ where: { id }, data: { name } });
-
-      onSuccess();
-    } catch {
-      onFailure("tagAlreadyExists");
+    onSuccess();
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2025":
+          onFailure("tagNotFound");
+          break;
+        case "P2002":
+          onFailure("tagAlreadyExists");
+          break;
+        default:
+          onFailure();
+      }
+    } else {
+      onFailure();
     }
-  } else {
-    onFailure("tagNotFound");
   }
 }
 
 async function deleteTagById(
   id: number,
   onSuccess: () => void,
-  onFailure: () => void
+  onFailure: (reason?: "tagNotFound") => void
 ): Promise<void> {
   try {
     await prisma.tag.delete({ where: { id } });
 
     onSuccess();
-  } catch {
-    onFailure();
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2025":
+          onFailure("tagNotFound");
+          break;
+        default:
+          onFailure();
+      }
+    } else {
+      onFailure();
+    }
   }
 }
 
