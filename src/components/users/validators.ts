@@ -1,4 +1,3 @@
-import prisma from "src/shared/prisma";
 import {
   isNotEmptyString,
   isBase64ImageDataUrl,
@@ -6,7 +5,7 @@ import {
 
 import { type ValidatedCreationData, type ValidationErrors } from "./types";
 
-async function validateCreationData(data: any): Promise<
+function validateCreationData(data: any):
   | {
       validatedData: ValidatedCreationData;
       errors: undefined;
@@ -14,8 +13,7 @@ async function validateCreationData(data: any): Promise<
   | {
       validatedData: undefined;
       errors: ValidationErrors;
-    }
-> {
+    } {
   const errors: ValidationErrors = {};
 
   if ("image" in data) {
@@ -27,13 +25,7 @@ async function validateCreationData(data: any): Promise<
   }
 
   if ("username" in data) {
-    if (isNotEmptyString(data.username)) {
-      if (
-        await prisma.user.findUnique({ where: { username: data.username } })
-      ) {
-        errors.username = "user with the same username already exists";
-      }
-    } else {
+    if (!isNotEmptyString(data.username)) {
       errors.username = "must be not empty string";
     }
   } else {

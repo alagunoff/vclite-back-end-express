@@ -305,18 +305,23 @@ function deleteHostedImageFolder(imageUrl) {
 }
 
 // src/components/users/services.ts
-function createUser(_0, _1) {
-  return __async(this, arguments, function* ({ image, username, password, firstName, lastName }, onSuccess) {
-    const createdUser = yield prisma_default.user.create({
-      data: {
-        image: saveImage(image, "users", username),
-        username,
-        password: import_bcryptjs2.default.hashSync(password),
-        firstName,
-        lastName
-      }
-    });
-    onSuccess(import_jsonwebtoken3.default.sign(String(createdUser.id), env_default.JWT_SECRET_KEY));
+function createUser(_0, _1, _2) {
+  return __async(this, arguments, function* ({ image, username, password, firstName, lastName }, onSuccess, onFailure) {
+    const user = yield prisma_default.user.findUnique({ where: { username } });
+    if (user) {
+      onFailure();
+    } else {
+      const createdUser = yield prisma_default.user.create({
+        data: {
+          image: saveImage(image, "users", username),
+          username,
+          password: import_bcryptjs2.default.hashSync(password),
+          firstName,
+          lastName
+        }
+      });
+      onSuccess(import_jsonwebtoken3.default.sign(String(createdUser.id), env_default.JWT_SECRET_KEY));
+    }
   });
 }
 function deleteUserById(id, onSuccess, onFailure) {
@@ -334,57 +339,51 @@ function deleteUserById(id, onSuccess, onFailure) {
 
 // src/components/users/validators.ts
 function validateCreationData(data) {
-  return __async(this, null, function* () {
-    const errors = {};
-    if ("image" in data) {
-      if (!isBase64ImageDataUrl(data.image)) {
-        errors.image = "must be base64 image in data URL format with mediatype";
-      }
-    } else {
-      errors.image = "required";
+  const errors = {};
+  if ("image" in data) {
+    if (!isBase64ImageDataUrl(data.image)) {
+      errors.image = "must be base64 image in data URL format with mediatype";
     }
-    if ("username" in data) {
-      if (isNotEmptyString(data.username)) {
-        if (yield prisma_default.user.findUnique({ where: { username: data.username } })) {
-          errors.username = "user with the same username already exists";
-        }
-      } else {
-        errors.username = "must be not empty string";
-      }
-    } else {
-      errors.username = "required";
+  } else {
+    errors.image = "required";
+  }
+  if ("username" in data) {
+    if (!isNotEmptyString(data.username)) {
+      errors.username = "must be not empty string";
     }
-    if ("password" in data) {
-      if (!isNotEmptyString(data.password)) {
-        errors.password = "must be not empty string";
-      }
-    } else {
-      errors.password = "required";
+  } else {
+    errors.username = "required";
+  }
+  if ("password" in data) {
+    if (!isNotEmptyString(data.password)) {
+      errors.password = "must be not empty string";
     }
-    if ("firstName" in data) {
-      if (!isNotEmptyString(data.firstName)) {
-        errors.firstName = "must be not empty string";
-      }
+  } else {
+    errors.password = "required";
+  }
+  if ("firstName" in data) {
+    if (!isNotEmptyString(data.firstName)) {
+      errors.firstName = "must be not empty string";
     }
-    if ("lastName" in data) {
-      if (!isNotEmptyString(data.lastName)) {
-        errors.lastName = "must be not empty string";
-      }
+  }
+  if ("lastName" in data) {
+    if (!isNotEmptyString(data.lastName)) {
+      errors.lastName = "must be not empty string";
     }
-    return Object.keys(errors).length ? {
-      validatedData: void 0,
-      errors
-    } : {
-      validatedData: {
-        image: data.image,
-        username: data.username,
-        password: data.password,
-        firstName: data.firstName,
-        lastName: data.lastName
-      },
-      errors: void 0
-    };
-  });
+  }
+  return Object.keys(errors).length ? {
+    validatedData: void 0,
+    errors
+  } : {
+    validatedData: {
+      image: data.image,
+      username: data.username,
+      password: data.password,
+      firstName: data.firstName,
+      lastName: data.lastName
+    },
+    errors: void 0
+  };
 }
 
 // src/components/users/controllers.ts
@@ -393,13 +392,19 @@ function createUser2(req, res) {
     const {
       validatedData: validatedCreationData,
       errors: creationDataValidationErrors
-    } = yield validateCreationData(req.body);
+    } = validateCreationData(req.body);
     if (creationDataValidationErrors) {
       res.status(400).json(creationDataValidationErrors);
     } else {
-      void createUser(validatedCreationData, (userJwtToken) => {
-        res.status(201).send(userJwtToken);
-      });
+      void createUser(
+        validatedCreationData,
+        (userJwtToken) => {
+          res.status(201).send(userJwtToken);
+        },
+        () => {
+          res.status(422).end();
+        }
+      );
     }
   });
 }
@@ -2360,6 +2365,9 @@ var api_docs_default = {
           },
           "400": {
             $ref: "#/components/responses/ValidationErrors"
+          },
+          "422": {
+            description: "User with this username already exists"
           }
         }
       },

@@ -8,14 +8,20 @@ async function createUser(req: Request, res: Response): Promise<void> {
   const {
     validatedData: validatedCreationData,
     errors: creationDataValidationErrors,
-  } = await validateCreationData(req.body);
+  } = validateCreationData(req.body);
 
   if (creationDataValidationErrors) {
     res.status(400).json(creationDataValidationErrors);
   } else {
-    void services.createUser(validatedCreationData, (userJwtToken) => {
-      res.status(201).send(userJwtToken);
-    });
+    void services.createUser(
+      validatedCreationData,
+      (userJwtToken) => {
+        res.status(201).send(userJwtToken);
+      },
+      () => {
+        res.status(422).end();
+      }
+    );
   }
 }
 

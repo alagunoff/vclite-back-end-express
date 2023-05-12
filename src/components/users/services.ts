@@ -9,19 +9,26 @@ import { type ValidatedCreationData } from "./types";
 
 async function createUser(
   { image, username, password, firstName, lastName }: ValidatedCreationData,
-  onSuccess: (userJwtToken: string) => void
+  onSuccess: (userJwtToken: string) => void,
+  onFailure: () => void
 ): Promise<void> {
-  const createdUser = await prisma.user.create({
-    data: {
-      image: saveImage(image, "users", username),
-      username,
-      password: bcrypt.hashSync(password),
-      firstName,
-      lastName,
-    },
-  });
+  const user = await prisma.user.findUnique({ where: { username } });
 
-  onSuccess(jwt.sign(String(createdUser.id), env.JWT_SECRET_KEY));
+  if (user) {
+    onFailure();
+  } else {
+    const createdUser = await prisma.user.create({
+      data: {
+        image: saveImage(image, "users", username),
+        username,
+        password: bcrypt.hashSync(password),
+        firstName,
+        lastName,
+      },
+    });
+
+    onSuccess(jwt.sign(String(createdUser.id), env.JWT_SECRET_KEY));
+  }
 }
 
 async function deleteUserById(

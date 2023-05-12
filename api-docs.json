@@ -91,6 +91,9 @@
           },
           "400": {
             "$ref": "#/components/responses/ValidationErrors"
+          },
+          "422": {
+            "description": "User with this username already exists"
           }
         }
       },
