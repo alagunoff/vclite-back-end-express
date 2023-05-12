@@ -4,7 +4,7 @@ import * as services from "./services";
 
 import { validateCreationData } from "./validators";
 
-async function createUser(req: Request, res: Response): Promise<void> {
+function createUser(req: Request, res: Response): void {
   const {
     validatedData: validatedCreationData,
     errors: creationDataValidationErrors,
@@ -25,7 +25,7 @@ async function createUser(req: Request, res: Response): Promise<void> {
   }
 }
 
-async function getUser(req: Request, res: Response): Promise<void> {
+function getUser(req: Request, res: Response): void {
   res.json({
     id: req.authenticatedUser?.id,
     image: req.authenticatedUser?.image,
@@ -37,7 +37,7 @@ async function getUser(req: Request, res: Response): Promise<void> {
   });
 }
 
-async function deleteUser(req: Request, res: Response): Promise<void> {
+function deleteUser(req: Request, res: Response): void {
   void services.deleteUserById(
     Number(req.params.id),
     () => {

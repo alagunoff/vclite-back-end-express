@@ -79,9 +79,7 @@ async function deleteCategoryById(
     await prisma.category.delete({ where: { id } });
 
     onSuccess();
-  } catch (error) {
-    console.log(error);
-
+  } catch {
     onFailure();
   }
 }

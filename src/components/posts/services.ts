@@ -245,9 +245,7 @@ async function deletePostById(
     deleteHostedImageFolder(deletedPost.image);
 
     onSuccess();
-  } catch (error) {
-    console.log(error);
-
+  } catch {
     onFailure();
   }
 }

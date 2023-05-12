@@ -34,9 +34,7 @@ function authenticateUser(onlyAdmin?: true) {
         } else {
           res.status(onlyAdmin ? 404 : 401).end();
         }
-      } catch (error) {
-        console.log(error);
-
+      } catch {
         res.status(onlyAdmin ? 404 : 401).end();
       }
     } else {

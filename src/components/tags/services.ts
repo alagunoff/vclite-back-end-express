@@ -57,9 +57,7 @@ async function deleteTagById(
     await prisma.tag.delete({ where: { id } });
 
     onSuccess();
-  } catch (error) {
-    console.log(error);
-
+  } catch {
     onFailure();
   }
 }

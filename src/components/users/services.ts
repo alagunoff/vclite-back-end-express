@@ -41,9 +41,7 @@ async function deleteUserById(
     deleteHostedImage(deletedUser.image);
 
     onSuccess();
-  } catch (error) {
-    console.log(error);
-
+  } catch {
     onFailure();
   }
 }

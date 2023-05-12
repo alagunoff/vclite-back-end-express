@@ -249,9 +249,7 @@ async function publishAuthorDraft(
     });
 
     onSuccess();
-  } catch (error) {
-    console.log(error);
-
+  } catch {
     onFailure();
   }
 }
@@ -273,9 +271,7 @@ async function deleteAuthorDraft(
     deleteHostedImageFolder(deletedDraft.image);
 
     onSuccess();
-  } catch (error) {
-    console.log(error);
-
+  } catch {
     onFailure();
   }
 }
