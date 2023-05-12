@@ -9,17 +9,12 @@ import {
 
 import { type ValidatedCreationData, type ValidatedUpdateData } from "./types";
 import { includeSubcategories } from "./utils";
-import {
-  type CREATION_FAILURE_REASON_TO_RESPONSE_MESSAGE,
-  type UPDATE_FAILURE_REASON_TO_RESPONSE_MESSAGE,
-  type DELETION_FAILURE_REASON_TO_RESPONSE_MESSAGE,
-} from "./constants";
 
 async function createCategory(
   { name, parentCategoryId }: ValidatedCreationData,
   onSuccess: () => void,
   onFailure: (
-    reason: keyof typeof CREATION_FAILURE_REASON_TO_RESPONSE_MESSAGE
+    reason?: "categoryAlreadyExists" | "parentCategoryNotFound"
   ) => void
 ): Promise<void> {
   try {
@@ -46,10 +41,10 @@ async function createCategory(
           onFailure("parentCategoryNotFound");
           break;
         default:
-          onFailure("unknown");
+          onFailure();
       }
     } else {
-      onFailure("unknown");
+      onFailure();
     }
   }
 }
@@ -92,7 +87,10 @@ async function updateCategoryById(
   { name, parentCategoryId }: ValidatedUpdateData,
   onSuccess: () => void,
   onFailure: (
-    reason: keyof typeof UPDATE_FAILURE_REASON_TO_RESPONSE_MESSAGE
+    reason?:
+      | "categoryNotFound"
+      | "categoryAlreadyExists"
+      | "parentCategoryNotFound"
   ) => void
 ): Promise<void> {
   try {
@@ -129,10 +127,10 @@ async function updateCategoryById(
           );
           break;
         default:
-          onFailure("unknown");
+          onFailure();
       }
     } else {
-      onFailure("unknown");
+      onFailure();
     }
   }
 }
@@ -140,9 +138,7 @@ async function updateCategoryById(
 async function deleteCategoryById(
   id: number,
   onSuccess: () => void,
-  onFailure: (
-    reason: keyof typeof DELETION_FAILURE_REASON_TO_RESPONSE_MESSAGE
-  ) => void
+  onFailure: (reason?: "categoryNotFound") => void
 ): Promise<void> {
   try {
     await prisma.category.delete({ where: { id } });
@@ -155,10 +151,10 @@ async function deleteCategoryById(
           onFailure("categoryNotFound");
           break;
         default:
-          onFailure("unknown");
+          onFailure();
       }
     } else {
-      onFailure("unknown");
+      onFailure();
     }
   }
 }

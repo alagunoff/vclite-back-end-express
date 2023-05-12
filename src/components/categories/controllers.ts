@@ -4,14 +4,6 @@ import { validatePaginationQueryParameters } from "src/shared/pagination/utils";
 
 import * as services from "./services";
 import { validateCreationData, validateUpdateData } from "./validators";
-import {
-  CREATION_FAILURE_REASON_TO_RESPONSE_STATUS_CODE,
-  CREATION_FAILURE_REASON_TO_RESPONSE_MESSAGE,
-  UPDATE_FAILURE_REASON_TO_RESPONSE_STATUS_CODE,
-  UPDATE_FAILURE_REASON_TO_RESPONSE_MESSAGE,
-  DELETION_FAILURE_REASON_TO_RESPONSE_STATUS_CODE,
-  DELETION_FAILURE_REASON_TO_RESPONSE_MESSAGE,
-} from "./constants";
 
 function createCategory(req: Request, res: Response): void {
   const {
@@ -28,11 +20,16 @@ function createCategory(req: Request, res: Response): void {
         res.status(201).end();
       },
       (failureReason) => {
-        res
-          .status(
-            CREATION_FAILURE_REASON_TO_RESPONSE_STATUS_CODE[failureReason]
-          )
-          .send(CREATION_FAILURE_REASON_TO_RESPONSE_MESSAGE[failureReason]);
+        switch (failureReason) {
+          case "categoryAlreadyExists":
+            res.status(422).send("category with this name already exists");
+            break;
+          case "parentCategoryNotFound":
+            res.status(422).send("parent category with this id not found");
+            break;
+          default:
+            res.status(500).end();
+        }
       }
     );
   }
@@ -72,9 +69,19 @@ function updateCategory(req: Request, res: Response): void {
         res.status(204).end();
       },
       (failureReason) => {
-        res
-          .status(UPDATE_FAILURE_REASON_TO_RESPONSE_STATUS_CODE[failureReason])
-          .send(UPDATE_FAILURE_REASON_TO_RESPONSE_MESSAGE[failureReason]);
+        switch (failureReason) {
+          case "categoryNotFound":
+            res.status(404).end();
+            break;
+          case "categoryAlreadyExists":
+            res.status(422).send("category with this name already exists");
+            break;
+          case "parentCategoryNotFound":
+            res.status(422).send("parent category with this id not found");
+            break;
+          default:
+            res.status(500).end();
+        }
       }
     );
   }
@@ -87,9 +94,13 @@ function deleteCategory(req: Request, res: Response): void {
       res.status(204).end();
     },
     (failureReason) => {
-      res
-        .status(DELETION_FAILURE_REASON_TO_RESPONSE_STATUS_CODE[failureReason])
-        .send(DELETION_FAILURE_REASON_TO_RESPONSE_MESSAGE[failureReason]);
+      switch (failureReason) {
+        case "categoryNotFound":
+          res.status(404).end();
+          break;
+        default:
+          res.status(500).end();
+      }
     }
   );
 }

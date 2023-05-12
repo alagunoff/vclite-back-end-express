@@ -100,9 +100,9 @@
       "get": {
         "tags": ["users"],
         "security": [{ "JWT": [] }],
-        "description": "Get info about **the** user assosiated with provided JWT",
         "responses": {
           "200": {
+            "description": "Info about **the** user assosiated with provided JWT",
             "content": {
               "application/json": {
                 "schema": {
@@ -568,8 +568,9 @@
         "responses": {
           "204": {},
           "404": {
-            "$ref": "#/components/responses/NotFoundOrNotAdmin"
-          }
+            "description": "Category not found or user assosiated with provided JWT isn't an admin"
+          },
+          "500": {}
         }
       }
     },
