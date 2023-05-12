@@ -19,8 +19,14 @@ function createAuthor(req: Request, res: Response): void {
       () => {
         res.status(201).end();
       },
-      () => {
-        res.status(422).end();
+      (failureReason) => {
+        switch (failureReason) {
+          case "userNotFound":
+            res.status(422).end();
+            break;
+          default:
+            res.status(500).end();
+        }
       }
     );
   }
@@ -59,8 +65,14 @@ function updateAuthor(req: Request, res: Response): void {
       () => {
         res.status(204).end();
       },
-      () => {
-        res.status(404).end();
+      (failureReason) => {
+        switch (failureReason) {
+          case "authorNotFound":
+            res.status(404).end();
+            break;
+          default:
+            res.status(500).end();
+        }
       }
     );
   }
@@ -72,8 +84,14 @@ function deleteAuthor(req: Request, res: Response): void {
     () => {
       res.status(204).end();
     },
-    () => {
-      res.status(404).end();
+    (failureReason) => {
+      switch (failureReason) {
+        case "authorNotFound":
+          res.status(404).end();
+          break;
+        default:
+          res.status(500).end();
+      }
     }
   );
 }

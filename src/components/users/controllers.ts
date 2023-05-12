@@ -20,7 +20,7 @@ function createUser(req: Request, res: Response): void {
       (failureReason) => {
         switch (failureReason) {
           case "userAlreadyExists":
-            res.status(422).send("user with this username already exists");
+            res.status(422).end();
             break;
           default:
             res.status(500).end();

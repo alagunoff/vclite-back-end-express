@@ -1,4 +1,4 @@
-import { type Author } from "@prisma/client";
+import { Prisma, type Author } from "@prisma/client";
 
 import prisma from "src/shared/prisma";
 import { type ValidatedPaginationQueryParameters } from "src/shared/pagination/types";
@@ -12,14 +12,31 @@ import { type ValidatedCreationData, type ValidatedUpdateData } from "./types";
 async function createAuthor(
   { description, userId }: ValidatedCreationData,
   onSuccess: () => void,
-  onFailure: () => void
+  onFailure: (reason?: "userNotFound") => void
 ): Promise<void> {
   try {
-    await prisma.author.create({ data: { description, userId } });
+    await prisma.author.create({
+      data: {
+        description,
+        user: {
+          connect: typeof userId === "number" ? { id: userId } : undefined,
+        },
+      },
+    });
 
     onSuccess();
-  } catch {
-    onFailure();
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2025":
+          onFailure("userNotFound");
+          break;
+        default:
+          onFailure();
+      }
+    } else {
+      onFailure();
+    }
   }
 }
 
@@ -51,28 +68,48 @@ async function updateAuthorById(
   id: number,
   { description }: ValidatedUpdateData,
   onSuccess: () => void,
-  onFailure: () => void
+  onFailure: (reason?: "authorNotFound") => void
 ): Promise<void> {
   try {
     await prisma.author.update({ where: { id }, data: { description } });
 
     onSuccess();
-  } catch {
-    onFailure();
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2025":
+          onFailure("authorNotFound");
+          break;
+        default:
+          onFailure();
+      }
+    } else {
+      onFailure();
+    }
   }
 }
 
 async function deleteAuthorById(
   id: number,
   onSuccess: () => void,
-  onFailure: () => void
+  onFailure: (reason?: "authorNotFound") => void
 ): Promise<void> {
   try {
     await prisma.author.delete({ where: { id } });
 
     onSuccess();
-  } catch {
-    onFailure();
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2025":
+          onFailure("authorNotFound");
+          break;
+        default:
+          onFailure();
+      }
+    } else {
+      onFailure();
+    }
   }
 }
 

@@ -37,9 +37,11 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/JWT"
+            "description": "Login successful"
           },
-          "400": {},
+          "400": {
+            "description": "Login data is invalid"
+          },
           "403": {
             "description": "Password is incorrect"
           },
@@ -61,7 +63,8 @@
                 "properties": {
                   "image": {
                     "type": "string",
-                    "format": "base64"
+                    "format": "base64",
+                    "minLength": 1
                   },
                   "username": {
                     "type": "string",
@@ -88,72 +91,30 @@
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/JWT"
+            "description": "User has been created"
           },
-          "400": {},
-          "422": {},
-          "500": {}
+          "400": {
+            "$ref": "#/components/responses/InvalidCreationData"
+          },
+          "422": {
+            "description": "User with this username already exists"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
+          }
         }
       },
       "get": {
+        "description": "Info about **the** user assosiated with provided JWT",
         "tags": ["users"],
         "security": [{ "JWT": [] }],
         "responses": {
           "200": {
-            "description": "Info about **the** user assosiated with provided JWT",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer",
-                      "minimum": 1
-                    },
-                    "image": {
-                      "type": "string",
-                      "format": "uri",
-                      "example": "https://localhost:3000/static/images/users/oleg.jpg"
-                    },
-                    "username": {
-                      "type": "string",
-                      "minLength": 1,
-                      "example": "oleg"
-                    },
-                    "firstName": {
-                      "type": "string",
-                      "minLength": 1,
-                      "nullable": true,
-                      "example": null
-                    },
-                    "lastName": {
-                      "type": "string",
-                      "minLength": 1,
-                      "nullable": true,
-                      "example": null
-                    },
-                    "isAdmin": {
-                      "type": "boolean"
-                    },
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "image",
-                    "username",
-                    "firstName",
-                    "lastName",
-                    "isAdmin",
-                    "createdAt"
-                  ]
-                }
-              }
-            }
+            "description": "OK"
           },
-          "401": {}
+          "401": {
+            "description": "JWT isn't provided or invalid"
+          }
         }
       }
     },
@@ -167,11 +128,15 @@
           }
         ],
         "responses": {
-          "204": {},
+          "204": {
+            "description": "User has been deleted"
+          },
           "404": {
             "description": "User not found or user assosiated with provided JWT isn't an admin"
           },
-          "500": {}
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
+          }
         }
       }
     },
@@ -201,15 +166,20 @@
           }
         },
         "responses": {
-          "201": {},
+          "201": {
+            "description": "Author has been created"
+          },
           "400": {
-            "$ref": "#/components/responses/ValidationErrors"
+            "$ref": "#/components/responses/InvalidCreationData"
           },
           "404": {
             "$ref": "#/components/responses/NotAdmin"
           },
           "422": {
-            "description": "User with this userId doesn't exist"
+            "description": "User with this id not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
           }
         }
       },
@@ -226,34 +196,7 @@
         ],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "authors": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Author"
-                      }
-                    },
-                    "authorsTotalNumber": {
-                      "type": "integer",
-                      "minimum": 0
-                    },
-                    "pagesTotalNumber": {
-                      "type": "integer",
-                      "minimum": 1
-                    }
-                  },
-                  "required": [
-                    "authors",
-                    "authorsTotalNumber",
-                    "pagesTotalNumber"
-                  ]
-                }
-              }
-            }
+            "description": "OK"
           },
           "404": {
             "$ref": "#/components/responses/NotAdmin"
@@ -286,12 +229,17 @@
           }
         },
         "responses": {
-          "204": {},
+          "204": {
+            "description": "Author has been updated"
+          },
           "400": {
-            "$ref": "#/components/responses/ValidationErrors"
+            "$ref": "#/components/responses/InvalidUpdateData"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundOrNotAdmin"
+            "$ref": "#/components/responses/AuthorNotFoundOrNotAdmin"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
           }
         }
       },
@@ -304,9 +252,14 @@
           }
         ],
         "responses": {
-          "204": {},
+          "204": {
+            "description": "Author has been deleted"
+          },
           "404": {
-            "$ref": "#/components/responses/NotFoundOrNotAdmin"
+            "$ref": "#/components/responses/AuthorNotFoundOrNotAdmin"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
           }
         }
       }
@@ -464,13 +417,21 @@
           }
         },
         "responses": {
-          "201": {},
-          "400": {},
+          "201": {
+            "description": "Category has been created"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidCreationData"
+          },
           "404": {
             "$ref": "#/components/responses/NotAdmin"
           },
-          "422": {},
-          "500": {}
+          "422": {
+            "$ref": "#/components/responses/CategoryAlreadyExistsOrParentCategoryNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
+          }
         }
       },
       "get": {
@@ -485,34 +446,7 @@
         ],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "categories": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Category"
-                      }
-                    },
-                    "categoriesTotalNumber": {
-                      "type": "integer",
-                      "minimum": 0
-                    },
-                    "pagesTotalNumber": {
-                      "type": "integer",
-                      "minimum": 1
-                    }
-                  },
-                  "required": [
-                    "categories",
-                    "categoriesTotalNumber",
-                    "pagesTotalNumber"
-                  ]
-                }
-              }
-            }
+            "description": "OK"
           }
         }
       }
@@ -547,13 +481,21 @@
           }
         },
         "responses": {
-          "204": {},
-          "400": {},
+          "204": {
+            "description": "Category has been updated"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidUpdateData"
+          },
           "404": {
             "$ref": "#/components/responses/CategoryNotFoundOrNotAdmin"
           },
-          "422": {},
-          "500": {}
+          "422": {
+            "$ref": "#/components/responses/CategoryAlreadyExistsOrParentCategoryNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
+          }
         }
       },
       "delete": {
@@ -565,11 +507,15 @@
           }
         ],
         "responses": {
-          "204": {},
+          "204": {
+            "description": "Category has been deleted"
+          },
           "404": {
             "$ref": "#/components/responses/CategoryNotFoundOrNotAdmin"
           },
-          "500": {}
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
+          }
         }
       }
     },
@@ -1385,29 +1331,32 @@
           }
         }
       },
-      "JWT": {
-        "content": {
-          "text/plain": {
-            "schema": {
-              "description": "JWT for authentication",
-              "type": "string",
-              "format": "jwt",
-              "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dmNsaXRl.p2ccOCLXgVZMiWp6ff1YJJ5emHNnlyq0uUxbm-hubCM"
-            }
-          }
-        }
-      },
       "NotFoundOrNotAdmin": {
         "description": "Resource not found or user assosiated with provided JWT isn't an admin"
-      },
-      "CategoryNotFoundOrNotAdmin": {
-        "description": "Category not found or user assosiated with provided JWT isn't an admin"
       },
       "NotAdmin": {
         "description": "User assosiated with provided JWT isn't an admin"
       },
       "NotAuthor": {
         "description": "User assosiated with provided JWT isn't an author"
+      },
+      "UnknownError": {
+        "description": "Unknown error"
+      },
+      "InvalidCreationData": {
+        "description": "Creation data is invalid"
+      },
+      "InvalidUpdateData": {
+        "description": "Update data is invalid"
+      },
+      "CategoryAlreadyExistsOrParentCategoryNotFound": {
+        "description": "Category with this name already exists or parent category with this id not found"
+      },
+      "CategoryNotFoundOrNotAdmin": {
+        "description": "Category not found or user assosiated with provided JWT isn't an admin"
+      },
+      "AuthorNotFoundOrNotAdmin": {
+        "description": "Author not found or user assosiated with provided JWT isn't an admin"
       },
       "TagAlreadyExists": {
         "description": "Tag already exists"
