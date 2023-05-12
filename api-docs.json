@@ -90,12 +90,9 @@
           "201": {
             "$ref": "#/components/responses/JWT"
           },
-          "400": {
-            "$ref": "#/components/responses/ValidationErrors"
-          },
-          "422": {
-            "description": "User with this username already exists"
-          }
+          "400": {},
+          "422": {},
+          "500": {}
         }
       },
       "get": {
@@ -172,8 +169,9 @@
         "responses": {
           "204": {},
           "404": {
-            "$ref": "#/components/responses/NotFoundOrNotAdmin"
-          }
+            "description": "User not found or user assosiated with provided JWT isn't an admin"
+          },
+          "500": {}
         }
       }
     },

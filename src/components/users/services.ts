@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
@@ -10,7 +11,7 @@ import { type ValidatedCreationData } from "./types";
 async function createUser(
   { image, username, password, firstName, lastName }: ValidatedCreationData,
   onSuccess: (userJwtToken: string) => void,
-  onFailure: () => void
+  onFailure: (reason?: "userAlreadyExists") => void
 ): Promise<void> {
   try {
     const createdUser = await prisma.user.create({
@@ -24,23 +25,43 @@ async function createUser(
     });
 
     onSuccess(jwt.sign(String(createdUser.id), env.JWT_SECRET_KEY));
-  } catch {
-    onFailure();
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2002":
+          onFailure("userAlreadyExists");
+          break;
+        default:
+          onFailure();
+      }
+    } else {
+      onFailure();
+    }
   }
 }
 
 async function deleteUserById(
   id: number,
   onSuccess: () => void,
-  onFailure: () => void
+  onFailure: (reason?: "userNotFound") => void
 ): Promise<void> {
   try {
     const deletedUser = await prisma.user.delete({ where: { id } });
     deleteHostedImage(deletedUser.image);
 
     onSuccess();
-  } catch {
-    onFailure();
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2025":
+          onFailure("userNotFound");
+          break;
+        default:
+          onFailure();
+      }
+    } else {
+      onFailure();
+    }
   }
 }
 

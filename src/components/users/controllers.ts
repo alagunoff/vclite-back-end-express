@@ -17,8 +17,14 @@ function createUser(req: Request, res: Response): void {
       (userJwtToken) => {
         res.status(201).send(userJwtToken);
       },
-      () => {
-        res.status(422).end();
+      (failureReason) => {
+        switch (failureReason) {
+          case "userAlreadyExists":
+            res.status(422).send("user with this username already exists");
+            break;
+          default:
+            res.status(500).end();
+        }
       }
     );
   }
@@ -42,8 +48,14 @@ function deleteUser(req: Request, res: Response): void {
     () => {
       res.status(204).end();
     },
-    () => {
-      res.status(404).end();
+    (failureReason) => {
+      switch (failureReason) {
+        case "userNotFound":
+          res.status(404).end();
+          break;
+        default:
+          res.status(500).end();
+      }
     }
   );
 }
