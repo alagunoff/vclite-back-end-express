@@ -10,39 +10,42 @@ import {
   validateUpdateData,
 } from "./validators";
 
-async function createPost(req: Request, res: Response): Promise<void> {
-  const {
-    validatedData: validatedCreationData,
-    errors: creationDataValidationErrors,
-  } = validateCreationData({
-    ...req.body,
-    authorId: req.authenticatedAuthor?.id,
-  });
+function createPost(asDraft = false) {
+  return async function (req: Request, res: Response) {
+    const {
+      validatedData: validatedCreationData,
+      errors: creationDataValidationErrors,
+    } = validateCreationData({
+      ...req.body,
+      authorId: req.authenticatedAuthor?.id,
+      isDraft: asDraft,
+    });
 
-  if (creationDataValidationErrors) {
-    res.status(400).json(creationDataValidationErrors);
-  } else {
-    void services.createPost(
-      validatedCreationData,
-      () => {
-        res.status(201).end();
-      },
-      (failureReason) => {
-        switch (failureReason) {
-          case "categoryNotFound":
-            res.status(422).send("category with this id not found");
-            break;
-          case "someTagNotFound":
-            res
-              .status(422)
-              .send("some tag in provided array of tags ids not found");
-            break;
-          default:
-            res.status(500).end();
+    if (creationDataValidationErrors) {
+      res.status(400).json(creationDataValidationErrors);
+    } else {
+      void services.createPost(
+        validatedCreationData,
+        () => {
+          res.status(201).end();
+        },
+        (failureReason) => {
+          switch (failureReason) {
+            case "categoryNotFound":
+              res.status(422).send("category with this id not found");
+              break;
+            case "someTagNotFound":
+              res
+                .status(422)
+                .send("some tag in provided array of tags ids not found");
+              break;
+            default:
+              res.status(500).end();
+          }
         }
-      }
-    );
-  }
+      );
+    }
+  };
 }
 
 async function getPosts(req: Request, res: Response): Promise<void> {

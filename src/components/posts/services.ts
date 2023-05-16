@@ -32,6 +32,7 @@ async function createPost(
     authorId,
     categoryId,
     tagsIds,
+    isDraft,
   }: ValidatedCreationData,
   onSuccess: () => void,
   onFailure: (reason?: "categoryNotFound" | "someTagNotFound") => void
@@ -62,6 +63,7 @@ async function createPost(
         tags: {
           connect: tagsIds.map((tagId) => ({ id: tagId })),
         },
+        isDraft,
       },
     });
 
@@ -188,30 +190,29 @@ async function updatePostById(
     });
 
     if (image ?? extraImages) {
-      const postToUpdateImagesFolderName = `posts/${getHostedImageFolderName(
+      const updatedPostImagesFolderName = `posts/${getHostedImageFolderName(
         updatedPost.image
       )}`;
 
       if (image) {
-        saveImage(image, postToUpdateImagesFolderName, "main");
+        saveImage(image, updatedPostImagesFolderName, "main");
       }
 
       if (extraImages) {
-        const postToUpdateExtraImages = await prisma.postExtraImage.findMany({
+        const updatedPostExtraImages = await prisma.postExtraImage.findMany({
           where: {
             postId: updatedPost.id,
           },
         });
 
-        for (const postToUpdateExtraImage of postToUpdateExtraImages) {
-          const deletedPostToUpdateExtraImage =
-            await prisma.postExtraImage.delete({
-              where: {
-                id: postToUpdateExtraImage.id,
-              },
-            });
+        for (const extraImage of updatedPostExtraImages) {
+          const deletedExtraImage = await prisma.postExtraImage.delete({
+            where: {
+              id: extraImage.id,
+            },
+          });
 
-          deleteHostedImage(deletedPostToUpdateExtraImage.image);
+          deleteHostedImage(deletedExtraImage.image);
         }
 
         await prisma.post.update({
@@ -224,7 +225,7 @@ async function updatePostById(
                 data: extraImages.map((extraImage, index) => ({
                   image: saveImage(
                     extraImage,
-                    postToUpdateImagesFolderName,
+                    updatedPostImagesFolderName,
                     `extra-${index}`
                   ),
                 })),
@@ -238,7 +239,6 @@ async function updatePostById(
     onSuccess();
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      console.log(error);
       switch (error.code) {
         case "P2025":
           onFailure(

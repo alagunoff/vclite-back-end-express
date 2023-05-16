@@ -1,32 +1,9 @@
 import { type Request, type Response } from "express";
 
-import prisma from "src/shared/prisma";
-
 import { validatePaginationQueryParameters } from "src/shared/pagination/utils";
-import {
-  validateCreationData,
-  validateUpdateData,
-} from "src/components/posts/validators";
+import { validateUpdateData } from "src/components/posts/validators";
 
 import * as services from "./services";
-
-async function createDraft(req: Request, res: Response): Promise<void> {
-  const {
-    validatedData: validatedCreationData,
-    errors: creationDataValidationErrors,
-  } = await validateCreationData({
-    ...req.body,
-    authorId: req.authenticatedAuthor?.id,
-  });
-
-  if (creationDataValidationErrors) {
-    res.status(400).json(creationDataValidationErrors);
-  } else {
-    void services.createDraft(validatedCreationData, () => {
-      res.status(201).end();
-    });
-  }
-}
 
 async function getDrafts(req: Request, res: Response): Promise<void> {
   const {
@@ -37,7 +14,7 @@ async function getDrafts(req: Request, res: Response): Promise<void> {
   if (paginationQueryParametersValidationErrors) {
     res.status(400).json(paginationQueryParametersValidationErrors);
   } else {
-    void services.getDraftsByAuthorId(
+    void services.getAuthorDrafts(
       req.authenticatedAuthor?.id as number,
       validatedPaginationQueryParameters,
       (drafts, draftsTotalNumber, pagesTotalNumber) => {
@@ -48,60 +25,78 @@ async function getDrafts(req: Request, res: Response): Promise<void> {
 }
 
 async function updateDraft(req: Request, res: Response): Promise<void> {
-  const draftToUpdate = await prisma.post.findUnique({
-    where: {
-      id: Number(req.params.id),
-      isDraft: true,
-      authorId: req.authenticatedAuthor?.id,
-    },
-  });
+  const {
+    validatedData: validatedUpdateData,
+    errors: updateDataValidationErrors,
+  } = validateUpdateData(req.body);
 
-  if (draftToUpdate) {
-    const {
-      validatedData: validatedUpdateData,
-      errors: updateDataValidationErrors,
-    } = await validateUpdateData(req.body, false);
-
-    if (updateDataValidationErrors) {
-      res.status(400).json(updateDataValidationErrors);
-    } else {
-      void services.updateDraftById(
-        draftToUpdate.id,
-        validatedUpdateData,
-        () => {
-          res.status(204).end();
-        }
-      );
-    }
+  if (updateDataValidationErrors) {
+    res.status(400).json(updateDataValidationErrors);
   } else {
-    res.status(404).end();
+    void services.updateAuthorDraft(
+      req.authenticatedAuthor?.id as number,
+      Number(req.params.id),
+      validatedUpdateData,
+      () => {
+        res.status(204).end();
+      },
+      (failureReason) => {
+        switch (failureReason) {
+          case "draftNotFound":
+            res.status(404).end();
+            break;
+          case "categoryNotFound":
+            res.status(422).send("category with this id not found");
+            break;
+          case "someTagNotFound":
+            res
+              .status(422)
+              .send("some tag in provided array of tags ids not found");
+            break;
+          default:
+            res.status(500).end();
+        }
+      }
+    );
   }
 }
 
 async function publishDraft(req: Request, res: Response): Promise<void> {
   void services.publishAuthorDraft(
-    Number(req.params.id),
     req.authenticatedAuthor?.id as number,
+    Number(req.params.id),
     () => {
       res.status(204).end();
     },
-    () => {
-      res.status(404).end();
+    (failureReason) => {
+      switch (failureReason) {
+        case "draftNotFound":
+          res.status(404).end();
+          break;
+        default:
+          res.status(500).end();
+      }
     }
   );
 }
 
 async function deleteDraft(req: Request, res: Response): Promise<void> {
   void services.deleteAuthorDraft(
-    Number(req.params.id),
     req.authenticatedAuthor?.id as number,
+    Number(req.params.id),
     () => {
       res.status(204).end();
     },
-    () => {
-      res.status(404).end();
+    (failureReason) => {
+      switch (failureReason) {
+        case "draftNotFound":
+          res.status(404).end();
+          break;
+        default:
+          res.status(500).end();
+      }
     }
   );
 }
 
-export { createDraft, getDrafts, updateDraft, publishDraft, deleteDraft };
+export { getDrafts, updateDraft, publishDraft, deleteDraft };

@@ -94,6 +94,7 @@ function validateCreationData(data: any):
           authorId: data.authorId,
           categoryId: data.categoryId,
           tagsIds: data.tagsIds,
+          isDraft: data.isDraft,
         },
         errors: undefined,
       };

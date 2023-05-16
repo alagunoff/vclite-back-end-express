@@ -8,6 +8,7 @@ interface ValidatedCreationData {
   authorId: number;
   categoryId: number;
   tagsIds: number[];
+  isDraft: boolean;
 }
 
 interface ValidatedUpdateData {

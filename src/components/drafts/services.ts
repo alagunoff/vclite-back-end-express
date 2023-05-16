@@ -1,5 +1,4 @@
-import { type Post } from "@prisma/client";
-import crypto from "crypto";
+import { Prisma, type Post } from "@prisma/client";
 
 import prisma from "src/shared/prisma";
 import {
@@ -13,67 +12,10 @@ import {
   createPaginationParameters,
   calculatePagesTotalNumber,
 } from "src/shared/pagination/utils";
-import {
-  type ValidatedCreationData,
-  type ValidatedUpdateData,
-} from "src/components/posts/types";
+import { type ValidatedUpdateData } from "src/components/posts/types";
 import { includeSubcategories } from "src/components/categories/utils";
 
-async function createDraft(
-  {
-    image,
-    extraImages,
-    title,
-    content,
-    authorId,
-    categoryId,
-    tagsIds,
-  }: ValidatedCreationData,
-  onSuccess: () => void
-): Promise<void> {
-  const draftImagesFolderName = `posts/${crypto.randomUUID()}`;
-
-  await prisma.post.create({
-    data: {
-      image: saveImage(image, draftImagesFolderName, "main"),
-      extraImages: extraImages
-        ? {
-            createMany: {
-              data: extraImages.map((extraImage, index) => ({
-                image: saveImage(
-                  extraImage,
-                  draftImagesFolderName,
-                  `extra-${index}`
-                ),
-              })),
-            },
-          }
-        : undefined,
-      title,
-      content,
-      author: {
-        connect: {
-          id: authorId,
-        },
-      },
-      category: {
-        connect: {
-          id: categoryId,
-        },
-      },
-      tags: {
-        connect: tagsIds.map((tagId) => ({
-          id: tagId,
-        })),
-      },
-      isDraft: true,
-    },
-  });
-
-  onSuccess();
-}
-
-async function getDraftsByAuthorId(
+async function getAuthorDrafts(
   authorId: number,
   validatedPaginationQueryParameters: ValidatedPaginationQueryParameters,
   onSuccess: (
@@ -84,10 +26,8 @@ async function getDraftsByAuthorId(
 ): Promise<void> {
   const drafts = await prisma.post.findMany({
     where: {
+      authorId,
       isDraft: true,
-      author: {
-        id: authorId,
-      },
     },
     ...createPaginationParameters(validatedPaginationQueryParameters),
     select: {
@@ -130,10 +70,8 @@ async function getDraftsByAuthorId(
   });
   const draftsTotalNumber = await prisma.post.count({
     where: {
+      authorId,
       isDraft: true,
-      author: {
-        id: authorId,
-      },
     },
   });
 
@@ -148,8 +86,9 @@ async function getDraftsByAuthorId(
   );
 }
 
-async function updateDraftById(
-  id: number,
+async function updateAuthorDraft(
+  authorId: number,
+  draftId: number,
   {
     image,
     extraImages,
@@ -158,90 +97,112 @@ async function updateDraftById(
     categoryId,
     tagsIds,
   }: ValidatedUpdateData,
-  onSuccess: () => void
+  onSuccess: () => void,
+  onFailure: (
+    reason?: "draftNotFound" | "categoryNotFound" | "someTagNotFound"
+  ) => void
 ): Promise<void> {
-  const updatedDraft = await prisma.post.update({
-    where: {
-      id,
-    },
-    data: {
-      title,
-      content,
-      categoryId,
-      tags: tagsIds
-        ? {
-            set: [],
-            connect: tagsIds.map((tagId) => ({
-              id: tagId,
-            })),
-          }
-        : undefined,
-    },
-  });
+  try {
+    const updatedDraft = await prisma.post.update({
+      where: {
+        id: draftId,
+        authorId,
+        isDraft: true,
+      },
+      data: {
+        title,
+        content,
+        categoryId,
+        tags: tagsIds
+          ? {
+              set: tagsIds.map((tagId) => ({ id: tagId })),
+            }
+          : undefined,
+      },
+    });
 
-  if (image ?? extraImages) {
-    const draftToUpdateImagesFolderName = `posts/${getHostedImageFolderName(
-      updatedDraft.image
-    )}`;
+    if (image ?? extraImages) {
+      const updatedDraftImagesFolderName = `posts/${getHostedImageFolderName(
+        updatedDraft.image
+      )}`;
 
-    if (image) {
-      saveImage(image, draftToUpdateImagesFolderName, "main");
-    }
+      if (image) {
+        saveImage(image, updatedDraftImagesFolderName, "main");
+      }
 
-    if (extraImages) {
-      const draftToUpdateExtraImages = await prisma.postExtraImage.findMany({
-        where: {
-          postId: id,
-        },
-      });
+      if (extraImages) {
+        const updatedDraftExtraImages = await prisma.postExtraImage.findMany({
+          where: {
+            postId: updatedDraft.id,
+          },
+        });
 
-      for (const draftToUpdateExtraImage of draftToUpdateExtraImages) {
-        const deletedPostToUpdateExtraImage =
-          await prisma.postExtraImage.delete({
+        for (const extraImage of updatedDraftExtraImages) {
+          const deletedExtraImage = await prisma.postExtraImage.delete({
             where: {
-              id: draftToUpdateExtraImage.id,
+              id: extraImage.id,
             },
           });
 
-        deleteHostedImage(deletedPostToUpdateExtraImage.image);
-      }
+          deleteHostedImage(deletedExtraImage.image);
+        }
 
-      await prisma.post.update({
-        where: {
-          id,
-        },
-        data: {
-          extraImages: {
-            createMany: {
-              data: extraImages.map((extraImage, index) => ({
-                image: saveImage(
-                  extraImage,
-                  draftToUpdateImagesFolderName,
-                  `extra-${index}`
-                ),
-              })),
+        await prisma.post.update({
+          where: {
+            id: updatedDraft.id,
+          },
+          data: {
+            extraImages: {
+              createMany: {
+                data: extraImages.map((extraImage, index) => ({
+                  image: saveImage(
+                    extraImage,
+                    updatedDraftImagesFolderName,
+                    `extra-${index}`
+                  ),
+                })),
+              },
             },
           },
-        },
-      });
+        });
+      }
+    }
+
+    onSuccess();
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2025":
+          onFailure(
+            error.meta?.cause === "Record to update not found."
+              ? "draftNotFound"
+              : "someTagNotFound"
+          );
+          break;
+        case "P2003":
+          onFailure("categoryNotFound");
+          break;
+        default:
+          onFailure();
+      }
+    } else {
+      onFailure();
     }
   }
-
-  onSuccess();
 }
 
 async function publishAuthorDraft(
-  draftId: number,
   authorId: number,
+  draftId: number,
   onSuccess: () => void,
-  onFailure: () => void
+  onFailure: (reason?: "draftNotFound") => void
 ): Promise<void> {
   try {
     await prisma.post.update({
       where: {
         id: draftId,
-        isDraft: true,
         authorId,
+        isDraft: true,
       },
       data: {
         isDraft: false,
@@ -249,37 +210,56 @@ async function publishAuthorDraft(
     });
 
     onSuccess();
-  } catch {
-    onFailure();
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2025":
+          onFailure("draftNotFound");
+          break;
+        default:
+          onFailure();
+      }
+    } else {
+      onFailure();
+    }
   }
 }
 
 async function deleteAuthorDraft(
-  draftId: number,
   authorId: number,
+  draftId: number,
   onSuccess: () => void,
-  onFailure: () => void
+  onFailure: (reason?: "draftNotFound") => void
 ): Promise<void> {
   try {
     const deletedDraft = await prisma.post.delete({
       where: {
         id: draftId,
-        isDraft: true,
         authorId,
+        isDraft: true,
       },
     });
     deleteHostedImageFolder(deletedDraft.image);
 
     onSuccess();
-  } catch {
-    onFailure();
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2025":
+          onFailure("draftNotFound");
+          break;
+        default:
+          onFailure();
+      }
+    } else {
+      onFailure();
+    }
   }
 }
 
 export {
-  createDraft,
-  getDraftsByAuthorId,
-  updateDraftById,
+  getAuthorDrafts,
+  updateAuthorDraft,
   publishAuthorDraft,
   deleteAuthorDraft,
 };
