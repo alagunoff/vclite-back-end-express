@@ -18,9 +18,7 @@ async function createAuthor(
     await prisma.author.create({
       data: {
         description,
-        user: {
-          connect: typeof userId === "number" ? { id: userId } : undefined,
-        },
+        userId,
       },
     });
 
@@ -28,7 +26,7 @@ async function createAuthor(
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       switch (error.code) {
-        case "P2025":
+        case "P2003":
           onFailure("userNotFound");
           break;
         default:

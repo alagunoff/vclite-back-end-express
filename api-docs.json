@@ -105,7 +105,7 @@
         }
       },
       "get": {
-        "description": "Info about **the** user assosiated with provided JWT",
+        "description": "Get info about the user assosiated with provided JWT",
         "tags": ["users"],
         "security": [{ "JWT": [] }],
         "responses": {
@@ -113,7 +113,7 @@
             "description": "OK"
           },
           "401": {
-            "description": "JWT isn't provided or invalid"
+            "$ref": "#/components/responses/Unauthenticated"
           }
         }
       }
@@ -805,7 +805,7 @@
     },
     "/posts/{id}/comments": {
       "post": {
-        "tags": ["comments"],
+        "tags": ["post comments"],
         "security": [{ "JWT": [] }],
         "parameters": [
           {
@@ -830,57 +830,44 @@
           }
         },
         "responses": {
-          "201": {},
-          "400": {
-            "$ref": "#/components/responses/ValidationErrors"
+          "201": {
+            "description": "Comment has been created"
           },
-          "401": {},
-          "404": {}
+          "400": {
+            "$ref": "#/components/responses/InvalidCreationData"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "description": "Post with this id not found"
+          }
         }
       },
       "get": {
-        "tags": ["comments"],
+        "tags": ["post comments"],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
+          },
+          {
+            "$ref": "#/components/parameters/pageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/itemsNumber"
           }
         ],
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "comments": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Comment"
-                      }
-                    },
-                    "commentsTotalNumber": {
-                      "type": "integer",
-                      "minimum": 0
-                    },
-                    "pagesTotalNumber": {
-                      "type": "integer",
-                      "minimum": 1
-                    }
-                  },
-                  "required": [
-                    "comments",
-                    "commentsTotalNumber",
-                    "pagesTotalNumber"
-                  ]
-                }
-              }
-            }
+            "description": "OK"
           },
-          "404": {}
+          "404": {
+            "description": "Post with this id not found"
+          }
         }
       },
       "delete": {
-        "tags": ["comments"],
+        "tags": ["post comments"],
         "security": [{ "JWT": [] }],
         "parameters": [
           {
@@ -894,7 +881,9 @@
           }
         ],
         "responses": {
-          "204": {},
+          "204": {
+            "description": "Comments have been deleted"
+          },
           "404": {
             "$ref": "#/components/responses/NotFoundOrNotAdmin"
           }
@@ -1352,6 +1341,9 @@
       },
       "TagNotFoundOrNotAdmin": {
         "description": "Tag not found or user assosiated with provided JWT isn't an admin"
+      },
+      "Unauthenticated": {
+        "description": "JWT isn't provided or invalid"
       },
       "UnknownError": {
         "description": "Unknown error"

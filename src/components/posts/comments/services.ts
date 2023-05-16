@@ -11,52 +11,92 @@ import { type ValidatedCreationData } from "./types";
 
 async function createComment(
   { content, postId }: ValidatedCreationData,
-  onSuccess: () => void
+  onSuccess: () => void,
+  onFailure: () => void
 ): Promise<void> {
-  await prisma.comment.create({ data: { content, postId } });
+  const postToCreateCommentFor = await prisma.post.findUnique({
+    where: {
+      id: postId,
+      isDraft: false,
+    },
+  });
 
-  onSuccess();
+  if (postToCreateCommentFor) {
+    await prisma.comment.create({
+      data: { content, postId: postToCreateCommentFor.id },
+    });
+
+    onSuccess();
+  } else {
+    onFailure();
+  }
 }
 
-async function getCommentsByPostId(
+async function getCommentsForPost(
   postId: number,
   validatedPaginationQueryParameters: ValidatedPaginationQueryParameters,
   onSuccess: (
     comments: Array<Omit<Comment, "postId">>,
     commentsTotalNumber: number,
     pagesTotalNumber: number
-  ) => void
+  ) => void,
+  onFailure: () => void
 ): Promise<void> {
-  const comments = await prisma.comment.findMany({
+  const postToGetCommentsFor = await prisma.post.findUnique({
     where: {
-      postId,
-    },
-    ...createPaginationParameters(validatedPaginationQueryParameters),
-    select: {
-      id: true,
-      content: true,
-    },
-  });
-  const commentsTotalNumber = await prisma.comment.count({
-    where: {
-      postId,
+      id: postId,
+      isDraft: false,
     },
   });
 
-  onSuccess(
-    comments,
-    commentsTotalNumber,
-    calculatePagesTotalNumber(commentsTotalNumber, comments.length)
-  );
+  if (postToGetCommentsFor) {
+    const comments = await prisma.comment.findMany({
+      where: {
+        postId: postToGetCommentsFor.id,
+      },
+      ...createPaginationParameters(validatedPaginationQueryParameters),
+      select: {
+        id: true,
+        content: true,
+      },
+    });
+    const commentsTotalNumber = await prisma.comment.count({
+      where: {
+        postId: postToGetCommentsFor.id,
+      },
+    });
+
+    onSuccess(
+      comments,
+      commentsTotalNumber,
+      calculatePagesTotalNumber(commentsTotalNumber, comments.length)
+    );
+  } else {
+    onFailure();
+  }
 }
 
-async function deleteCommentsByPostId(
+async function deletePostComments(
   postId: number,
-  onSuccess: () => void
+  onSuccess: () => void,
+  onFailure: () => void
 ): Promise<void> {
-  await prisma.comment.deleteMany({ where: { postId } });
+  const postToDeleteCommentsFrom = await prisma.post.findUnique({
+    where: {
+      id: postId,
+      isDraft: false,
+    },
+  });
 
-  onSuccess();
+  if (postToDeleteCommentsFrom) {
+    await prisma.comment.deleteMany({
+      where: { postId: postToDeleteCommentsFrom.id },
+    });
+
+    onSuccess();
+  } else {
+    onFailure();
+  }
 }
 
-export { createComment, getCommentsByPostId, deleteCommentsByPostId };
+export { createComment, getCommentsForPost, deletePostComments };
