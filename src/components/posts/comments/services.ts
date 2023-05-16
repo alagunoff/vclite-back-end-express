@@ -1,4 +1,4 @@
-import { type Comment } from "@prisma/client";
+import { Prisma, type Comment } from "@prisma/client";
 
 import prisma from "src/shared/prisma";
 import { type ValidatedPaginationQueryParameters } from "src/shared/pagination/types";
@@ -12,23 +12,31 @@ import { type ValidatedCreationData } from "./types";
 async function createComment(
   { content, postId }: ValidatedCreationData,
   onSuccess: () => void,
-  onFailure: () => void
+  onFailure: (reason?: "postNotFound") => void
 ): Promise<void> {
-  const postToCreateCommentFor = await prisma.post.findUnique({
-    where: {
-      id: postId,
-      isDraft: false,
-    },
-  });
-
-  if (postToCreateCommentFor) {
-    await prisma.comment.create({
-      data: { content, postId: postToCreateCommentFor.id },
+  try {
+    await prisma.post.update({
+      where: { id: postId, isDraft: false },
+      data: {
+        comments: {
+          create: { content },
+        },
+      },
     });
 
     onSuccess();
-  } else {
-    onFailure();
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2025":
+          onFailure("postNotFound");
+          break;
+        default:
+          onFailure();
+      }
+    } else {
+      onFailure();
+    }
   }
 }
 
@@ -40,29 +48,27 @@ async function getCommentsForPost(
     commentsTotalNumber: number,
     pagesTotalNumber: number
   ) => void,
-  onFailure: () => void
+  onFailure: (reason?: "postNotFound") => void
 ): Promise<void> {
-  const postToGetCommentsFor = await prisma.post.findUnique({
-    where: {
-      id: postId,
-      isDraft: false,
-    },
-  });
-
-  if (postToGetCommentsFor) {
-    const comments = await prisma.comment.findMany({
+  const comments = await prisma.post
+    .findUnique({
       where: {
-        postId: postToGetCommentsFor.id,
+        id: postId,
+        isDraft: false,
       },
+    })
+    .comments({
       ...createPaginationParameters(validatedPaginationQueryParameters),
       select: {
         id: true,
         content: true,
       },
     });
+
+  if (comments) {
     const commentsTotalNumber = await prisma.comment.count({
       where: {
-        postId: postToGetCommentsFor.id,
+        postId,
       },
     });
 
@@ -72,30 +78,38 @@ async function getCommentsForPost(
       calculatePagesTotalNumber(commentsTotalNumber, comments.length)
     );
   } else {
-    onFailure();
+    onFailure("postNotFound");
   }
 }
 
 async function deletePostComments(
   postId: number,
   onSuccess: () => void,
-  onFailure: () => void
+  onFailure: (reason?: "postNotFound") => void
 ): Promise<void> {
-  const postToDeleteCommentsFrom = await prisma.post.findUnique({
-    where: {
-      id: postId,
-      isDraft: false,
-    },
-  });
-
-  if (postToDeleteCommentsFrom) {
-    await prisma.comment.deleteMany({
-      where: { postId: postToDeleteCommentsFrom.id },
+  try {
+    await prisma.post.update({
+      where: { id: postId, isDraft: false },
+      data: {
+        comments: {
+          deleteMany: {},
+        },
+      },
     });
 
     onSuccess();
-  } else {
-    onFailure();
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2025":
+          onFailure("postNotFound");
+          break;
+        default:
+          onFailure();
+      }
+    } else {
+      onFailure();
+    }
   }
 }
 

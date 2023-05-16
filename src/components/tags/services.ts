@@ -60,7 +60,10 @@ async function updateTagById(
   onFailure: (reason?: "tagNotFound" | "tagAlreadyExists") => void
 ): Promise<void> {
   try {
-    await prisma.tag.update({ where: { id }, data: { name } });
+    await prisma.tag.update({
+      where: { id },
+      data: { name },
+    });
 
     onSuccess();
   } catch (error) {

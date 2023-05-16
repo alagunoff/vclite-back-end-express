@@ -22,8 +22,14 @@ async function createComment(req: Request, res: Response): Promise<void> {
       () => {
         res.status(201).end();
       },
-      () => {
-        res.status(404).end();
+      (failureReason) => {
+        switch (failureReason) {
+          case "postNotFound":
+            res.status(404).end();
+            break;
+          default:
+            res.status(500).end();
+        }
       }
     );
   }
@@ -44,8 +50,14 @@ async function getComments(req: Request, res: Response): Promise<void> {
       (comments, commentsTotalNumber, pagesTotalNumber) => {
         res.json({ comments, commentsTotalNumber, pagesTotalNumber });
       },
-      () => {
-        res.status(404).end();
+      (failureReason) => {
+        switch (failureReason) {
+          case "postNotFound":
+            res.status(404).end();
+            break;
+          default:
+            res.status(500).end();
+        }
       }
     );
   }
@@ -57,8 +69,14 @@ async function deleteComments(req: Request, res: Response): Promise<void> {
     () => {
       res.status(204).end();
     },
-    () => {
-      res.status(404).end();
+    (failureReason) => {
+      switch (failureReason) {
+        case "postNotFound":
+          res.status(404).end();
+          break;
+        default:
+          res.status(500).end();
+      }
     }
   );
 }

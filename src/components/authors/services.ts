@@ -26,7 +26,7 @@ async function createAuthor(
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       switch (error.code) {
-        case "P2003":
+        case "P2025":
           onFailure("userNotFound");
           break;
         default:

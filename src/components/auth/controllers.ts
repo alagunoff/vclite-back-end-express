@@ -24,7 +24,6 @@ function logIn(req: Request, res: Response): void {
             break;
           case "incorrectPassword":
             res.status(403).end();
-            break;
         }
       }
     );

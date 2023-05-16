@@ -22,7 +22,7 @@ function createTag(req: Request, res: Response): void {
       (failureReason) => {
         switch (failureReason) {
           case "tagAlreadyExists":
-            res.status(422).end();
+            res.status(422).send("tag with this name already exists");
             break;
           default:
             res.status(500).end();
