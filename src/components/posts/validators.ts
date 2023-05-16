@@ -233,10 +233,7 @@ function validateOrderQueryParameters(queryParameters: Request["query"]):
       };
 }
 
-function validateUpdateData(
-  data: any,
-  isPostBeingValidated: boolean = true
-):
+function validateUpdateData(data: any):
   | {
       validatedData: ValidatedUpdateData;
       errors: undefined;
@@ -272,12 +269,6 @@ function validateUpdateData(
     }
   }
 
-  if (isPostBeingValidated && "authorId" in data) {
-    if (!isPositiveInteger(data.authorId)) {
-      errors.authorId = "must be positive integer";
-    }
-  }
-
   if ("categoryId" in data) {
     if (!isPositiveInteger(data.categoryId)) {
       errors.categoryId = "must be positive integer";
@@ -301,7 +292,6 @@ function validateUpdateData(
           extraImages: data.extraImages,
           title: data.title,
           content: data.content,
-          authorId: isPostBeingValidated ? data.authorId : undefined,
           categoryId: data.categoryId,
           tagsIds: data.tagsIds,
         },

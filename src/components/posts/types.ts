@@ -15,7 +15,6 @@ interface ValidatedUpdateData {
   extraImages?: string[];
   title?: string;
   content?: string;
-  authorId?: number;
   categoryId?: number;
   tagsIds?: number[];
 }

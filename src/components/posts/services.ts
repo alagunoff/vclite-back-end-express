@@ -1,4 +1,4 @@
-import { type Post } from "@prisma/client";
+import { Prisma, type Post } from "@prisma/client";
 import crypto from "crypto";
 
 import prisma from "src/shared/prisma";
@@ -34,52 +34,53 @@ async function createPost(
     tagsIds,
   }: ValidatedCreationData,
   onSuccess: () => void,
-  onFailure: (reason: "categoryNotFound" | "noTagsFound") => void
+  onFailure: (reason?: "categoryNotFound" | "someTagNotFound") => void
 ): Promise<void> {
-  const categoryToCreatePostIn = await prisma.category.findUnique({
-    where: { id: categoryId },
-  });
+  try {
+    const postImagesFolderName = `posts/${crypto.randomUUID()}`;
 
-  if (categoryToCreatePostIn) {
-    const tagsToCreatePostWith = await prisma.tag.findMany({
-      where: { id: { in: tagsIds } },
+    await prisma.post.create({
+      data: {
+        image: saveImage(image, postImagesFolderName, "main"),
+        extraImages: extraImages
+          ? {
+              createMany: {
+                data: extraImages.map((extraImage, index) => ({
+                  image: saveImage(
+                    extraImage,
+                    postImagesFolderName,
+                    `extra-${index}`
+                  ),
+                })),
+              },
+            }
+          : undefined,
+        title,
+        content,
+        authorId,
+        categoryId,
+        tags: {
+          connect: tagsIds.map((tagId) => ({ id: tagId })),
+        },
+      },
     });
 
-    if (tagsToCreatePostWith.length) {
-      const postImagesFolderName = `posts/${crypto.randomUUID()}`;
-
-      await prisma.post.create({
-        data: {
-          image: saveImage(image, postImagesFolderName, "main"),
-          extraImages: extraImages
-            ? {
-                createMany: {
-                  data: extraImages.map((extraImage, index) => ({
-                    image: saveImage(
-                      extraImage,
-                      postImagesFolderName,
-                      `extra-${index}`
-                    ),
-                  })),
-                },
-              }
-            : undefined,
-          title,
-          content,
-          authorId,
-          categoryId: categoryToCreatePostIn.id,
-          tags: {
-            connect: tagsToCreatePostWith,
-          },
-        },
-      });
-
-      onSuccess();
+    onSuccess();
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2003":
+          onFailure("categoryNotFound");
+          break;
+        case "P2025":
+          onFailure("someTagNotFound");
+          break;
+        default:
+          onFailure();
+      }
     } else {
-      onFailure("noTagsFound");
+      onFailure();
     }
-  } else {
-    onFailure("categoryNotFound");
   }
 }
 
@@ -160,87 +161,108 @@ async function updatePostById(
     extraImages,
     title,
     content,
-    authorId,
     categoryId,
     tagsIds,
   }: ValidatedUpdateData,
-  onSuccess: () => void
+  onSuccess: () => void,
+  onFailure: (
+    reason?: "postNotFound" | "categoryNotFound" | "someTagNotFound"
+  ) => void
 ): Promise<void> {
-  const updatedPost = await prisma.post.update({
-    where: {
-      id,
-    },
-    data: {
-      title,
-      content,
-      authorId,
-      categoryId,
-      tags: tagsIds
-        ? {
-            set: [],
-            connect: tagsIds.map((tagId) => ({
-              id: tagId,
-            })),
-          }
-        : undefined,
-    },
-  });
+  try {
+    const updatedPost = await prisma.post.update({
+      where: {
+        id,
+        isDraft: false,
+      },
+      data: {
+        title,
+        content,
+        categoryId,
+        tags: tagsIds
+          ? {
+              set: tagsIds.map((tagId) => ({ id: tagId })),
+            }
+          : undefined,
+      },
+    });
 
-  if (image ?? extraImages) {
-    const postToUpdateImagesFolderName = `posts/${getHostedImageFolderName(
-      updatedPost.image
-    )}`;
+    if (image ?? extraImages) {
+      const postToUpdateImagesFolderName = `posts/${getHostedImageFolderName(
+        updatedPost.image
+      )}`;
 
-    if (image) {
-      saveImage(image, postToUpdateImagesFolderName, "main");
-    }
-
-    if (extraImages) {
-      const postToUpdateExtraImages = await prisma.postExtraImage.findMany({
-        where: {
-          postId: id,
-        },
-      });
-
-      for (const postToUpdateExtraImage of postToUpdateExtraImages) {
-        const deletedPostToUpdateExtraImage =
-          await prisma.postExtraImage.delete({
-            where: {
-              id: postToUpdateExtraImage.id,
-            },
-          });
-
-        deleteHostedImage(deletedPostToUpdateExtraImage.image);
+      if (image) {
+        saveImage(image, postToUpdateImagesFolderName, "main");
       }
 
-      await prisma.post.update({
-        where: {
-          id,
-        },
-        data: {
-          extraImages: {
-            createMany: {
-              data: extraImages.map((extraImage, index) => ({
-                image: saveImage(
-                  extraImage,
-                  postToUpdateImagesFolderName,
-                  `extra-${index}`
-                ),
-              })),
+      if (extraImages) {
+        const postToUpdateExtraImages = await prisma.postExtraImage.findMany({
+          where: {
+            postId: updatedPost.id,
+          },
+        });
+
+        for (const postToUpdateExtraImage of postToUpdateExtraImages) {
+          const deletedPostToUpdateExtraImage =
+            await prisma.postExtraImage.delete({
+              where: {
+                id: postToUpdateExtraImage.id,
+              },
+            });
+
+          deleteHostedImage(deletedPostToUpdateExtraImage.image);
+        }
+
+        await prisma.post.update({
+          where: {
+            id: updatedPost.id,
+          },
+          data: {
+            extraImages: {
+              createMany: {
+                data: extraImages.map((extraImage, index) => ({
+                  image: saveImage(
+                    extraImage,
+                    postToUpdateImagesFolderName,
+                    `extra-${index}`
+                  ),
+                })),
+              },
             },
           },
-        },
-      });
+        });
+      }
+    }
+
+    onSuccess();
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      console.log(error);
+      switch (error.code) {
+        case "P2025":
+          onFailure(
+            error.meta?.cause === "Record to update not found."
+              ? "postNotFound"
+              : "someTagNotFound"
+          );
+          break;
+        case "P2003":
+          onFailure("categoryNotFound");
+          break;
+        default:
+          onFailure();
+      }
+    } else {
+      onFailure();
     }
   }
-
-  onSuccess();
 }
 
 async function deletePostById(
   id: number,
   onSuccess: () => void,
-  onFailure: () => void
+  onFailure: (reason?: "postNotFound") => void
 ): Promise<void> {
   try {
     const deletedPost = await prisma.post.delete({
@@ -252,8 +274,18 @@ async function deletePostById(
     deleteHostedImageFolder(deletedPost.image);
 
     onSuccess();
-  } catch {
-    onFailure();
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2025":
+          onFailure("postNotFound");
+          break;
+        default:
+          onFailure();
+      }
+    } else {
+      onFailure();
+    }
   }
 }
 

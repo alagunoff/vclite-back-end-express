@@ -841,6 +841,9 @@
           },
           "404": {
             "description": "Post with this id not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
           }
         }
       },
@@ -863,6 +866,9 @@
           },
           "404": {
             "description": "Post with this id not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
           }
         }
       },
@@ -886,6 +892,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFoundOrNotAdmin"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
           }
         }
       }

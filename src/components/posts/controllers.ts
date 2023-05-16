@@ -1,6 +1,5 @@
 import { type Request, type Response } from "express";
 
-import prisma from "src/shared/prisma";
 import { validatePaginationQueryParameters } from "src/shared/pagination/utils";
 
 import * as services from "./services";
@@ -33,8 +32,13 @@ async function createPost(req: Request, res: Response): Promise<void> {
           case "categoryNotFound":
             res.status(422).send("category with this id not found");
             break;
-          case "noTagsFound":
-            res.status(422).send("no tags found in provided array of tags ids");
+          case "someTagNotFound":
+            res
+              .status(422)
+              .send("some tag in provided array of tags ids not found");
+            break;
+          default:
+            res.status(500).end();
         }
       }
     );
@@ -80,28 +84,38 @@ async function getPosts(req: Request, res: Response): Promise<void> {
 }
 
 async function updatePost(req: Request, res: Response): Promise<void> {
-  const postToUpdate = await prisma.post.findUnique({
-    where: {
-      id: Number(req.params.id),
-      isDraft: false,
-    },
-  });
+  const {
+    validatedData: validatedUpdateData,
+    errors: updateDataValidationErrors,
+  } = validateUpdateData(req.body);
 
-  if (postToUpdate) {
-    const {
-      validatedData: validatedUpdateData,
-      errors: updateDataValidationErrors,
-    } = validateUpdateData(req.body);
-
-    if (updateDataValidationErrors) {
-      res.status(400).json(updateDataValidationErrors);
-    } else {
-      void services.updatePostById(postToUpdate.id, validatedUpdateData, () => {
-        res.status(204).end();
-      });
-    }
+  if (updateDataValidationErrors) {
+    res.status(400).json(updateDataValidationErrors);
   } else {
-    res.status(404).end();
+    void services.updatePostById(
+      Number(req.params.id),
+      validatedUpdateData,
+      () => {
+        res.status(204).end();
+      },
+      (failureReason) => {
+        switch (failureReason) {
+          case "postNotFound":
+            res.status(404).end();
+            break;
+          case "categoryNotFound":
+            res.status(422).send("category with this id not found");
+            break;
+          case "someTagNotFound":
+            res
+              .status(422)
+              .send("some tag in provided array of tags ids not found");
+            break;
+          default:
+            res.status(500).end();
+        }
+      }
+    );
   }
 }
 
@@ -111,8 +125,14 @@ async function deletePost(req: Request, res: Response): Promise<void> {
     () => {
       res.status(204).end();
     },
-    () => {
-      res.status(404).end();
+    (failureReason) => {
+      switch (failureReason) {
+        case "postNotFound":
+          res.status(404).end();
+          break;
+        default:
+          res.status(500).end();
+      }
     }
   );
 }
