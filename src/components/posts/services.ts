@@ -33,47 +33,54 @@ async function createPost(
     categoryId,
     tagsIds,
   }: ValidatedCreationData,
-  onSuccess: () => void
+  onSuccess: () => void,
+  onFailure: (reason: "categoryNotFound" | "noTagsFound") => void
 ): Promise<void> {
-  const postImagesFolderName = `posts/${crypto.randomUUID()}`;
-
-  await prisma.post.create({
-    data: {
-      image: saveImage(image, postImagesFolderName, "main"),
-      extraImages: extraImages
-        ? {
-            createMany: {
-              data: extraImages.map((extraImage, index) => ({
-                image: saveImage(
-                  extraImage,
-                  postImagesFolderName,
-                  `extra-${index}`
-                ),
-              })),
-            },
-          }
-        : undefined,
-      title,
-      content,
-      author: {
-        connect: {
-          id: authorId,
-        },
-      },
-      category: {
-        connect: {
-          id: categoryId,
-        },
-      },
-      tags: {
-        connect: tagsIds.map((tagId) => ({
-          id: tagId,
-        })),
-      },
-    },
+  const categoryToCreatePostIn = await prisma.category.findUnique({
+    where: { id: categoryId },
   });
 
-  onSuccess();
+  if (categoryToCreatePostIn) {
+    const tagsToCreatePostWith = await prisma.tag.findMany({
+      where: { id: { in: tagsIds } },
+    });
+
+    if (tagsToCreatePostWith.length) {
+      const postImagesFolderName = `posts/${crypto.randomUUID()}`;
+
+      await prisma.post.create({
+        data: {
+          image: saveImage(image, postImagesFolderName, "main"),
+          extraImages: extraImages
+            ? {
+                createMany: {
+                  data: extraImages.map((extraImage, index) => ({
+                    image: saveImage(
+                      extraImage,
+                      postImagesFolderName,
+                      `extra-${index}`
+                    ),
+                  })),
+                },
+              }
+            : undefined,
+          title,
+          content,
+          authorId,
+          categoryId: categoryToCreatePostIn.id,
+          tags: {
+            connect: tagsToCreatePostWith,
+          },
+        },
+      });
+
+      onSuccess();
+    } else {
+      onFailure("noTagsFound");
+    }
+  } else {
+    onFailure("categoryNotFound");
+  }
 }
 
 async function getPosts(

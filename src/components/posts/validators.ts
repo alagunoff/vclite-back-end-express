@@ -1,6 +1,5 @@
 import { type Request } from "express";
 
-import prisma from "src/shared/prisma";
 import {
   isBase64ImageDataUrl,
   isNotEmptyString,
@@ -23,7 +22,7 @@ import {
 } from "./types";
 import { ORDER_VALID_VALUES } from "./constants";
 
-async function validateCreationData(data: any): Promise<
+function validateCreationData(data: any):
   | {
       validatedData: ValidatedCreationData;
       errors: undefined;
@@ -31,8 +30,7 @@ async function validateCreationData(data: any): Promise<
   | {
       validatedData: undefined;
       errors: ValidationErrors;
-    }
-> {
+    } {
   const errors: ValidationErrors = {};
 
   if ("image" in data) {
@@ -67,13 +65,7 @@ async function validateCreationData(data: any): Promise<
   }
 
   if ("categoryId" in data) {
-    if (isPositiveInteger(data.categoryId)) {
-      if (
-        !(await prisma.category.findUnique({ where: { id: data.categoryId } }))
-      ) {
-        errors.categoryId = "category with this id doesn't exist";
-      }
-    } else {
+    if (!isPositiveInteger(data.categoryId)) {
       errors.categoryId = "must be positive integer";
     }
   } else {
@@ -81,25 +73,7 @@ async function validateCreationData(data: any): Promise<
   }
 
   if ("tagsIds" in data) {
-    if (isPositiveIntegersNotEmptyArray(data.tagsIds)) {
-      for (const tagId of data.tagsIds) {
-        const tag = await prisma.tag.findUnique({
-          where: { id: tagId },
-        });
-
-        if (!tag) {
-          const errorMessage = "tag with this id doesn't exist";
-
-          if ("tagsIds" in errors && typeof errors.tagsIds === "object") {
-            errors.tagsIds[tagId] = errorMessage;
-          } else {
-            errors.tagsIds = {
-              [tagId]: errorMessage,
-            };
-          }
-        }
-      }
-    } else {
+    if (!isPositiveIntegersNotEmptyArray(data.tagsIds)) {
       errors.tagsIds = "must be not empty positive integers array";
     }
   } else {
@@ -259,10 +233,10 @@ function validateOrderQueryParameters(queryParameters: Request["query"]):
       };
 }
 
-async function validateUpdateData(
+function validateUpdateData(
   data: any,
   isPostBeingValidated: boolean = true
-): Promise<
+):
   | {
       validatedData: ValidatedUpdateData;
       errors: undefined;
@@ -270,8 +244,7 @@ async function validateUpdateData(
   | {
       validatedData: undefined;
       errors: ValidationErrors;
-    }
-> {
+    } {
   const errors: ValidationErrors = {};
 
   if ("image" in data) {
@@ -300,47 +273,19 @@ async function validateUpdateData(
   }
 
   if (isPostBeingValidated && "authorId" in data) {
-    if (isPositiveInteger(data.authorId)) {
-      if (!(await prisma.author.findUnique({ where: { id: data.authorId } }))) {
-        errors.authorId = "author with this id doesn't exist";
-      }
-    } else {
+    if (!isPositiveInteger(data.authorId)) {
       errors.authorId = "must be positive integer";
     }
   }
 
   if ("categoryId" in data) {
-    if (isPositiveInteger(data.categoryId)) {
-      if (
-        !(await prisma.category.findUnique({ where: { id: data.categoryId } }))
-      ) {
-        errors.categoryId = "category with this id doesn't exist";
-      }
-    } else {
+    if (!isPositiveInteger(data.categoryId)) {
       errors.categoryId = "must be positive integer";
     }
   }
 
   if ("tagsIds" in data) {
-    if (isPositiveIntegersNotEmptyArray(data.tagsIds)) {
-      for (const tagId of data.tagsIds) {
-        const tag = await prisma.tag.findUnique({
-          where: { id: tagId },
-        });
-
-        if (!tag) {
-          const errorMessage = "tag with this id doesn't exist";
-
-          if ("tagsIds" in errors && typeof errors.tagsIds === "object") {
-            errors.tagsIds[tagId] = errorMessage;
-          } else {
-            errors.tagsIds = {
-              [tagId]: errorMessage,
-            };
-          }
-        }
-      }
-    } else {
+    if (!isPositiveIntegersNotEmptyArray(data.tagsIds)) {
       errors.tagsIds = "must be not empty positive integers array";
     }
   }

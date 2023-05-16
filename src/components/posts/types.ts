@@ -27,7 +27,7 @@ interface ValidationErrors {
   content?: string;
   authorId?: string;
   categoryId?: string;
-  tagsIds?: string | Record<number, string>;
+  tagsIds?: string;
 }
 
 interface ValidatedFilterQueryParameters {

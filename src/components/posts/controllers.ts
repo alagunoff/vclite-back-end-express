@@ -15,7 +15,7 @@ async function createPost(req: Request, res: Response): Promise<void> {
   const {
     validatedData: validatedCreationData,
     errors: creationDataValidationErrors,
-  } = await validateCreationData({
+  } = validateCreationData({
     ...req.body,
     authorId: req.authenticatedAuthor?.id,
   });
@@ -23,9 +23,21 @@ async function createPost(req: Request, res: Response): Promise<void> {
   if (creationDataValidationErrors) {
     res.status(400).json(creationDataValidationErrors);
   } else {
-    void services.createPost(validatedCreationData, () => {
-      res.status(201).end();
-    });
+    void services.createPost(
+      validatedCreationData,
+      () => {
+        res.status(201).end();
+      },
+      (failureReason) => {
+        switch (failureReason) {
+          case "categoryNotFound":
+            res.status(422).send("category with this id not found");
+            break;
+          case "noTagsFound":
+            res.status(422).send("no tags found in provided array of tags ids");
+        }
+      }
+    );
   }
 }
 
@@ -79,7 +91,7 @@ async function updatePost(req: Request, res: Response): Promise<void> {
     const {
       validatedData: validatedUpdateData,
       errors: updateDataValidationErrors,
-    } = await validateUpdateData(req.body);
+    } = validateUpdateData(req.body);
 
     if (updateDataValidationErrors) {
       res.status(400).json(updateDataValidationErrors);
