@@ -26,7 +26,7 @@ async function createAuthor(
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       switch (error.code) {
-        case "P2025":
+        case "P2003":
           onFailure("userNotFound");
           break;
         default:
@@ -48,6 +48,9 @@ async function getAuthors(
 ): Promise<void> {
   const authors = await prisma.author.findMany({
     ...createPaginationParameters(validatedPaginationQueryParameters),
+    orderBy: {
+      id: "asc",
+    },
     select: {
       id: true,
       description: true,

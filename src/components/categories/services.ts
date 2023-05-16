@@ -62,6 +62,9 @@ async function getCategories(
       parentCategoryId: null,
     },
     ...createPaginationParameters(validatedPaginationQueryParameters),
+    orderBy: {
+      id: "asc",
+    },
     select: {
       id: true,
       name: true,

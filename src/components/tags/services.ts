@@ -43,6 +43,9 @@ async function getTags(
 ): Promise<void> {
   const tags = await prisma.tag.findMany({
     ...createPaginationParameters(validatedPaginationQueryParameters),
+    orderBy: {
+      id: "asc",
+    },
   });
   const tagsTotalNumber = await prisma.tag.count();
 

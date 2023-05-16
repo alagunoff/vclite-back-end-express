@@ -38,9 +38,23 @@ async function createPost(
   onFailure: (reason?: "categoryNotFound" | "someTagNotFound") => void
 ): Promise<void> {
   try {
+    const createdPost = await prisma.post.create({
+      data: {
+        image: "",
+        title,
+        content,
+        authorId,
+        categoryId,
+        tags: {
+          connect: tagsIds.map((tagId) => ({ id: tagId })),
+        },
+        isDraft,
+      },
+    });
     const postImagesFolderName = `posts/${crypto.randomUUID()}`;
 
-    await prisma.post.create({
+    await prisma.post.update({
+      where: { id: createdPost.id },
       data: {
         image: saveImage(image, postImagesFolderName, "main"),
         extraImages: extraImages
@@ -56,14 +70,6 @@ async function createPost(
               },
             }
           : undefined,
-        title,
-        content,
-        authorId,
-        categoryId,
-        tags: {
-          connect: tagsIds.map((tagId) => ({ id: tagId })),
-        },
-        isDraft,
       },
     });
 

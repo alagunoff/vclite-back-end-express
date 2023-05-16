@@ -30,6 +30,9 @@ async function getAuthorDrafts(
       isDraft: true,
     },
     ...createPaginationParameters(validatedPaginationQueryParameters),
+    orderBy: {
+      id: "asc",
+    },
     select: {
       id: true,
       image: true,

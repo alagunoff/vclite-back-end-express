@@ -155,7 +155,7 @@ function createOrderParameters({
     };
   }
 
-  return orderParams;
+  return Object.keys(orderParams).length ? orderParams : { id: "asc" };
 }
 
 export { createFilterParameters, createOrderParameters };
