@@ -86,18 +86,56 @@ async function getPosts(req: Request, res: Response): Promise<void> {
   }
 }
 
-async function updatePost(req: Request, res: Response): Promise<void> {
-  const {
-    validatedData: validatedUpdateData,
-    errors: updateDataValidationErrors,
-  } = validateUpdateData(req.body);
+function updatePost(asDraft = false) {
+  return async function (req: Request, res: Response) {
+    const {
+      validatedData: validatedUpdateData,
+      errors: updateDataValidationErrors,
+    } = validateUpdateData(req.body);
 
-  if (updateDataValidationErrors) {
-    res.status(400).json(updateDataValidationErrors);
-  } else {
-    void services.updatePostById(
-      Number(req.params.id),
-      validatedUpdateData,
+    if (updateDataValidationErrors) {
+      res.status(400).json(updateDataValidationErrors);
+    } else {
+      void services.updatePost(
+        {
+          id: Number(req.params.id),
+          authorId: asDraft ? req.authenticatedAuthor?.id : undefined,
+          isDraft: asDraft,
+        },
+        validatedUpdateData,
+        () => {
+          res.status(204).end();
+        },
+        (failureReason) => {
+          switch (failureReason) {
+            case "postNotFound":
+              res.status(404).end();
+              break;
+            case "categoryNotFound":
+              res.status(422).send("category with this id not found");
+              break;
+            case "someTagNotFound":
+              res
+                .status(422)
+                .send("some tag in provided array of tags ids not found");
+              break;
+            default:
+              res.status(500).end();
+          }
+        }
+      );
+    }
+  };
+}
+
+function deletePost(asDraft = false) {
+  return async function (req: Request, res: Response) {
+    void services.deletePost(
+      {
+        id: Number(req.params.id),
+        authorId: asDraft ? req.authenticatedAuthor?.id : undefined,
+        isDraft: asDraft,
+      },
       () => {
         res.status(204).end();
       },
@@ -106,38 +144,12 @@ async function updatePost(req: Request, res: Response): Promise<void> {
           case "postNotFound":
             res.status(404).end();
             break;
-          case "categoryNotFound":
-            res.status(422).send("category with this id not found");
-            break;
-          case "someTagNotFound":
-            res
-              .status(422)
-              .send("some tag in provided array of tags ids not found");
-            break;
           default:
             res.status(500).end();
         }
       }
     );
-  }
-}
-
-async function deletePost(req: Request, res: Response): Promise<void> {
-  void services.deletePostById(
-    Number(req.params.id),
-    () => {
-      res.status(204).end();
-    },
-    (failureReason) => {
-      switch (failureReason) {
-        case "postNotFound":
-          res.status(404).end();
-          break;
-        default:
-          res.status(500).end();
-      }
-    }
-  );
+  };
 }
 
 export { createPost, getPosts, updatePost, deletePost };

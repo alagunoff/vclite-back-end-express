@@ -162,8 +162,8 @@ async function getPosts(
   );
 }
 
-async function updatePostById(
-  id: number,
+async function updatePost(
+  filterParameters: Prisma.PostWhereUniqueInput,
   {
     image,
     extraImages,
@@ -179,10 +179,7 @@ async function updatePostById(
 ): Promise<void> {
   try {
     const updatedPost = await prisma.post.update({
-      where: {
-        id,
-        isDraft: false,
-      },
+      where: filterParameters,
       data: {
         title,
         content,
@@ -265,17 +262,14 @@ async function updatePostById(
   }
 }
 
-async function deletePostById(
-  id: number,
+async function deletePost(
+  filterParameters: Prisma.PostWhereUniqueInput,
   onSuccess: () => void,
   onFailure: (reason?: "postNotFound") => void
 ): Promise<void> {
   try {
     const deletedPost = await prisma.post.delete({
-      where: {
-        id,
-        isDraft: false,
-      },
+      where: filterParameters,
     });
     deleteHostedImageFolder(deletedPost.image);
 
@@ -295,4 +289,4 @@ async function deletePostById(
   }
 }
 
-export { createPost, getPosts, updatePostById, deletePostById };
+export { createPost, getPosts, updatePost, deletePost };
