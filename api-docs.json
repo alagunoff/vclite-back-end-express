@@ -298,7 +298,7 @@
             "$ref": "#/components/responses/NotAdmin"
           },
           "422": {
-            "$ref": "#/components/responses/TagAlreadyExists"
+            "description": "Tag with this name already exists"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
