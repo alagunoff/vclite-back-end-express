@@ -14,9 +14,9 @@ import { projectAbsolutePath } from "./shared/constants";
 const app = express();
 app.listen(3000);
 app.disable("x-powered-by");
-
 app.use(express.json());
 app.use("/api/static", express.static(`${projectAbsolutePath}/static`));
+
 app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/authors", authorsRouter);

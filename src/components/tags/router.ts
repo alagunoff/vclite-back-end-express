@@ -6,9 +6,10 @@ import { createTag, getTags, updateTag, deleteTag } from "./controllers";
 
 const router = Router();
 
-router.post("", authenticateUser(true), createTag);
-router.get("", getTags);
-router.patch("/:id(\\d+)", authenticateUser(true), updateTag);
-router.delete("/:id(\\d+)", authenticateUser(true), deleteTag);
+router.route("").post(authenticateUser(true), createTag).get(getTags);
+router
+  .route("/:id(\\d+)")
+  .patch(authenticateUser(true), updateTag)
+  .delete(authenticateUser(true), deleteTag);
 
 export default router;

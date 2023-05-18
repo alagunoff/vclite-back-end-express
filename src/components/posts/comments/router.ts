@@ -6,8 +6,10 @@ import { createComment, getComments, deleteComments } from "./controllers";
 
 const router = Router({ mergeParams: true });
 
-router.post("", authenticateUser(), createComment);
-router.get("", getComments);
-router.delete("", authenticateUser(true), deleteComments);
+router
+  .route("")
+  .post(authenticateUser(), createComment)
+  .get(getComments)
+  .delete(authenticateUser(true), deleteComments);
 
 export default router;

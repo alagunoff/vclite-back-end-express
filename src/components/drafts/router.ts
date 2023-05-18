@@ -11,20 +11,14 @@ import { getDrafts, publishDraft } from "./controllers";
 
 const router = Router();
 
-router.post("", authenticateUser(), authenticateAuthor, createPost(true));
-router.get("", authenticateUser(), authenticateAuthor, getDrafts);
-router.patch(
-  "/:id(\\d+)",
-  authenticateUser(),
-  authenticateAuthor,
-  updatePost(true)
-);
-router.delete(
-  "/:id(\\d+)",
-  authenticateUser(),
-  authenticateAuthor,
-  deletePost(true)
-);
+router
+  .route("")
+  .post(authenticateUser(), authenticateAuthor, createPost(true))
+  .get(authenticateUser(), authenticateAuthor, getDrafts);
+router
+  .route("/:id(\\d+)")
+  .patch(authenticateUser(), authenticateAuthor, updatePost(true))
+  .delete(authenticateUser(), authenticateAuthor, deletePost(true));
 
 router.post(
   "/:id(\\d+)/publish",

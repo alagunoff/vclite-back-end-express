@@ -11,9 +11,13 @@ import {
 
 const router = Router();
 
-router.post("", authenticateUser(true), createCategory);
-router.get("", getCategories);
-router.patch("/:id(\\d+)", authenticateUser(true), updateCategory);
-router.delete("/:id(\\d+)", authenticateUser(true), deleteCategory);
+router
+  .route("")
+  .post(authenticateUser(true), createCategory)
+  .get(getCategories);
+router
+  .route("/:id(\\d+)")
+  .patch(authenticateUser(true), updateCategory)
+  .delete(authenticateUser(true), deleteCategory);
 
 export default router;

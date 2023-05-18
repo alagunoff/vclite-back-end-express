@@ -7,10 +7,14 @@ import { createPost, getPosts, updatePost, deletePost } from "./controllers";
 
 const router = Router();
 
-router.post("", authenticateUser(), authenticateAuthor, createPost());
-router.get("", getPosts);
-router.patch("/:id(\\d+)", authenticateUser(true), updatePost());
-router.delete("/:id(\\d+)", authenticateUser(true), deletePost());
+router
+  .route("")
+  .post(authenticateUser(), authenticateAuthor, createPost())
+  .get(getPosts);
+router
+  .route("/:id(\\d+)")
+  .patch(authenticateUser(true), updatePost())
+  .delete(authenticateUser(true), deletePost());
 
 router.use("/:postId(\\d+)/comments", commentsRouter);
 

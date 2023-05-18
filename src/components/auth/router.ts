@@ -4,6 +4,6 @@ import { logIn } from "./controllers";
 
 const router = Router();
 
-router.post("/login", logIn);
+router.route("/login").post(logIn);
 
 export default router;

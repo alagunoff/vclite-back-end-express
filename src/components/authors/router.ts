@@ -11,9 +11,13 @@ import {
 
 const router = Router();
 
-router.post("", authenticateUser(true), createAuthor);
-router.get("", authenticateUser(true), getAuthors);
-router.patch("/:id(\\d+)", authenticateUser(true), updateAuthor);
-router.delete("/:id(\\d+)", authenticateUser(true), deleteAuthor);
+router
+  .route("")
+  .post(authenticateUser(true), createAuthor)
+  .get(authenticateUser(true), getAuthors);
+router
+  .route("/:id(\\d+)")
+  .patch(authenticateUser(true), updateAuthor)
+  .delete(authenticateUser(true), deleteAuthor);
 
 export default router;
