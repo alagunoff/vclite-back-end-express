@@ -1,4 +1,5 @@
 import express from "express";
+import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
 
 import apiDocs from "../api-docs.json";
@@ -13,8 +14,8 @@ import { projectAbsolutePath } from "./shared/constants";
 
 const app = express();
 app.listen(3000);
-app.disable("x-powered-by");
 app.use(express.json());
+app.use(helmet());
 app.use("/api/static", express.static(`${projectAbsolutePath}/static`));
 
 app.use("/api/auth", authRouter);
