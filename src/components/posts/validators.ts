@@ -9,7 +9,7 @@ import {
   isPositiveIntegersNotEmptyArray,
   isStringPositiveIntegersNotEmptyArray,
   isBase64ImageDataUrlsNotEmptyArray,
-} from "src/shared/validation/utils";
+} from "src/shared/validation/validators";
 
 import {
   type ValidatedCreationData,

@@ -1,46 +1,30 @@
-import { isNotEmptyString } from "src/shared/validation/utils";
+import { ERROR_MESSAGES } from "src/shared/validation/constants";
+import { isNotEmptyString } from "src/shared/validation/validators";
 
-import { type ValidatedLoginData, type ValidationErrors } from "./types";
+import { type ValidationErrors } from "./types";
 
-function validateLoginData(data: any):
-  | {
-      validatedData: ValidatedLoginData;
-      errors: undefined;
-    }
-  | {
-      validatedData: undefined;
-      errors: ValidationErrors;
-    } {
+function validateLoginData(data: any): ValidationErrors | undefined {
   const errors: ValidationErrors = {};
 
   if ("username" in data) {
     if (!isNotEmptyString(data.username)) {
-      errors.username = "must be not empty string";
+      errors.username = ERROR_MESSAGES.notEmptyString;
     }
   } else {
-    errors.username = "required";
+    errors.username = ERROR_MESSAGES.required;
   }
 
   if ("password" in data) {
     if (!isNotEmptyString(data.password)) {
-      errors.password = "must be not empty string";
+      errors.password = ERROR_MESSAGES.notEmptyString;
     }
   } else {
-    errors.password = "required";
+    errors.password = ERROR_MESSAGES.required;
   }
 
-  return Object.keys(errors).length
-    ? {
-        validatedData: undefined,
-        errors,
-      }
-    : {
-        validatedData: {
-          username: data.username,
-          password: data.password,
-        },
-        errors: undefined,
-      };
+  if (Object.keys(errors).length) {
+    return errors;
+  }
 }
 
 export { validateLoginData };

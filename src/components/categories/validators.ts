@@ -1,7 +1,7 @@
 import {
   isNotEmptyString,
   isPositiveInteger,
-} from "src/shared/validation/utils";
+} from "src/shared/validation/validators";
 
 import {
   type ValidatedCreationData,

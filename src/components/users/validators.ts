@@ -1,7 +1,7 @@
 import {
   isNotEmptyString,
   isBase64ImageDataUrl,
-} from "src/shared/validation/utils";
+} from "src/shared/validation/validators";
 
 import { type ValidatedCreationData, type ValidationErrors } from "./types";
 
