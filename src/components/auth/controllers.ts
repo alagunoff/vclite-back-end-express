@@ -11,9 +11,9 @@ async function logIn(req: Request, res: Response): Promise<void> {
   }
 
   const loginResult = await services.logIn(req.body);
-  res.status(loginResult.statusCode);
-
-  loginResult.jwt ? res.send(loginResult.jwt) : res.end();
+  "jwt" in loginResult
+    ? res.send(loginResult.jwt)
+    : res.status(loginResult.statusCode).end();
 }
 
 export { logIn };

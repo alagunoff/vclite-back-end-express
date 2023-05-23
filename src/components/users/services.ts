@@ -6,13 +6,26 @@ import prisma from "src/shared/prisma";
 import env from "src/shared/env";
 import { saveImage, deleteHostedImage } from "src/shared/images/utils";
 
-import { type ValidatedCreationData } from "./types";
-
-async function createUser(
-  { image, username, password, firstName, lastName }: ValidatedCreationData,
-  onSuccess: (userJwtToken: string) => void,
-  onFailure: (reason?: "userAlreadyExists") => void
-): Promise<void> {
+async function createUser({
+  image,
+  username,
+  password,
+  firstName,
+  lastName,
+}: {
+  image: string;
+  username: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+}): Promise<
+  | {
+      jwt: string;
+    }
+  | {
+      statusCode: 422 | 500;
+    }
+> {
   try {
     const createdUser = await prisma.user.create({
       data: {
@@ -24,44 +37,34 @@ async function createUser(
       },
     });
 
-    onSuccess(jwt.sign(String(createdUser.id), env.JWT_SECRET_KEY));
+    return { jwt: jwt.sign(String(createdUser.id), env.JWT_SECRET_KEY) };
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      switch (error.code) {
-        case "P2002":
-          onFailure("userAlreadyExists");
-          break;
-        default:
-          onFailure();
-      }
-    } else {
-      onFailure();
-    }
+    return {
+      statusCode:
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+          ? 422
+          : 500,
+    };
   }
 }
 
-async function deleteUserById(
-  id: number,
-  onSuccess: () => void,
-  onFailure: (reason?: "userNotFound") => void
-): Promise<void> {
+async function deleteUserById(id: number): Promise<{
+  statusCode: 204 | 404 | 500;
+}> {
   try {
     const deletedUser = await prisma.user.delete({ where: { id } });
     deleteHostedImage(deletedUser.image);
 
-    onSuccess();
+    return { statusCode: 204 };
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      switch (error.code) {
-        case "P2025":
-          onFailure("userNotFound");
-          break;
-        default:
-          onFailure();
-      }
-    } else {
-      onFailure();
-    }
+    return {
+      statusCode:
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2025"
+          ? 404
+          : 500,
+    };
   }
 }
 

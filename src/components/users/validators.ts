@@ -3,17 +3,9 @@ import {
   isBase64ImageDataUrl,
 } from "src/shared/validation/validators";
 
-import { type ValidatedCreationData, type ValidationErrors } from "./types";
+import { type ValidationErrors } from "./types";
 
-function validateCreationData(data: any):
-  | {
-      validatedData: ValidatedCreationData;
-      errors: undefined;
-    }
-  | {
-      validatedData: undefined;
-      errors: ValidationErrors;
-    } {
+function validateCreationData(data: any): ValidationErrors | undefined {
   const errors: ValidationErrors = {};
 
   if ("image" in data) {
@@ -52,21 +44,9 @@ function validateCreationData(data: any):
     }
   }
 
-  return Object.keys(errors).length
-    ? {
-        validatedData: undefined,
-        errors,
-      }
-    : {
-        validatedData: {
-          image: data.image,
-          username: data.username,
-          password: data.password,
-          firstName: data.firstName,
-          lastName: data.lastName,
-        },
-        errors: undefined,
-      };
+  if (Object.keys(errors).length) {
+    return errors;
+  }
 }
 
 export { validateCreationData };

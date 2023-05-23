@@ -1,11 +1,3 @@
-interface ValidatedCreationData {
-  image: string;
-  username: string;
-  password: string;
-  firstName?: string;
-  lastName?: string;
-}
-
 interface ValidationErrors {
   image?: string;
   username?: string;
@@ -14,4 +6,4 @@ interface ValidationErrors {
   lastName?: string;
 }
 
-export type { ValidatedCreationData, ValidationErrors };
+export type { ValidationErrors };

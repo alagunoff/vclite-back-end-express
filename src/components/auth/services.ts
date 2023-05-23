@@ -10,15 +10,17 @@ async function logIn({
 }: {
   username: string;
   password: string;
-}): Promise<{
-  statusCode: 404 | 403 | 200;
-  jwt?: string;
-}> {
+}): Promise<
+  | {
+      jwt: string;
+    }
+  | {
+      statusCode: 403 | 404;
+    }
+> {
   const userToLogIn = await prisma.user.findUnique({ where: { username } });
   if (!userToLogIn) {
-    return {
-      statusCode: 404,
-    };
+    return { statusCode: 404 };
   }
 
   const isProvidedPasswordCorrect = bcrypt.compareSync(
@@ -26,15 +28,10 @@ async function logIn({
     userToLogIn.password
   );
   if (!isProvidedPasswordCorrect) {
-    return {
-      statusCode: 403,
-    };
+    return { statusCode: 403 };
   }
 
-  return {
-    statusCode: 200,
-    jwt: jwt.sign(String(userToLogIn.id), env.JWT_SECRET_KEY),
-  };
+  return { jwt: jwt.sign(String(userToLogIn.id), env.JWT_SECRET_KEY) };
 }
 
 export { logIn };
