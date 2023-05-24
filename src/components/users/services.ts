@@ -20,10 +20,12 @@ async function createUser({
   lastName?: string;
 }): Promise<
   | {
+      status: "success";
       jwt: string;
     }
   | {
-      statusCode: 422 | 500;
+      status: "failure";
+      errorCode: 422 | 500;
     }
 > {
   try {
@@ -37,10 +39,14 @@ async function createUser({
       },
     });
 
-    return { jwt: jwt.sign(String(createdUser.id), env.JWT_SECRET_KEY) };
+    return {
+      status: "success",
+      jwt: jwt.sign(String(createdUser.id), env.JWT_SECRET_KEY),
+    };
   } catch (error) {
     return {
-      statusCode:
+      status: "failure",
+      errorCode:
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === "P2002"
           ? 422

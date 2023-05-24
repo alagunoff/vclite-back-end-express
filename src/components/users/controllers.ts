@@ -11,9 +11,12 @@ async function createUser(req: Request, res: Response): Promise<void> {
   }
 
   const userCreationResult = await services.createUser(req.body);
-  "jwt" in userCreationResult
-    ? res.status(201).send(userCreationResult.jwt)
-    : res.status(userCreationResult.statusCode).end();
+  if (userCreationResult.status === "failure") {
+    res.status(userCreationResult.errorCode).end();
+    return;
+  }
+
+  res.status(201).send(userCreationResult.jwt);
 }
 
 function getUser(req: Request, res: Response): void {
