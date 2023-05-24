@@ -10,6 +10,6 @@ router
   .route("")
   .post(authenticateUser(), createComment)
   .get(getComments)
-  .delete(authenticateUser(true), deleteComments);
+  .delete(authenticateUser("admin"), deleteComments);
 
 export default router;

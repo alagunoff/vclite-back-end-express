@@ -13,11 +13,11 @@ const router = Router();
 
 router
   .route("")
-  .post(authenticateUser(true), createAuthor)
-  .get(authenticateUser(true), getAuthors);
+  .post(authenticateUser("admin"), createAuthor)
+  .get(authenticateUser("admin"), getAuthors);
 router
   .route("/:id(\\d+)")
-  .patch(authenticateUser(true), updateAuthor)
-  .delete(authenticateUser(true), deleteAuthor);
+  .patch(authenticateUser("admin"), updateAuthor)
+  .delete(authenticateUser("admin"), deleteAuthor);
 
 export default router;

@@ -13,11 +13,11 @@ const router = Router();
 
 router
   .route("")
-  .post(authenticateUser(true), createCategory)
+  .post(authenticateUser("admin"), createCategory)
   .get(getCategories);
 router
   .route("/:id(\\d+)")
-  .patch(authenticateUser(true), updateCategory)
-  .delete(authenticateUser(true), deleteCategory);
+  .patch(authenticateUser("admin"), updateCategory)
+  .delete(authenticateUser("admin"), deleteCategory);
 
 export default router;

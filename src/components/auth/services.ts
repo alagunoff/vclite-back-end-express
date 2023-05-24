@@ -21,6 +21,7 @@ async function logIn({
     }
 > {
   const userToLogIn = await prisma.user.findUnique({ where: { username } });
+
   if (!userToLogIn) {
     return { status: "failure", errorCode: 404 };
   }
@@ -29,6 +30,7 @@ async function logIn({
     password,
     userToLogIn.password
   );
+
   if (!isProvidedPasswordCorrect) {
     return { status: "failure", errorCode: 403 };
   }

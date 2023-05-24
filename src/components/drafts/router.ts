@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { authenticateUser, authenticateAuthor } from "src/middlewares/auth";
+import { authenticateUser } from "src/middlewares/auth";
 import {
   createPost,
   updatePost,
@@ -13,18 +13,13 @@ const router = Router();
 
 router
   .route("")
-  .post(authenticateUser(), authenticateAuthor, createPost(true))
-  .get(authenticateUser(), authenticateAuthor, getDrafts);
+  .post(authenticateUser("author"), createPost(true))
+  .get(authenticateUser("author"), getDrafts);
 router
   .route("/:id(\\d+)")
-  .patch(authenticateUser(), authenticateAuthor, updatePost(true))
-  .delete(authenticateUser(), authenticateAuthor, deletePost(true));
+  .patch(authenticateUser("author"), updatePost(true))
+  .delete(authenticateUser("author"), deletePost(true));
 
-router.post(
-  "/:id(\\d+)/publish",
-  authenticateUser(),
-  authenticateAuthor,
-  publishDraft
-);
+router.post("/:id(\\d+)/publish", authenticateUser("author"), publishDraft);
 
 export default router;

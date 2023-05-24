@@ -1,20 +1,17 @@
 import { Router } from "express";
 
-import { authenticateUser, authenticateAuthor } from "src/middlewares/auth";
+import { authenticateUser } from "src/middlewares/auth";
 
 import commentsRouter from "./comments/router";
 import { createPost, getPosts, updatePost, deletePost } from "./controllers";
 
 const router = Router();
 
-router
-  .route("")
-  .post(authenticateUser(), authenticateAuthor, createPost())
-  .get(getPosts);
+router.route("").post(authenticateUser("author"), createPost()).get(getPosts);
 router
   .route("/:id(\\d+)")
-  .patch(authenticateUser(true), updatePost())
-  .delete(authenticateUser(true), deletePost());
+  .patch(authenticateUser("admin"), updatePost())
+  .delete(authenticateUser("admin"), deletePost());
 
 router.use("/:postId(\\d+)/comments", commentsRouter);
 
