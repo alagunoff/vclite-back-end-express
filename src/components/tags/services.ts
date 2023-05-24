@@ -1,114 +1,91 @@
-import { Prisma, type Tag } from "@prisma/client";
+import { type Tag } from "@prisma/client";
 
 import prisma from "src/shared/prisma";
-import { type ValidatedPaginationQueryParameters } from "src/shared/pagination/types";
-import {
-  createPaginationParameters,
-  calculatePagesTotalNumber,
-} from "src/shared/pagination/utils";
+import { type PaginationParameters } from "src/shared/pagination/types";
+import { calculatePagesTotalNumber } from "src/shared/pagination/utils";
 
-import { type ValidatedCreationData, type ValidatedUpdateData } from "./types";
-
-async function createTag(
-  { name }: ValidatedCreationData,
-  onSuccess: () => void,
-  onFailure: (reason?: "tagAlreadyExists") => void
-): Promise<void> {
-  try {
-    await prisma.tag.create({ data: { name } });
-
-    onSuccess();
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      switch (error.code) {
-        case "P2002":
-          onFailure("tagAlreadyExists");
-          break;
-        default:
-          onFailure();
-      }
-    } else {
-      onFailure();
-    }
+async function createTag({
+  name,
+}: {
+  name: string;
+}): Promise<{ status: "success" } | { status: "failure"; errorCode: 422 }> {
+  if (await prisma.tag.findUnique({ where: { name } })) {
+    return {
+      status: "failure",
+      errorCode: 422,
+    };
   }
+
+  await prisma.tag.create({ data: { name } });
+
+  return {
+    status: "success",
+  };
 }
 
 async function getTags(
-  validatedPaginationQueryParameters: ValidatedPaginationQueryParameters,
-  onSuccess: (
-    tags: Tag[],
-    tagsTotalNumber: number,
-    pagesTotalNumber: number
-  ) => void
-): Promise<void> {
+  paginationParameters: PaginationParameters | undefined
+): Promise<{ tags: Tag[]; tagsTotalNumber: number; pagesTotalNumber: number }> {
   const tags = await prisma.tag.findMany({
-    ...createPaginationParameters(validatedPaginationQueryParameters),
+    ...paginationParameters,
     orderBy: {
       id: "asc",
     },
   });
   const tagsTotalNumber = await prisma.tag.count();
 
-  onSuccess(
+  return {
     tags,
     tagsTotalNumber,
-    calculatePagesTotalNumber(tagsTotalNumber, tags.length)
-  );
+    pagesTotalNumber: calculatePagesTotalNumber(
+      tagsTotalNumber,
+      paginationParameters?.take
+    ),
+  };
 }
 
 async function updateTagById(
   id: number,
-  { name }: ValidatedUpdateData,
-  onSuccess: () => void,
-  onFailure: (reason?: "tagNotFound" | "tagAlreadyExists") => void
-): Promise<void> {
-  try {
-    await prisma.tag.update({
-      where: { id },
-      data: { name },
-    });
-
-    onSuccess();
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      switch (error.code) {
-        case "P2025":
-          onFailure("tagNotFound");
-          break;
-        case "P2002":
-          onFailure("tagAlreadyExists");
-          break;
-        default:
-          onFailure();
-      }
-    } else {
-      onFailure();
-    }
+  { name }: { name?: string }
+): Promise<
+  { status: "success" } | { status: "failure"; errorCode: 404 | 422 }
+> {
+  if (!(await prisma.tag.findUnique({ where: { id } }))) {
+    return {
+      status: "failure",
+      errorCode: 404,
+    };
   }
+
+  if (await prisma.tag.findUnique({ where: { name } })) {
+    return {
+      status: "failure",
+      errorCode: 422,
+    };
+  }
+
+  await prisma.tag.update({ where: { id }, data: { name } });
+
+  return {
+    status: "success",
+  };
 }
 
 async function deleteTagById(
-  id: number,
-  onSuccess: () => void,
-  onFailure: (reason?: "tagNotFound") => void
-): Promise<void> {
-  try {
-    await prisma.tag.delete({ where: { id } });
-
-    onSuccess();
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      switch (error.code) {
-        case "P2025":
-          onFailure("tagNotFound");
-          break;
-        default:
-          onFailure();
-      }
-    } else {
-      onFailure();
-    }
+  id: number
+): Promise<{ status: "success" } | { status: "failure"; errorCode: 404 }> {
+  if (!(await prisma.tag.findUnique({ where: { id } }))) {
+    return {
+      status: "failure",
+      errorCode: 404,
+    };
   }
+
+  await prisma.tag.delete({ where: { id } });
+
+  return {
+    status: "success",
+  };
 }
 
 export { createTag, getTags, updateTagById, deleteTagById };

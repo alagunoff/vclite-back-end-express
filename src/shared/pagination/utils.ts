@@ -3,7 +3,7 @@ import { type Request } from "express";
 import { ERROR_MESSAGES } from "src/shared/validation/constants";
 import { isStringPositiveInteger } from "src/shared/validation/validators";
 
-import { type ValidationErrors } from "./types";
+import { type ValidationErrors, type PaginationParameters } from "./types";
 
 function validatePaginationQueryParameters(
   queryParameters: Request["query"]
@@ -41,12 +41,7 @@ function createPaginationParameters({
 }: {
   pageNumber?: string;
   itemsNumber?: string;
-}):
-  | {
-      skip: number;
-      take: number;
-    }
-  | undefined {
+}): PaginationParameters | undefined {
   if (pageNumber && itemsNumber) {
     const itemsNumberAsNumber = Number(itemsNumber);
 
@@ -59,10 +54,10 @@ function createPaginationParameters({
 
 function calculatePagesTotalNumber(
   itemsTotalNumber: number,
-  filteredItemsTotalNumber: number
+  itemsDesiredNumber?: number
 ): number {
-  return itemsTotalNumber && filteredItemsTotalNumber
-    ? Math.ceil(itemsTotalNumber / filteredItemsTotalNumber)
+  return itemsTotalNumber && itemsDesiredNumber
+    ? Math.ceil(itemsTotalNumber / itemsDesiredNumber)
     : 1;
 }
 

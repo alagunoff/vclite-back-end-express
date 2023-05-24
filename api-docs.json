@@ -47,6 +47,9 @@
           },
           "404": {
             "description": "User with this username not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
           }
         }
       }
@@ -106,13 +109,15 @@
       "get": {
         "tags": ["users"],
         "description": "Get info about the user assosiated with provided JWT",
-        "security": [{ "JWT": [] }],
         "responses": {
           "200": {
             "description": "OK"
           },
           "401": {
             "$ref": "#/components/responses/Unauthenticated"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
           }
         }
       }
@@ -120,7 +125,6 @@
     "/users/{id}": {
       "delete": {
         "tags": ["users"],
-        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -131,7 +135,7 @@
             "description": "User has been deleted"
           },
           "404": {
-            "description": "User not found or user assosiated with provided JWT isn't an admin"
+            "description": "Either JWT isn't provided or invalid or authenticated user isn't an admin or user to delete not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -142,7 +146,6 @@
     "/authors": {
       "post": {
         "tags": ["authors"],
-        "security": [{ "JWT": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -184,7 +187,6 @@
       },
       "get": {
         "tags": ["authors"],
-        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/pageNumber"
@@ -202,6 +204,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotAdmin"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
           }
         }
       }
@@ -209,7 +214,6 @@
     "/authors/{id}": {
       "patch": {
         "tags": ["authors"],
-        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -238,7 +242,7 @@
             "$ref": "#/components/responses/InvalidUpdateData"
           },
           "404": {
-            "description": "Author not found or user assosiated with provided JWT isn't an admin"
+            "description": "Either JWT isn't provided or invalid or authenticated user isn't an admin or authore to update not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -247,7 +251,6 @@
       },
       "delete": {
         "tags": ["authors"],
-        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -258,7 +261,7 @@
             "description": "Author has been deleted"
           },
           "404": {
-            "description": "Author not found or user assosiated with provided JWT isn't an admin"
+            "description": "Either JWT isn't provided or invalid or authenticated user isn't an admin or authore to delete not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -269,7 +272,6 @@
     "/tags": {
       "post": {
         "tags": ["tags"],
-        "security": [{ "JWT": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -321,6 +323,9 @@
           },
           "400": {
             "$ref": "#/components/responses/InvalidPaginationQueryParameters"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
           }
         }
       }
@@ -328,7 +333,6 @@
     "/tags/{id}": {
       "patch": {
         "tags": ["tags"],
-        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -369,7 +373,6 @@
       },
       "delete": {
         "tags": ["tags"],
-        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -391,7 +394,7 @@
     "/categories": {
       "post": {
         "tags": ["categories"],
-        "security": [{ "JWT": [] }],
+
         "requestBody": {
           "required": true,
           "content": {
@@ -454,7 +457,7 @@
     "/categories/{id}": {
       "patch": {
         "tags": ["categories"],
-        "security": [{ "JWT": [] }],
+
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -500,7 +503,7 @@
       },
       "delete": {
         "tags": ["categories"],
-        "security": [{ "JWT": [] }],
+
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -522,7 +525,7 @@
     "/posts": {
       "post": {
         "tags": ["posts"],
-        "security": [{ "JWT": [] }],
+
         "requestBody": {
           "required": true,
           "content": {
@@ -726,7 +729,7 @@
     "/posts/{id}": {
       "patch": {
         "tags": ["posts"],
-        "security": [{ "JWT": [] }],
+
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -795,7 +798,7 @@
       },
       "delete": {
         "tags": ["posts"],
-        "security": [{ "JWT": [] }],
+
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -817,7 +820,7 @@
     "/posts/{id}/comments": {
       "post": {
         "tags": ["post's comments"],
-        "security": [{ "JWT": [] }],
+
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -888,7 +891,7 @@
       },
       "delete": {
         "tags": ["post's comments"],
-        "security": [{ "JWT": [] }],
+
         "parameters": [
           {
             "in": "path",
@@ -916,7 +919,7 @@
     "/drafts": {
       "post": {
         "tags": ["drafts"],
-        "security": [{ "JWT": [] }],
+
         "requestBody": {
           "required": true,
           "content": {
@@ -992,7 +995,7 @@
       "get": {
         "tags": ["drafts"],
         "description": "Get author's drafts",
-        "security": [{ "JWT": [] }],
+
         "parameters": [
           {
             "$ref": "#/components/parameters/pageNumber"
@@ -1020,7 +1023,7 @@
     "/drafts/{id}": {
       "patch": {
         "tags": ["drafts"],
-        "security": [{ "JWT": [] }],
+
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -1095,7 +1098,7 @@
       },
       "delete": {
         "tags": ["drafts"],
-        "security": [{ "JWT": [] }],
+
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -1123,7 +1126,7 @@
     "/drafts/{id}/publish": {
       "post": {
         "tags": ["drafts"],
-        "security": [{ "JWT": [] }],
+
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -1186,7 +1189,7 @@
     },
     "responses": {
       "NotAdmin": {
-        "description": "User assosiated with provided JWT isn't an admin"
+        "description": "Either JWT isn't provided or invalid or authenticated user isn't an admin"
       },
       "NotAuthor": {
         "description": "User assosiated with provided JWT isn't an author"
@@ -1198,7 +1201,7 @@
         "description": "Update data is invalid"
       },
       "InvalidPaginationQueryParameters": {
-        "description": "Invalid pagination query parameters"
+        "description": "Pagination query parameters are invalid"
       },
       "Unauthenticated": {
         "description": "JWT isn't provided or invalid"

@@ -10,11 +10,11 @@ async function createAuthor({
   description?: string;
   userId: number;
 }): Promise<{ status: "success" } | { status: "failure"; errorCode: 422 }> {
-  const userToCreateAuthorFor = await prisma.user.findUnique({
-    where: { id: userId },
-  });
-
-  if (!userToCreateAuthorFor) {
+  if (
+    !(await prisma.user.findUnique({
+      where: { id: userId },
+    }))
+  ) {
     return {
       status: "failure",
       errorCode: 422,
@@ -57,7 +57,7 @@ async function getAuthors(
     authorsTotalNumber,
     pagesTotalNumber: calculatePagesTotalNumber(
       authorsTotalNumber,
-      authors.length
+      paginationParameters?.take
     ),
   };
 }
@@ -66,19 +66,14 @@ async function updateAuthorById(
   id: number,
   { description }: { description?: string }
 ): Promise<{ status: "success" } | { status: "failure"; errorCode: 404 }> {
-  const authorToUpdate = await prisma.author.findUnique({ where: { id } });
-
-  if (!authorToUpdate) {
+  if (!(await prisma.author.findUnique({ where: { id } }))) {
     return {
       status: "failure",
       errorCode: 404,
     };
   }
 
-  await prisma.author.update({
-    where: { id: authorToUpdate.id },
-    data: { description },
-  });
+  await prisma.author.update({ where: { id }, data: { description } });
 
   return {
     status: "success",
@@ -88,9 +83,7 @@ async function updateAuthorById(
 async function deleteAuthorById(
   id: number
 ): Promise<{ status: "success" } | { status: "failure"; errorCode: 404 }> {
-  const authorToDelete = prisma.author.findUnique({ where: { id } });
-
-  if (!authorToDelete) {
+  if (!(await prisma.author.findUnique({ where: { id } }))) {
     return {
       status: "failure",
       errorCode: 404,

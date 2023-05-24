@@ -3,4 +3,9 @@ interface ValidationErrors {
   itemsNumber?: string;
 }
 
-export type { ValidationErrors };
+interface PaginationParameters {
+  skip: number;
+  take: number;
+}
+
+export type { ValidationErrors, PaginationParameters };

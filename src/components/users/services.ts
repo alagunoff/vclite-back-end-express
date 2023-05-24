@@ -46,18 +46,14 @@ async function createUser({
 async function deleteUserById(
   id: number
 ): Promise<{ status: "success" } | { status: "failure"; errorCode: 404 }> {
-  const userToDelete = await prisma.user.findUnique({ where: { id } });
-
-  if (!userToDelete) {
+  if (!(await prisma.user.findUnique({ where: { id } }))) {
     return {
       status: "failure",
       errorCode: 404,
     };
   }
 
-  const deletedUser = await prisma.user.delete({
-    where: { id: userToDelete.id },
-  });
+  const deletedUser = await prisma.user.delete({ where: { id } });
   deleteHostedImage(deletedUser.image);
 
   return { status: "success" };
