@@ -8,18 +8,19 @@ function saveImage(
   folderName: string,
   imageFileName: string
 ): string {
+  const folderToSaveAbsolutePath = `${projectAbsolutePath}/static/images/${folderName}`;
+
+  fs.mkdirSync(folderToSaveAbsolutePath, { recursive: true });
+
   const [imageMediatype, base64Image] = base64ImageDataUrl
     .slice(5)
     .split(";base64,");
-  const imageFileNameWithExtension = `${imageFileName}.${
-    imageMediatype.split("/")[1]
-  }`;
-  const folderAbsolutePath = `${projectAbsolutePath}/static/images/${folderName}`;
+  const imageExtension = imageMediatype.split("/")[1];
+  const imageFileNameWithExtension = `${imageFileName}.${imageExtension}`;
 
-  fs.mkdirSync(folderAbsolutePath, { recursive: true });
   fs.writeFileSync(
-    `${folderAbsolutePath}/${imageFileNameWithExtension}`,
-    Buffer.from(base64Image, "base64")
+    `${folderToSaveAbsolutePath}/${imageFileNameWithExtension}`,
+    Buffer.from(base64Image, "base64url")
   );
 
   return `${APP_HOST_NAME}/api/static/images/${folderName}/${imageFileNameWithExtension}`;

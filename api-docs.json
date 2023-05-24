@@ -125,6 +125,7 @@
     "/users/{id}": {
       "delete": {
         "tags": ["users"],
+        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -146,6 +147,7 @@
     "/authors": {
       "post": {
         "tags": ["authors"],
+        "security": [{ "JWT": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -187,6 +189,7 @@
       },
       "get": {
         "tags": ["authors"],
+        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/pageNumber"
@@ -214,6 +217,7 @@
     "/authors/{id}": {
       "patch": {
         "tags": ["authors"],
+        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -251,6 +255,7 @@
       },
       "delete": {
         "tags": ["authors"],
+        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -272,6 +277,7 @@
     "/tags": {
       "post": {
         "tags": ["tags"],
+        "security": [{ "JWT": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -333,6 +339,7 @@
     "/tags/{id}": {
       "patch": {
         "tags": ["tags"],
+        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -373,6 +380,7 @@
       },
       "delete": {
         "tags": ["tags"],
+        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
