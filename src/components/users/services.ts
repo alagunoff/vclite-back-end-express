@@ -47,6 +47,7 @@ async function deleteUserById(
   id: number
 ): Promise<{ status: "success" } | { status: "failure"; errorCode: 404 }> {
   const userToDelete = await prisma.user.findUnique({ where: { id } });
+
   if (!userToDelete) {
     return {
       status: "failure",

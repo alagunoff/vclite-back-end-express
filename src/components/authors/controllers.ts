@@ -1,99 +1,75 @@
 import { type Request, type Response } from "express";
 
-import { validatePaginationQueryParameters } from "src/shared/pagination/utils";
+import {
+  validatePaginationQueryParameters,
+  createPaginationParameters,
+} from "src/shared/pagination/utils";
 
 import { validateCreationData, validateUpdateData } from "./validators";
 import * as services from "./services";
 
-function createAuthor(req: Request, res: Response): void {
-  const {
-    validatedData: validatedCreationData,
-    errors: creationDataValidationErrors,
-  } = validateCreationData(req.body);
+async function createAuthor(req: Request, res: Response): Promise<void> {
+  const creationDataValidationErrors = validateCreationData(req.body);
 
   if (creationDataValidationErrors) {
     res.status(400).json(creationDataValidationErrors);
-  } else {
-    void services.createAuthor(
-      validatedCreationData,
-      () => {
-        res.status(201).end();
-      },
-      (failureReason) => {
-        switch (failureReason) {
-          case "userNotFound":
-            res.status(422).end();
-            break;
-          default:
-            res.status(500).end();
-        }
-      }
-    );
+    return;
   }
+
+  const authorCreationResult = await services.createAuthor(req.body);
+
+  if (authorCreationResult.status === "failure") {
+    res.status(authorCreationResult.errorCode).end();
+    return;
+  }
+
+  res.status(201).end();
 }
 
-function getAuthors(req: Request, res: Response): void {
-  const {
-    validatedData: validatedPaginationQueryParameters,
-    errors: paginationQueryParametersValidationErrors,
-  } = validatePaginationQueryParameters(req.query);
+async function getAuthors(req: Request, res: Response): Promise<void> {
+  const paginationQueryParametersValidationErrors =
+    validatePaginationQueryParameters(req.query);
 
   if (paginationQueryParametersValidationErrors) {
     res.status(400).json(paginationQueryParametersValidationErrors);
-  } else {
-    void services.getAuthors(
-      validatedPaginationQueryParameters,
-      (authors, authorsTotalNumber, pagesTotalNumber) => {
-        res.json({ authors, authorsTotalNumber, pagesTotalNumber });
-      }
-    );
+    return;
   }
+
+  res.json(await services.getAuthors(createPaginationParameters(req.query)));
 }
 
-function updateAuthor(req: Request, res: Response): void {
-  const {
-    validatedData: validatedUpdateData,
-    errors: updateDataValidationErrors,
-  } = validateUpdateData(req.body);
+async function updateAuthor(req: Request, res: Response): Promise<void> {
+  const updateDataValidationErrors = validateUpdateData(req.body);
 
   if (updateDataValidationErrors) {
     res.status(400).json(updateDataValidationErrors);
-  } else {
-    void services.updateAuthorById(
-      Number(req.params.id),
-      validatedUpdateData,
-      () => {
-        res.status(204).end();
-      },
-      (failureReason) => {
-        switch (failureReason) {
-          case "authorNotFound":
-            res.status(404).end();
-            break;
-          default:
-            res.status(500).end();
-        }
-      }
-    );
+    return;
   }
+
+  const authorUpdateResult = await services.updateAuthorById(
+    Number(req.params.id),
+    req.body
+  );
+
+  if (authorUpdateResult.status === "failure") {
+    res.status(authorUpdateResult.errorCode).end();
+    return;
+  }
+
+  res.status(204).end();
 }
 
-function deleteAuthor(req: Request, res: Response): void {
-  void services.deleteAuthorById(
-    Number(req.params.id),
-    () => {
-      res.status(204).end();
-    },
-    (failureReason) => {
-      switch (failureReason) {
-        case "authorNotFound":
-          res.status(404).end();
-          break;
-        default:
-          res.status(500).end();
-      }
-    }
+async function deleteAuthor(req: Request, res: Response): Promise<void> {
+  const authorDeletionResult = await services.deleteAuthorById(
+    Number(req.params.id)
   );
+
+  if (authorDeletionResult.status === "failure") {
+    res.status(authorDeletionResult.errorCode).end();
+    return;
+  }
+
+  res.status(204).end();
 }
 
 export { createAuthor, getAuthors, updateAuthor, deleteAuthor };

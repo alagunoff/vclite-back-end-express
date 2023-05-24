@@ -1,67 +1,53 @@
 import { type Request } from "express";
 
+import { ERROR_MESSAGES } from "src/shared/validation/constants";
 import { isStringPositiveInteger } from "src/shared/validation/validators";
 
-import {
-  type ValidatedPaginationQueryParameters,
-  type ValidationErrors,
-} from "./types";
+import { type ValidationErrors } from "./types";
 
-function validatePaginationQueryParameters(queryParameters: Request["query"]):
-  | {
-      validatedData: ValidatedPaginationQueryParameters;
-      errors: undefined;
-    }
-  | {
-      validatedData: undefined;
-      errors: ValidationErrors;
-    } {
+function validatePaginationQueryParameters(
+  queryParameters: Request["query"]
+): ValidationErrors | undefined {
   const errors: ValidationErrors = {};
 
   if ("pageNumber" in queryParameters) {
     if (!isStringPositiveInteger(queryParameters.pageNumber)) {
-      errors.pageNumber = "must be positive integer";
+      errors.pageNumber = ERROR_MESSAGES.positiveInteger;
     }
 
     if (!("itemsNumber" in queryParameters)) {
-      errors.itemsNumber = "required";
+      errors.itemsNumber = ERROR_MESSAGES.required;
     }
   }
 
   if ("itemsNumber" in queryParameters) {
     if (!isStringPositiveInteger(queryParameters.itemsNumber)) {
-      errors.itemsNumber = "must be positive integer";
+      errors.itemsNumber = ERROR_MESSAGES.positiveInteger;
     }
 
     if (!("pageNumber" in queryParameters)) {
-      errors.pageNumber = "required";
+      errors.pageNumber = ERROR_MESSAGES.required;
     }
   }
 
-  return Object.keys(errors).length
-    ? {
-        validatedData: undefined,
-        errors,
-      }
-    : {
-        validatedData: {
-          pageNumber: queryParameters.pageNumber as string | undefined,
-          itemsNumber: queryParameters.itemsNumber as string | undefined,
-        },
-        errors: undefined,
-      };
+  if (Object.keys(errors).length) {
+    return errors;
+  }
 }
 
 function createPaginationParameters({
   pageNumber,
   itemsNumber,
-}: ValidatedPaginationQueryParameters):
+}: {
+  pageNumber?: string;
+  itemsNumber?: string;
+}):
   | {
       skip: number;
       take: number;
     }
   | undefined {
-  if (typeof pageNumber === "string" && typeof itemsNumber === "string") {
+  if (pageNumber && itemsNumber) {
     const itemsNumberAsNumber = Number(itemsNumber);
 
     return {

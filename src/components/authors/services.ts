@@ -1,53 +1,47 @@
-import { Prisma, type Author } from "@prisma/client";
+import { type Author } from "@prisma/client";
 
 import prisma from "src/shared/prisma";
-import { type ValidatedPaginationQueryParameters } from "src/shared/pagination/types";
-import {
-  createPaginationParameters,
-  calculatePagesTotalNumber,
-} from "src/shared/pagination/utils";
+import { calculatePagesTotalNumber } from "src/shared/pagination/utils";
 
-import { type ValidatedCreationData, type ValidatedUpdateData } from "./types";
+async function createAuthor({
+  description,
+  userId,
+}: {
+  description?: string;
+  userId: number;
+}): Promise<{ status: "success" } | { status: "failure"; errorCode: 422 }> {
+  const userToCreateAuthorFor = await prisma.user.findUnique({
+    where: { id: userId },
+  });
 
-async function createAuthor(
-  { description, userId }: ValidatedCreationData,
-  onSuccess: () => void,
-  onFailure: (reason?: "userNotFound") => void
-): Promise<void> {
-  try {
-    await prisma.author.create({
-      data: {
-        description,
-        userId,
-      },
-    });
-
-    onSuccess();
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      switch (error.code) {
-        case "P2003":
-          onFailure("userNotFound");
-          break;
-        default:
-          onFailure();
-      }
-    } else {
-      onFailure();
-    }
+  if (!userToCreateAuthorFor) {
+    return {
+      status: "failure",
+      errorCode: 422,
+    };
   }
+
+  await prisma.author.create({ data: { description, userId } });
+
+  return {
+    status: "success",
+  };
 }
 
 async function getAuthors(
-  validatedPaginationQueryParameters: ValidatedPaginationQueryParameters,
-  onSuccess: (
-    authors: Array<Omit<Author, "userId">>,
-    authorsTotalNumber: number,
-    pagesTotalNumber: number
-  ) => void
-): Promise<void> {
+  paginationParameters:
+    | {
+        skip?: number;
+        take?: number;
+      }
+    | undefined
+): Promise<{
+  authors: Array<Omit<Author, "userId">>;
+  authorsTotalNumber: number;
+  pagesTotalNumber: number;
+}> {
   const authors = await prisma.author.findMany({
-    ...createPaginationParameters(validatedPaginationQueryParameters),
+    ...paginationParameters,
     orderBy: {
       id: "asc",
     },
@@ -58,60 +52,54 @@ async function getAuthors(
   });
   const authorsTotalNumber = await prisma.author.count();
 
-  onSuccess(
+  return {
     authors,
     authorsTotalNumber,
-    calculatePagesTotalNumber(authorsTotalNumber, authors.length)
-  );
+    pagesTotalNumber: calculatePagesTotalNumber(
+      authorsTotalNumber,
+      authors.length
+    ),
+  };
 }
 
 async function updateAuthorById(
   id: number,
-  { description }: ValidatedUpdateData,
-  onSuccess: () => void,
-  onFailure: (reason?: "authorNotFound") => void
-): Promise<void> {
-  try {
-    await prisma.author.update({ where: { id }, data: { description } });
+  { description }: { description?: string }
+): Promise<{ status: "success" } | { status: "failure"; errorCode: 404 }> {
+  const authorToUpdate = await prisma.author.findUnique({ where: { id } });
 
-    onSuccess();
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      switch (error.code) {
-        case "P2025":
-          onFailure("authorNotFound");
-          break;
-        default:
-          onFailure();
-      }
-    } else {
-      onFailure();
-    }
+  if (!authorToUpdate) {
+    return {
+      status: "failure",
+      errorCode: 404,
+    };
   }
+
+  await prisma.author.update({
+    where: { id: authorToUpdate.id },
+    data: { description },
+  });
+
+  return {
+    status: "success",
+  };
 }
 
 async function deleteAuthorById(
-  id: number,
-  onSuccess: () => void,
-  onFailure: (reason?: "authorNotFound") => void
-): Promise<void> {
-  try {
-    await prisma.author.delete({ where: { id } });
+  id: number
+): Promise<{ status: "success" } | { status: "failure"; errorCode: 404 }> {
+  const authorToDelete = prisma.author.findUnique({ where: { id } });
 
-    onSuccess();
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      switch (error.code) {
-        case "P2025":
-          onFailure("authorNotFound");
-          break;
-        default:
-          onFailure();
-      }
-    } else {
-      onFailure();
-    }
+  if (!authorToDelete) {
+    return {
+      status: "failure",
+      errorCode: 404,
+    };
   }
+
+  await prisma.author.delete({ where: { id } });
+
+  return { status: "success" };
 }
 
 export { createAuthor, getAuthors, updateAuthorById, deleteAuthorById };

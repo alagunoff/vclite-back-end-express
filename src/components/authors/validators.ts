@@ -1,81 +1,41 @@
+import { ERROR_MESSAGES } from "src/shared/validation/constants";
 import {
   isNotEmptyString,
   isPositiveInteger,
 } from "src/shared/validation/validators";
 
-import {
-  type ValidatedCreationData,
-  type ValidatedUpdateData,
-  type ValidationErrors,
-} from "./types";
+import { type ValidationErrors } from "./types";
 
-function validateCreationData(data: any):
-  | {
-      validatedData: ValidatedCreationData;
-      errors: undefined;
-    }
-  | {
-      validatedData: undefined;
-      errors: ValidationErrors;
-    } {
+function validateCreationData(data: any): ValidationErrors | undefined {
   const errors: ValidationErrors = {};
 
-  if ("description" in data) {
-    if (!isNotEmptyString(data.description)) {
-      errors.description = "must be not empty string";
-    }
+  if ("description" in data && !isNotEmptyString(data.description)) {
+    errors.description = ERROR_MESSAGES.notEmptyString;
   }
 
   if ("userId" in data) {
     if (!isPositiveInteger(data.userId)) {
-      errors.userId = "must be positive integer";
+      errors.userId = ERROR_MESSAGES.positiveInteger;
     }
   } else {
-    errors.userId = "required";
+    errors.userId = ERROR_MESSAGES.required;
   }
 
-  return Object.keys(errors).length
-    ? {
-        validatedData: undefined,
-        errors,
-      }
-    : {
-        validatedData: {
-          description: data.description,
-          userId: data.userId,
-        },
-        errors: undefined,
-      };
+  if (Object.keys(errors).length) {
+    return errors;
+  }
 }
 
-function validateUpdateData(data: any):
-  | {
-      validatedData: ValidatedUpdateData;
-      errors: undefined;
-    }
-  | {
-      validatedData: undefined;
-      errors: ValidationErrors;
-    } {
+function validateUpdateData(data: any): ValidationErrors | undefined {
   const errors: ValidationErrors = {};
 
-  if ("description" in data) {
-    if (!isNotEmptyString(data.description)) {
-      errors.description = "must be not empty string";
-    }
+  if ("description" in data && !isNotEmptyString(data.description)) {
+    errors.description = ERROR_MESSAGES.notEmptyString;
   }
 
-  return Object.keys(errors).length
-    ? {
-        validatedData: undefined,
-        errors,
-      }
-    : {
-        validatedData: {
-          description: data.description,
-        },
-        errors: undefined,
-      };
+  if (Object.keys(errors).length) {
+    return errors;
+  }
 }
 
 export { validateCreationData, validateUpdateData };

@@ -7,9 +7,7 @@ function isPositiveInteger(value: unknown): value is number {
 }
 
 function isStringPositiveInteger(value: unknown): value is string {
-  const valueAsNumber = Number(value);
-
-  return Number.isInteger(valueAsNumber) && valueAsNumber > 0;
+  return isPositiveInteger(Number(value));
 }
 
 function isBase64ImageDataUrl(value: unknown): boolean {
