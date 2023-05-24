@@ -12,7 +12,7 @@ function isStringPositiveInteger(value: unknown): value is string {
 
 function isBase64ImageDataUrl(value: unknown): boolean {
   return (
-    typeof value === "string" && /^data:image\/(jpe?g|png);base64,/.test(value)
+    typeof value === "string" && /^data:image\/(jpeg|png);base64,/.test(value)
   );
 }
 
