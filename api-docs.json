@@ -242,7 +242,7 @@
             "$ref": "#/components/responses/InvalidUpdateData"
           },
           "404": {
-            "description": "Either JWT isn't provided or invalid or authenticated user isn't an admin or authore to update not found"
+            "description": "Either JWT isn't provided or invalid or authenticated user isn't an admin or author to update not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -261,7 +261,7 @@
             "description": "Author has been deleted"
           },
           "404": {
-            "description": "Either JWT isn't provided or invalid or authenticated user isn't an admin or authore to delete not found"
+            "description": "Either JWT isn't provided or invalid or authenticated user isn't an admin or author to delete not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -361,7 +361,7 @@
             "$ref": "#/components/responses/InvalidUpdateData"
           },
           "404": {
-            "description": "Tag not found or user assosiated with provided JWT isn't an admin"
+            "description": "Either JWT isn't provided or invalid or authenticated user isn't an admin or tag to update not found"
           },
           "422": {
             "description": "Tag with this name already exists"
@@ -383,7 +383,7 @@
             "description": "Tag has been deleted"
           },
           "404": {
-            "description": "Tag not found or user assosiated with provided JWT isn't an admin"
+            "description": "Either JWT isn't provided or invalid or authenticated user isn't an admin or tag to delete not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
