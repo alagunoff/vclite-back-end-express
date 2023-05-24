@@ -5,12 +5,14 @@ import * as services from "./services";
 
 async function createUser(req: Request, res: Response): Promise<void> {
   const creationDataValidationErrors = validateCreationData(req.body);
+
   if (creationDataValidationErrors) {
     res.status(400).json(creationDataValidationErrors);
     return;
   }
 
   const userCreationResult = await services.createUser(req.body);
+
   if (userCreationResult.status === "failure") {
     res.status(userCreationResult.errorCode).end();
     return;
@@ -35,7 +37,13 @@ async function deleteUser(req: Request, res: Response): Promise<void> {
   const userDeletionResult = await services.deleteUserById(
     Number(req.params.id)
   );
-  res.status(userDeletionResult.statusCode).end();
+
+  if (userDeletionResult.status === "failure") {
+    res.status(userDeletionResult.errorCode).end();
+    return;
+  }
+
+  res.status(204).end();
 }
 
 export { createUser, getUser, deleteUser };

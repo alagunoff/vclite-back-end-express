@@ -1,3 +1,4 @@
+import { ERROR_MESSAGES } from "src/shared/validation/constants";
 import {
   isNotEmptyString,
   isBase64ImageDataUrl,
@@ -10,38 +11,34 @@ function validateCreationData(data: any): ValidationErrors | undefined {
 
   if ("image" in data) {
     if (!isBase64ImageDataUrl(data.image)) {
-      errors.image = "must be base64 image in data URL format with mediatype";
+      errors.image = ERROR_MESSAGES.base64ImageDataUrl;
     }
   } else {
-    errors.image = "required";
+    errors.image = ERROR_MESSAGES.required;
   }
 
   if ("username" in data) {
     if (!isNotEmptyString(data.username)) {
-      errors.username = "must be not empty string";
+      errors.username = ERROR_MESSAGES.notEmptyString;
     }
   } else {
-    errors.username = "required";
+    errors.username = ERROR_MESSAGES.required;
   }
 
   if ("password" in data) {
     if (!isNotEmptyString(data.password)) {
-      errors.password = "must be not empty string";
+      errors.password = ERROR_MESSAGES.notEmptyString;
     }
   } else {
-    errors.password = "required";
+    errors.password = ERROR_MESSAGES.required;
   }
 
-  if ("firstName" in data) {
-    if (!isNotEmptyString(data.firstName)) {
-      errors.firstName = "must be not empty string";
-    }
+  if ("firstName" in data && !isNotEmptyString(data.firstName)) {
+    errors.firstName = ERROR_MESSAGES.notEmptyString;
   }
 
-  if ("lastName" in data) {
-    if (!isNotEmptyString(data.lastName)) {
-      errors.lastName = "must be not empty string";
-    }
+  if ("lastName" in data && !isNotEmptyString(data.lastName)) {
+    errors.lastName = ERROR_MESSAGES.notEmptyString;
   }
 
   if (Object.keys(errors).length) {
