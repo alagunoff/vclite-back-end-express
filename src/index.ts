@@ -1,4 +1,9 @@
-import express from "express";
+import express, {
+  type Request,
+  type Response,
+  type NextFunction,
+} from "express";
+import "express-async-errors";
 import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
 
@@ -26,3 +31,8 @@ app.use("/api/categories", categoriesRouter);
 app.use("/api/posts", postsRouter);
 app.use("/api/drafts", draftsRouter);
 app.use("/api/swagger", swaggerUi.serve, swaggerUi.setup(apiDocs));
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  console.log(error);
+
+  res.status(500).end();
+});
