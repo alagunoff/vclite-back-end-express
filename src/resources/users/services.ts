@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-import prisma from "src/shared/prisma";
-import env from "src/shared/env";
+import prisma from "src/prisma";
+import env from "src/env";
 import { saveImage, deleteHostedImage } from "src/shared/images/utils";
 
 async function createUser({

@@ -1,4 +1,4 @@
-import prisma from "src/shared/prisma";
+import prisma from "src/prisma";
 import { type PaginationParameters } from "src/shared/pagination/types";
 import { calculatePagesTotalNumber } from "src/shared/pagination/utils";
 
@@ -8,10 +8,7 @@ async function createTag({
   name: string;
 }): Promise<{ status: "success" } | { status: "failure"; errorCode: 422 }> {
   if (await prisma.tag.findUnique({ where: { name } })) {
-    return {
-      status: "failure",
-      errorCode: 422,
-    };
+    return { status: "failure", errorCode: 422 };
   }
 
   await prisma.tag.create({ data: { name } });

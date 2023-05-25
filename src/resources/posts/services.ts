@@ -1,7 +1,7 @@
 import { type Prisma } from "@prisma/client";
 import crypto from "crypto";
 
-import prisma from "src/shared/prisma";
+import prisma from "src/prisma";
 import {
   saveImage,
   getHostedImageFolderName,

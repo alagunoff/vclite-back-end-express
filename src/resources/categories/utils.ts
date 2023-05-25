@@ -1,4 +1,4 @@
-import prisma from "src/shared/prisma";
+import prisma from "src/prisma";
 
 import { type CategoryWithSubcategories } from "./types";
 
