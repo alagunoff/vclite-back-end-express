@@ -224,25 +224,19 @@ async function updatePost(
 
     if (extraImages) {
       const updatedPostExtraImages = await prisma.postExtraImage.findMany({
-        where: {
-          postId: updatedPost.id,
-        },
+        where: { postId: updatedPost.id },
       });
 
       for (const extraImage of updatedPostExtraImages) {
         const deletedExtraImage = await prisma.postExtraImage.delete({
-          where: {
-            id: extraImage.id,
-          },
+          where: { id: extraImage.id },
         });
 
         deleteHostedImage(deletedExtraImage.image);
       }
 
       await prisma.post.update({
-        where: {
-          id: updatedPost.id,
-        },
+        where: { id: updatedPost.id },
         data: {
           extraImages: {
             createMany: {
