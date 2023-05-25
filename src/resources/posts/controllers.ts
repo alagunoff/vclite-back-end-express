@@ -27,7 +27,7 @@ async function createPost(req: Request, res: Response) {
   });
 
   if (postCreationResult.status === "failure") {
-    res.status(postCreationResult.errorCode).send(postCreationResult.message);
+    res.status(postCreationResult.errorCode).send(postCreationResult.reason);
     return;
   }
 
@@ -88,7 +88,7 @@ async function updatePost(req: Request, res: Response) {
 
     postUpdateResult.errorCode === 404
       ? res.end()
-      : res.send(postUpdateResult.message);
+      : res.send(postUpdateResult.reason);
 
     return;
   }

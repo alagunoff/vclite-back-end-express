@@ -19,7 +19,7 @@ async function createCategory(req: Request, res: Response) {
   if (categoryCreationResult.status === "failure") {
     res
       .status(categoryCreationResult.errorCode)
-      .send(categoryCreationResult.message);
+      .send(categoryCreationResult.reason);
     return;
   }
 
@@ -56,7 +56,7 @@ async function updateCategory(req: Request, res: Response) {
 
     categoryUpdateResult.errorCode === 404
       ? res.end()
-      : res.send(categoryUpdateResult.message);
+      : res.send(categoryUpdateResult.reason);
 
     return;
   }

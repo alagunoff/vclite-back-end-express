@@ -23,7 +23,7 @@ async function createDraft(req: Request, res: Response) {
   });
 
   if (draftCreationResult.status === "failure") {
-    res.status(draftCreationResult.errorCode).send(draftCreationResult.message);
+    res.status(draftCreationResult.errorCode).send(draftCreationResult.reason);
     return;
   }
 
@@ -80,7 +80,7 @@ async function updateDraft(req: Request, res: Response) {
 
     draftUpdateResult.errorCode === 404
       ? res.end()
-      : res.send(draftUpdateResult.message);
+      : res.send(draftUpdateResult.reason);
 
     return;
   }

@@ -11,13 +11,13 @@ async function createCategory({
   name: string;
   parentCategoryId?: number;
 }): Promise<
-  { status: "success" } | { status: "failure"; errorCode: 422; message: string }
+  { status: "success" } | { status: "failure"; errorCode: 422; reason: string }
 > {
   if (await prisma.category.findUnique({ where: { name } })) {
     return {
       status: "failure",
       errorCode: 422,
-      message: "category with this name already exists",
+      reason: "categoryAlreadyExists",
     };
   }
 
@@ -28,7 +28,7 @@ async function createCategory({
     return {
       status: "failure",
       errorCode: 422,
-      message: "parent category with this id not found",
+      reason: "parentCategoryNotFound",
     };
   }
 
@@ -84,7 +84,7 @@ async function updateCategoryById(
 ): Promise<
   | { status: "success" }
   | { status: "failure"; errorCode: 404 }
-  | { status: "failure"; errorCode: 422; message: string }
+  | { status: "failure"; errorCode: 422; reason: string }
 > {
   if (!(await prisma.category.findUnique({ where: { id } }))) {
     return {
@@ -97,7 +97,7 @@ async function updateCategoryById(
     return {
       status: "failure",
       errorCode: 422,
-      message: "category with this name already exists",
+      reason: "categoryAlreadyExists",
     };
   }
 
@@ -108,7 +108,7 @@ async function updateCategoryById(
     return {
       status: "failure",
       errorCode: 422,
-      message: "parent category with this id not found",
+      reason: "parentCategoryNotFound",
     };
   }
 

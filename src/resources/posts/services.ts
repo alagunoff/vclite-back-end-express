@@ -31,13 +31,13 @@ async function createPost({
   tagsIds: number[];
   isDraft: boolean;
 }): Promise<
-  { status: "success" } | { status: "failure"; errorCode: 422; message: string }
+  { status: "success" } | { status: "failure"; errorCode: 422; reason: string }
 > {
   if (!(await prisma.category.findUnique({ where: { id: categoryId } }))) {
     return {
       status: "failure",
       errorCode: 422,
-      message: "category with this id not found",
+      reason: "categoryNotFound",
     };
   }
 
@@ -46,7 +46,7 @@ async function createPost({
       return {
         status: "failure",
         errorCode: 422,
-        message: `tag with id ${tagId} not found`,
+        reason: `tag with id ${tagId} not found`,
       };
     }
   }
@@ -168,7 +168,7 @@ async function updatePost(
 ): Promise<
   | { status: "success" }
   | { status: "failure"; errorCode: 404 }
-  | { status: "failure"; errorCode: 422; message: string }
+  | { status: "failure"; errorCode: 422; reason: string }
 > {
   if (!(await prisma.post.findUnique({ where: filterParameters }))) {
     return {
@@ -184,7 +184,7 @@ async function updatePost(
     return {
       status: "failure",
       errorCode: 422,
-      message: "category with this id not found",
+      reason: "categoryNotFound",
     };
   }
 
@@ -194,7 +194,7 @@ async function updatePost(
         return {
           status: "failure",
           errorCode: 422,
-          message: `tag with id ${tagId} not found`,
+          reason: `tag with id ${tagId} not found`,
         };
       }
     }
