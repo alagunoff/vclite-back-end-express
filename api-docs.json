@@ -402,7 +402,7 @@
     "/categories": {
       "post": {
         "tags": ["categories"],
-
+        "security": [{ "JWT": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -465,7 +465,7 @@
     "/categories/{id}": {
       "patch": {
         "tags": ["categories"],
-
+        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -511,7 +511,7 @@
       },
       "delete": {
         "tags": ["categories"],
-
+        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -533,7 +533,7 @@
     "/posts": {
       "post": {
         "tags": ["posts"],
-
+        "security": [{ "JWT": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -737,7 +737,7 @@
     "/posts/{id}": {
       "patch": {
         "tags": ["posts"],
-
+        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -806,7 +806,7 @@
       },
       "delete": {
         "tags": ["posts"],
-
+        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -828,7 +828,7 @@
     "/posts/{id}/comments": {
       "post": {
         "tags": ["post's comments"],
-
+        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -899,7 +899,7 @@
       },
       "delete": {
         "tags": ["post's comments"],
-
+        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "in": "path",
@@ -927,7 +927,7 @@
     "/drafts": {
       "post": {
         "tags": ["drafts"],
-
+        "security": [{ "JWT": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -1003,7 +1003,7 @@
       "get": {
         "tags": ["drafts"],
         "description": "Get author's drafts",
-
+        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/pageNumber"
@@ -1031,7 +1031,7 @@
     "/drafts/{id}": {
       "patch": {
         "tags": ["drafts"],
-
+        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -1106,7 +1106,7 @@
       },
       "delete": {
         "tags": ["drafts"],
-
+        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"
@@ -1134,7 +1134,7 @@
     "/drafts/{id}/publish": {
       "post": {
         "tags": ["drafts"],
-
+        "security": [{ "JWT": [] }],
         "parameters": [
           {
             "$ref": "#/components/parameters/id"

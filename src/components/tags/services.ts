@@ -57,7 +57,7 @@ async function updateTagById(
     };
   }
 
-  if (await prisma.tag.findUnique({ where: { name } })) {
+  if (name && (await prisma.tag.findUnique({ where: { name } }))) {
     return {
       status: "failure",
       errorCode: 422,

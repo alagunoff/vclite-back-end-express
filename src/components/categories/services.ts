@@ -1,67 +1,64 @@
-import { Prisma, type Category } from "@prisma/client";
+import { type Category } from "@prisma/client";
 
 import prisma from "src/shared/prisma";
-import { type ValidatedPaginationQueryParameters } from "src/shared/pagination/types";
-import {
-  createPaginationParameters,
-  calculatePagesTotalNumber,
-} from "src/shared/pagination/utils";
+import { type PaginationParameters } from "src/shared/pagination/types";
+import { calculatePagesTotalNumber } from "src/shared/pagination/utils";
 
-import { type ValidatedCreationData, type ValidatedUpdateData } from "./types";
 import { includeSubcategories } from "./utils";
 
-async function createCategory(
-  { name, parentCategoryId }: ValidatedCreationData,
-  onSuccess: () => void,
-  onFailure: (
-    reason?: "categoryAlreadyExists" | "parentCategoryNotFound"
-  ) => void
-): Promise<void> {
-  try {
-    await prisma.category.create({
-      data: {
-        name,
-        parentCategory: {
-          connect:
-            typeof parentCategoryId === "number"
-              ? { id: parentCategoryId }
-              : undefined,
-        },
-      },
-    });
-
-    onSuccess();
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      switch (error.code) {
-        case "P2002":
-          onFailure("categoryAlreadyExists");
-          break;
-        case "P2025":
-          onFailure("parentCategoryNotFound");
-          break;
-        default:
-          onFailure();
-      }
-    } else {
-      onFailure();
-    }
+async function createCategory({
+  name,
+  parentCategoryId,
+}: {
+  name: string;
+  parentCategoryId?: number;
+}): Promise<
+  { status: "success" } | { status: "failure"; errorCode: 422; message: string }
+> {
+  if (await prisma.category.findUnique({ where: { name } })) {
+    return {
+      status: "failure",
+      errorCode: 422,
+      message: "category with this name already exists",
+    };
   }
+
+  if (
+    parentCategoryId &&
+    !(await prisma.category.findUnique({ where: { id: parentCategoryId } }))
+  ) {
+    return {
+      status: "failure",
+      errorCode: 422,
+      message: "parent category with this id not found",
+    };
+  }
+
+  await prisma.category.create({
+    data: {
+      name,
+      parentCategory: {
+        connect: parentCategoryId ? { id: parentCategoryId } : undefined,
+      },
+    },
+  });
+
+  return {
+    status: "success",
+  };
 }
 
 async function getCategories(
-  validatedPaginationQueryParameters: ValidatedPaginationQueryParameters,
-  onSuccess: (
-    categories: Array<Omit<Category, "parentCategoryId">>,
-    categoriesTotalNumber: number,
-    pagesTotalNumber: number
-  ) => void
-): Promise<void> {
+  paginationParameters: PaginationParameters | undefined
+): Promise<{
+  categories: Array<Omit<Category, "parentCategoryId">>;
+  categoriesTotalNumber: number;
+  pagesTotalNumber: number;
+}> {
+  const filterParameters = { parentCategoryId: null };
   const categories = await prisma.category.findMany({
-    where: {
-      parentCategoryId: null,
-    },
-    ...createPaginationParameters(validatedPaginationQueryParameters),
+    where: filterParameters,
+    ...paginationParameters,
     orderBy: {
       id: "asc",
     },
@@ -71,95 +68,90 @@ async function getCategories(
     },
   });
   const categoriesTotalNumber = await prisma.category.count({
-    where: { parentCategoryId: null },
+    where: filterParameters,
   });
 
   for (const category of categories) {
     await includeSubcategories(category);
   }
 
-  onSuccess(
+  return {
     categories,
     categoriesTotalNumber,
-    calculatePagesTotalNumber(categoriesTotalNumber, categories.length)
-  );
+    pagesTotalNumber: calculatePagesTotalNumber(
+      categoriesTotalNumber,
+      paginationParameters?.take
+    ),
+  };
 }
 
 async function updateCategoryById(
   id: number,
-  { name, parentCategoryId }: ValidatedUpdateData,
-  onSuccess: () => void,
-  onFailure: (
-    reason?:
-      | "categoryNotFound"
-      | "categoryAlreadyExists"
-      | "parentCategoryNotFound"
-  ) => void
-): Promise<void> {
-  try {
-    await prisma.category.update({
-      where: {
-        id,
-      },
-      data: {
-        name,
-        parentCategory: {
-          disconnect: parentCategoryId === null ? true : undefined,
-          connect:
-            typeof parentCategoryId === "number"
-              ? {
-                  id: parentCategoryId,
-                }
-              : undefined,
-        },
-      },
-    });
-
-    onSuccess();
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      switch (error.code) {
-        case "P2025":
-          onFailure(
-            error.meta?.cause === "Record to update not found."
-              ? "categoryNotFound"
-              : "parentCategoryNotFound"
-          );
-          break;
-        case "P2002":
-          onFailure("categoryAlreadyExists");
-          break;
-        default:
-          onFailure();
-      }
-    } else {
-      onFailure();
-    }
+  {
+    name,
+    parentCategoryId,
+  }: { name?: string; parentCategoryId?: number | null }
+): Promise<
+  | { status: "success" }
+  | { status: "failure"; errorCode: 404 }
+  | { status: "failure"; errorCode: 422; message: string }
+> {
+  if (!(await prisma.category.findUnique({ where: { id } }))) {
+    return {
+      status: "failure",
+      errorCode: 404,
+    };
   }
+
+  if (name && (await prisma.category.findUnique({ where: { name } }))) {
+    return {
+      status: "failure",
+      errorCode: 422,
+      message: "category with this name already exists",
+    };
+  }
+
+  if (
+    parentCategoryId &&
+    !(await prisma.category.findUnique({ where: { id: parentCategoryId } }))
+  ) {
+    return {
+      status: "failure",
+      errorCode: 422,
+      message: "parent category with this id not found",
+    };
+  }
+
+  await prisma.category.update({
+    where: {
+      id,
+    },
+    data: {
+      name,
+      parentCategoryId,
+    },
+  });
+
+  return {
+    status: "success",
+  };
 }
 
 async function deleteCategoryById(
-  id: number,
-  onSuccess: () => void,
-  onFailure: (reason?: "categoryNotFound") => void
-): Promise<void> {
-  try {
-    await prisma.category.delete({ where: { id } });
-
-    onSuccess();
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      switch (error.code) {
-        case "P2025":
-          onFailure("categoryNotFound");
-          break;
-        default:
-          onFailure();
-      }
-    } else {
-      onFailure();
-    }
+  id: number
+): Promise<{ status: "success" } | { status: "failure"; errorCode: 404 }> {
+  if (!(await prisma.category.findUnique({ where: { id } }))) {
+    return {
+      status: "failure",
+      errorCode: 404,
+    };
   }
+
+  await prisma.category.delete({ where: { id } });
+
+  return {
+    status: "success",
+  };
 }
 
 export {

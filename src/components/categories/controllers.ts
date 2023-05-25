@@ -1,108 +1,82 @@
 import { type Request, type Response } from "express";
 
-import { validatePaginationQueryParameters } from "src/shared/pagination/utils";
+import {
+  validatePaginationQueryParameters,
+  createPaginationParameters,
+} from "src/shared/pagination/utils";
 
 import * as services from "./services";
 import { validateCreationData, validateUpdateData } from "./validators";
 
-function createCategory(req: Request, res: Response): void {
-  const {
-    validatedData: validatedCreationData,
-    errors: creationDataValidationErrors,
-  } = validateCreationData(req.body);
+async function createCategory(req: Request, res: Response): Promise<void> {
+  const creationDataValidationErrors = validateCreationData(req.body);
 
   if (creationDataValidationErrors) {
     res.status(400).json(creationDataValidationErrors);
-  } else {
-    void services.createCategory(
-      validatedCreationData,
-      () => {
-        res.status(201).end();
-      },
-      (failureReason) => {
-        switch (failureReason) {
-          case "categoryAlreadyExists":
-            res.status(422).send("category with this name already exists");
-            break;
-          case "parentCategoryNotFound":
-            res.status(422).send("parent category with this id not found");
-            break;
-          default:
-            res.status(500).end();
-        }
-      }
-    );
+    return;
   }
+
+  const categoryCreationResult = await services.createCategory(req.body);
+
+  if (categoryCreationResult.status === "failure") {
+    res
+      .status(categoryCreationResult.errorCode)
+      .send(categoryCreationResult.message);
+    return;
+  }
+
+  res.status(201).end();
 }
 
-function getCategories(req: Request, res: Response): void {
-  const {
-    validatedData: validatedPaginationQueryParameters,
-    errors: paginationQueryParametersValidationErrors,
-  } = validatePaginationQueryParameters(req.query);
+async function getCategories(req: Request, res: Response): Promise<void> {
+  const paginationQueryParametersValidationErrors =
+    validatePaginationQueryParameters(req.query);
 
   if (paginationQueryParametersValidationErrors) {
     res.status(400).json(paginationQueryParametersValidationErrors);
-  } else {
-    void services.getCategories(
-      validatedPaginationQueryParameters,
-      (categories, categoriesTotalNumber, pagesTotalNumber) => {
-        res.json({ categories, categoriesTotalNumber, pagesTotalNumber });
-      }
-    );
+    return;
   }
+
+  res.json(await services.getCategories(createPaginationParameters(req.query)));
 }
 
-function updateCategory(req: Request, res: Response): void {
-  const {
-    validatedData: validatedUpdateData,
-    errors: updateDataValidationErrors,
-  } = validateUpdateData(req.body);
+async function updateCategory(req: Request, res: Response): Promise<void> {
+  const updateDataValidationErrors = validateUpdateData(req.body);
 
   if (updateDataValidationErrors) {
     res.status(400).json(updateDataValidationErrors);
-  } else {
-    void services.updateCategoryById(
-      Number(req.params.id),
-      validatedUpdateData,
-      () => {
-        res.status(204).end();
-      },
-      (failureReason) => {
-        switch (failureReason) {
-          case "categoryNotFound":
-            res.status(404).end();
-            break;
-          case "categoryAlreadyExists":
-            res.status(422).send("category with this name already exists");
-            break;
-          case "parentCategoryNotFound":
-            res.status(422).send("parent category with this id not found");
-            break;
-          default:
-            res.status(500).end();
-        }
-      }
-    );
+    return;
   }
+
+  const categoryUpdateResult = await services.updateCategoryById(
+    Number(req.params.id),
+    req.body
+  );
+
+  if (categoryUpdateResult.status === "failure") {
+    res.status(categoryUpdateResult.errorCode);
+
+    categoryUpdateResult.errorCode === 404
+      ? res.end()
+      : res.send(categoryUpdateResult.message);
+
+    return;
+  }
+
+  res.status(204).end();
 }
 
-function deleteCategory(req: Request, res: Response): void {
-  void services.deleteCategoryById(
-    Number(req.params.id),
-    () => {
-      res.status(204).end();
-    },
-    (failureReason) => {
-      switch (failureReason) {
-        case "categoryNotFound":
-          res.status(404).end();
-          break;
-        default:
-          res.status(500).end();
-      }
-    }
+async function deleteCategory(req: Request, res: Response): Promise<void> {
+  const categoryDeletionResult = await services.deleteCategoryById(
+    Number(req.params.id)
   );
+
+  if (categoryDeletionResult.status === "failure") {
+    res.status(categoryDeletionResult.errorCode).end();
+    return;
+  }
+
+  res.status(204).end();
 }
 
 export { createCategory, getCategories, updateCategory, deleteCategory };
