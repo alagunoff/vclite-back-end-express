@@ -4,12 +4,12 @@ import swaggerUi from "swagger-ui-express";
 
 import apiDocs from "../api-docs.json";
 import authRouter from "./auth/router";
-import usersRouter from "./components/users/router";
-import authorsRouter from "./components/authors/router";
-import tagsRouter from "./components/tags/router";
-import categoriesRouter from "./components/categories/router";
-import postsRouter from "./components/posts/router";
-import draftsRouter from "./components/drafts/router";
+import usersRouter from "./resources/users/router";
+import authorsRouter from "./resources/authors/router";
+import tagsRouter from "./resources/tags/router";
+import categoriesRouter from "./resources/categories/router";
+import postsRouter from "./resources/posts/router";
+import draftsRouter from "./resources/drafts/router";
 import { projectAbsolutePath } from "./shared/constants";
 
 const app = express();

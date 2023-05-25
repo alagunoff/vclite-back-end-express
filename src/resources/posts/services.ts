@@ -10,7 +10,7 @@ import {
 } from "src/shared/images/utils";
 import { type PaginationParameters } from "src/shared/pagination/types";
 import { calculatePagesTotalNumber } from "src/shared/pagination/utils";
-import { includeSubcategories } from "src/components/categories/utils";
+import { includeSubcategories } from "src/resources/categories/utils";
 
 async function createPost({
   image,

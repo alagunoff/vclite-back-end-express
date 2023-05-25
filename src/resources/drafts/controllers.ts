@@ -5,8 +5,8 @@ import { createPaginationParameters } from "src/shared/pagination/utils";
 import {
   validateCreationData,
   validateUpdateData,
-} from "src/components/posts/validators";
-import * as postServices from "src/components/posts/services";
+} from "src/resources/posts/validators";
+import * as postServices from "src/resources/posts/services";
 
 async function createDraft(req: Request, res: Response) {
   const creationDataValidationErrors = validateCreationData(req.body);
