@@ -128,7 +128,7 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "$ref": "#/components/parameters/id"
+            "$ref": "#/components/pathParameters/id"
           }
         ],
         "responses": {
@@ -192,10 +192,10 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "$ref": "#/components/parameters/pageNumber"
+            "$ref": "#/components/queryParameters/pageNumber"
           },
           {
-            "$ref": "#/components/parameters/itemsNumber"
+            "$ref": "#/components/queryParameters/itemsNumber"
           }
         ],
         "responses": {
@@ -220,7 +220,7 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "$ref": "#/components/parameters/id"
+            "$ref": "#/components/pathParameters/id"
           }
         ],
         "requestBody": {
@@ -258,7 +258,7 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "$ref": "#/components/parameters/id"
+            "$ref": "#/components/pathParameters/id"
           }
         ],
         "responses": {
@@ -317,10 +317,10 @@
         "tags": ["tags"],
         "parameters": [
           {
-            "$ref": "#/components/parameters/pageNumber"
+            "$ref": "#/components/queryParameters/pageNumber"
           },
           {
-            "$ref": "#/components/parameters/itemsNumber"
+            "$ref": "#/components/queryParameters/itemsNumber"
           }
         ],
         "responses": {
@@ -342,7 +342,7 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "$ref": "#/components/parameters/id"
+            "$ref": "#/components/pathParameters/id"
           }
         ],
         "requestBody": {
@@ -383,7 +383,7 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "$ref": "#/components/parameters/id"
+            "$ref": "#/components/pathParameters/id"
           }
         ],
         "responses": {
@@ -446,10 +446,10 @@
         "tags": ["categories"],
         "parameters": [
           {
-            "$ref": "#/components/parameters/pageNumber"
+            "$ref": "#/components/queryParameters/pageNumber"
           },
           {
-            "$ref": "#/components/parameters/itemsNumber"
+            "$ref": "#/components/queryParameters/itemsNumber"
           }
         ],
         "responses": {
@@ -471,7 +471,7 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "$ref": "#/components/parameters/id"
+            "$ref": "#/components/pathParameters/id"
           }
         ],
         "requestBody": {
@@ -502,7 +502,7 @@
             "$ref": "#/components/responses/InvalidUpdateData"
           },
           "404": {
-            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or caetgory to update not found"
+            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or category to update not found"
           },
           "422": {
             "description": "Category with this name already exists or parent category with this id not found"
@@ -517,7 +517,7 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "$ref": "#/components/parameters/id"
+            "$ref": "#/components/pathParameters/id"
           }
         ],
         "responses": {
@@ -525,7 +525,7 @@
             "description": "Category has been deleted"
           },
           "404": {
-            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or caetgory to delete not found"
+            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or category to delete not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -704,10 +704,10 @@
             }
           },
           {
-            "$ref": "#/components/parameters/pageNumber"
+            "$ref": "#/components/queryParameters/pageNumber"
           },
           {
-            "$ref": "#/components/parameters/itemsNumber"
+            "$ref": "#/components/queryParameters/itemsNumber"
           },
           {
             "in": "query",
@@ -733,6 +733,9 @@
           },
           "400": {
             "description": "Invalid filter, pagination or order query parameters"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
           }
         }
       }
@@ -743,7 +746,7 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "$ref": "#/components/parameters/id"
+            "$ref": "#/components/pathParameters/id"
           }
         ],
         "requestBody": {
@@ -797,7 +800,7 @@
             "$ref": "#/components/responses/InvalidUpdateData"
           },
           "404": {
-            "description": "Post not found or user assosiated with provided JWT isn't an admin"
+            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or post to update not found"
           },
           "422": {
             "description": "Category with this id not found or some tag in provided array of tags ids not found"
@@ -812,7 +815,7 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "$ref": "#/components/parameters/id"
+            "$ref": "#/components/pathParameters/id"
           }
         ],
         "responses": {
@@ -820,7 +823,7 @@
             "description": "Post has been deleted"
           },
           "404": {
-            "description": "Post not found or user assosiated with provided JWT isn't an admin"
+            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or post to delete not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -834,7 +837,7 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "$ref": "#/components/parameters/id"
+            "$ref": "#/components/pathParameters/id"
           }
         ],
         "requestBody": {
@@ -876,13 +879,13 @@
         "tags": ["post's comments"],
         "parameters": [
           {
-            "$ref": "#/components/parameters/id"
+            "$ref": "#/components/pathParameters/id"
           },
           {
-            "$ref": "#/components/parameters/pageNumber"
+            "$ref": "#/components/queryParameters/pageNumber"
           },
           {
-            "$ref": "#/components/parameters/itemsNumber"
+            "$ref": "#/components/queryParameters/itemsNumber"
           }
         ],
         "responses": {
@@ -905,13 +908,7 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "id",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            }
+            "$ref": "#/components/pathParameters/id"
           }
         ],
         "responses": {
@@ -919,7 +916,7 @@
             "description": "Comments have been deleted"
           },
           "404": {
-            "description": "Post not found or user assosiated with provided JWT isn't an admin"
+            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or post to delete comments for not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -1009,10 +1006,10 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "$ref": "#/components/parameters/pageNumber"
+            "$ref": "#/components/queryParameters/pageNumber"
           },
           {
-            "$ref": "#/components/parameters/itemsNumber"
+            "$ref": "#/components/queryParameters/itemsNumber"
           }
         ],
         "responses": {
@@ -1027,6 +1024,9 @@
           },
           "403": {
             "$ref": "#/components/responses/NotAuthor"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
           }
         }
       }
@@ -1037,7 +1037,7 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "$ref": "#/components/parameters/id"
+            "$ref": "#/components/pathParameters/id"
           }
         ],
         "requestBody": {
@@ -1112,7 +1112,7 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "$ref": "#/components/parameters/id"
+            "$ref": "#/components/pathParameters/id"
           }
         ],
         "responses": {
@@ -1140,7 +1140,7 @@
         "security": [{ "JWT": [] }],
         "parameters": [
           {
-            "$ref": "#/components/parameters/id"
+            "$ref": "#/components/pathParameters/id"
           }
         ],
         "responses": {
@@ -1171,7 +1171,7 @@
         "bearerFormat": "JWT"
       }
     },
-    "parameters": {
+    "pathParameters": {
       "id": {
         "in": "path",
         "required": true,
@@ -1180,7 +1180,9 @@
           "type": "integer",
           "minimum": 1
         }
-      },
+      }
+    },
+    "queryParameters": {
       "pageNumber": {
         "in": "query",
         "name": "pageNumber",
@@ -1203,7 +1205,7 @@
         "description": "JWT isn't provided or invalid or authenticated user isn't an admin"
       },
       "NotAuthor": {
-        "description": "User assosiated with provided JWT isn't an author"
+        "description": "Authenticated user isn't an author"
       },
       "InvalidCreationData": {
         "description": "Creation data is invalid"
