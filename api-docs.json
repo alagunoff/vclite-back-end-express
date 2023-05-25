@@ -458,6 +458,9 @@
           },
           "400": {
             "$ref": "#/components/responses/InvalidPaginationQueryParameters"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
           }
         }
       }
@@ -499,7 +502,7 @@
             "$ref": "#/components/responses/InvalidUpdateData"
           },
           "404": {
-            "description": "Category not found or user assosiated with provided JWT isn't an admin"
+            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or caetgory to update not found"
           },
           "422": {
             "description": "Category with this name already exists or parent category with this id not found"
@@ -522,7 +525,7 @@
             "description": "Category has been deleted"
           },
           "404": {
-            "description": "Category not found or user assosiated with provided JWT isn't an admin"
+            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or caetgory to delete not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
