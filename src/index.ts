@@ -3,7 +3,7 @@ import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
 
 import apiDocs from "../api-docs.json";
-import authRouter from "./components/auth/router";
+import authRouter from "./auth/router";
 import usersRouter from "./components/users/router";
 import authorsRouter from "./components/authors/router";
 import tagsRouter from "./components/tags/router";

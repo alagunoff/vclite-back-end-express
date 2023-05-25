@@ -7,7 +7,7 @@ function saveImage(
   base64ImageDataUrl: string,
   folderName: string,
   imageFileName: string
-): string {
+) {
   const folderToSaveAbsolutePath = `${projectAbsolutePath}/static/images/${folderName}`;
 
   fs.mkdirSync(folderToSaveAbsolutePath, { recursive: true });
@@ -26,22 +26,22 @@ function saveImage(
   return `${APP_HOST_NAME}/api/static/images/${folderName}/${imageFileNameWithExtension}`;
 }
 
-function getHostedImageAbsolutePath(imageUrl: string): string {
+function getHostedImageAbsolutePath(imageUrl: string) {
   return `${projectAbsolutePath}/${imageUrl.replace(
     `${APP_HOST_NAME}/api/`,
     ""
   )}`;
 }
 
-function getHostedImageFolderName(imageUrl: string): string {
+function getHostedImageFolderName(imageUrl: string) {
   return path.basename(path.dirname(getHostedImageAbsolutePath(imageUrl)));
 }
 
-function deleteHostedImage(imageUrl: string): void {
+function deleteHostedImage(imageUrl: string) {
   fs.unlinkSync(getHostedImageAbsolutePath(imageUrl));
 }
 
-function deleteHostedImageFolder(imageUrl: string): void {
+function deleteHostedImageFolder(imageUrl: string) {
   fs.rmSync(path.dirname(getHostedImageAbsolutePath(imageUrl)), {
     recursive: true,
     force: true,

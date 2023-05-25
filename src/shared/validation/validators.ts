@@ -10,7 +10,7 @@ function isStringPositiveInteger(value: unknown): value is string {
   return isPositiveInteger(Number(value));
 }
 
-function isBase64ImageDataUrl(value: unknown): boolean {
+function isBase64ImageDataUrl(value: unknown) {
   return (
     typeof value === "string" && /^data:image\/(jpeg|png);base64,/.test(value)
   );
@@ -20,7 +20,7 @@ function isDateString(value: unknown): value is string {
   return typeof value === "string" ? !Number.isNaN(Date.parse(value)) : false;
 }
 
-function isPositiveIntegersNotEmptyArray(value: unknown): boolean {
+function isPositiveIntegersNotEmptyArray(value: unknown) {
   return (
     Array.isArray(value) &&
     !!value.length &&
@@ -44,7 +44,7 @@ function isStringPositiveIntegersNotEmptyArray(
   );
 }
 
-function isBase64ImageDataUrlsNotEmptyArray(value: unknown): boolean {
+function isBase64ImageDataUrlsNotEmptyArray(value: unknown) {
   return (
     Array.isArray(value) &&
     !!value.length &&

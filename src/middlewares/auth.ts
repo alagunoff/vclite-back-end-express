@@ -4,9 +4,7 @@ import jwt from "jsonwebtoken";
 import prisma from "src/shared/prisma";
 import env from "src/shared/env";
 
-function authenticateUser(
-  as?: "admin" | "author"
-): (req: Request, res: Response, next: NextFunction) => Promise<void> {
+function authenticateUser(as?: "admin" | "author") {
   const isAdminAuthentication = as === "admin";
 
   return async function (req: Request, res: Response, next: NextFunction) {

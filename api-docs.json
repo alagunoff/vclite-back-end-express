@@ -719,8 +719,8 @@
                 "-createdAt",
                 "authorFirstName",
                 "-authorFirstName",
-                "category",
-                "-category",
+                "categoryName",
+                "-categoryName",
                 "imagesNumber",
                 "-imagesNumber"
               ]
@@ -1144,8 +1144,8 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "Draft has been published"
+          "201": {
+            "description": "Post has been created"
           },
           "401": {
             "$ref": "#/components/responses/Unauthenticated"
