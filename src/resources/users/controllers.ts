@@ -34,12 +34,12 @@ function getUser(req: Request, res: Response): void {
 }
 
 async function deleteUser(req: Request, res: Response) {
-  const userDeletionResult = await services.deleteUserById(
+  const userDeletionError = await services.deleteUserById(
     Number(req.params.id)
   );
 
-  if (userDeletionResult.status === "failure") {
-    res.status(userDeletionResult.errorCode).end();
+  if (userDeletionError) {
+    res.status(userDeletionError.code).end();
     return;
   }
 

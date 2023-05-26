@@ -1,6 +1,6 @@
 import { type Prisma } from "@prisma/client";
 
-import prisma from "src/prisma";
+import prisma from "src/shared/prisma/client";
 import { type PaginationParameters } from "src/shared/pagination/types";
 import { calculatePagesTotalNumber } from "src/shared/pagination/utils";
 

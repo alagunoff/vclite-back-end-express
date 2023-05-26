@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-import env from "src/env";
-import prisma from "src/prisma";
+import env from "src/shared/env";
+import prisma from "src/shared/prisma/client";
 
 async function logIn({
   username,

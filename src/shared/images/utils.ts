@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 
-import { APP_HOST_NAME, projectAbsolutePath } from "src/shared/constants";
+import { HOST_NAME, projectAbsolutePath } from "src/shared/app/constants";
 
 function saveImage(
   base64ImageDataUrl: string,
@@ -23,14 +23,11 @@ function saveImage(
     Buffer.from(base64Image, "base64url")
   );
 
-  return `${APP_HOST_NAME}/api/static/images/${folderName}/${imageFileNameWithExtension}`;
+  return `${HOST_NAME}/api/static/images/${folderName}/${imageFileNameWithExtension}`;
 }
 
 function getHostedImageAbsolutePath(imageUrl: string) {
-  return `${projectAbsolutePath}/${imageUrl.replace(
-    `${APP_HOST_NAME}/api/`,
-    ""
-  )}`;
+  return `${projectAbsolutePath}/${imageUrl.replace(`${HOST_NAME}/api/`, "")}`;
 }
 
 function getHostedImageFolderName(imageUrl: string) {

@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-import prisma from "src/prisma";
-import env from "src/env";
+import prisma from "src/shared/prisma/client";
+import env from "src/shared/env";
 import { saveImage, deleteHostedImage } from "src/shared/images/utils";
 
 async function createUser({
@@ -40,17 +40,13 @@ async function createUser({
   };
 }
 
-async function deleteUserById(
-  id: number
-): Promise<{ status: "success" } | { status: "failure"; errorCode: 404 }> {
+async function deleteUserById(id: number): Promise<{ code: 404 } | undefined> {
   if (!(await prisma.user.findUnique({ where: { id } }))) {
-    return { status: "failure", errorCode: 404 };
+    return { code: 404 };
   }
 
   const deletedUser = await prisma.user.delete({ where: { id } });
   deleteHostedImage(deletedUser.image);
-
-  return { status: "success" };
 }
 
 export { createUser, deleteUserById };

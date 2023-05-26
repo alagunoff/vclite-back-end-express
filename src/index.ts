@@ -15,7 +15,7 @@ import tagsRouter from "./resources/tags/router";
 import categoriesRouter from "./resources/categories/router";
 import postsRouter from "./resources/posts/router";
 import draftsRouter from "./resources/drafts/router";
-import { projectAbsolutePath } from "./shared/constants";
+import { projectAbsolutePath } from "./shared/app/constants";
 
 const app = express();
 app.listen(3000);
