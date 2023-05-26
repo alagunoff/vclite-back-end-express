@@ -21,7 +21,7 @@ async function createUser(req: Request, res: Response) {
   res.status(201).send(userCreationResult.jwt);
 }
 
-function getUser(req: Request, res: Response): void {
+function getUser(req: Request, res: Response) {
   res.json({
     id: req.authenticatedUser?.id,
     image: req.authenticatedUser?.image,

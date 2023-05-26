@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { authenticateUser } from "src/shared/middlewares/auth";
+import { authenticateUser } from "src/auth/middlewares";
 
 import commentsRouter from "./comments/router";
 import { createPost, getPosts, updatePost, deletePost } from "./controllers";

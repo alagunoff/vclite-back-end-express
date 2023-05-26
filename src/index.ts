@@ -1,8 +1,4 @@
-import express, {
-  type Request,
-  type Response,
-  type NextFunction,
-} from "express";
+import express from "express";
 import "express-async-errors";
 import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
@@ -16,6 +12,7 @@ import categoriesRouter from "./resources/categories/router";
 import postsRouter from "./resources/posts/router";
 import draftsRouter from "./resources/drafts/router";
 import { projectAbsolutePath } from "./shared/app/constants";
+import { handleError } from "./shared/errors/middlewares";
 
 const app = express();
 app.listen(3000);
@@ -31,8 +28,4 @@ app.use("/api/categories", categoriesRouter);
 app.use("/api/posts", postsRouter);
 app.use("/api/drafts", draftsRouter);
 app.use("/api/swagger", swaggerUi.serve, swaggerUi.setup(apiDocs));
-app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  console.log(error);
-
-  res.status(500).end();
-});
+app.use(handleError);

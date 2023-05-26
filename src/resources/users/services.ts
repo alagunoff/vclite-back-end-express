@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import prisma from "src/shared/prisma/client";
 import env from "src/shared/env";
 import { saveImage, deleteHostedImage } from "src/shared/images/utils";
+import { type ApiError } from "src/shared/errors/types";
 
 async function createUser({
   image,
@@ -40,7 +41,7 @@ async function createUser({
   };
 }
 
-async function deleteUserById(id: number): Promise<{ code: 404 } | undefined> {
+async function deleteUserById(id: number): Promise<ApiError | undefined> {
   if (!(await prisma.user.findUnique({ where: { id } }))) {
     return { code: 404 };
   }
