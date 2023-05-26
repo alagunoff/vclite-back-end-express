@@ -5,6 +5,7 @@ import { createPaginationParameters } from "src/shared/pagination/utils";
 
 import * as services from "./services";
 import { validateCreationData } from "./validators";
+import { ApiError } from "src/shared/errors/classes";
 
 async function createComment(req: Request, res: Response) {
   const creationDataValidationErrors = validateCreationData(req.body);
@@ -14,13 +15,13 @@ async function createComment(req: Request, res: Response) {
     return;
   }
 
-  const commentCreationResult = await services.createComment({
+  const commentCreationError = await services.createComment({
     ...req.body,
     postId: Number(req.params.postId),
   });
 
-  if (commentCreationResult.status === "failure") {
-    res.status(commentCreationResult.errorCode).end();
+  if (commentCreationError) {
+    res.status(commentCreationError.code).end();
     return;
   }
 
@@ -41,21 +42,21 @@ async function getComments(req: Request, res: Response) {
     createPaginationParameters(req.query)
   );
 
-  if (commentsGettingResult.status === "failure") {
-    res.status(commentsGettingResult.errorCode).end();
+  if (commentsGettingResult instanceof ApiError) {
+    res.status(commentsGettingResult.code).end();
     return;
   }
 
-  res.json(commentsGettingResult.data);
+  res.json(commentsGettingResult);
 }
 
 async function deleteComments(req: Request, res: Response) {
-  const commentsDeletionResult = await services.deletePostComments(
+  const commentsDeletionError = await services.deletePostComments(
     Number(req.params.postId)
   );
 
-  if (commentsDeletionResult.status === "failure") {
-    res.status(commentsDeletionResult.errorCode).end();
+  if (commentsDeletionError) {
+    res.status(commentsDeletionError.code).end();
     return;
   }
 

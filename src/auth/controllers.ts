@@ -13,12 +13,12 @@ async function logIn(req: Request, res: Response) {
 
   const loginResult = await services.logIn(req.body);
 
-  if (loginResult.status === "failure") {
-    res.status(loginResult.errorCode).end();
+  if (typeof loginResult !== "string") {
+    res.status(loginResult.code).end();
     return;
   }
 
-  res.send(loginResult.jwt);
+  res.send(loginResult);
 }
 
 export { logIn };

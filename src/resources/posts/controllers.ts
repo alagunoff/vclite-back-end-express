@@ -20,14 +20,14 @@ async function createPost(req: Request, res: Response) {
     return;
   }
 
-  const postCreationResult = await services.createPost({
+  const postCreationError = await services.createPost({
     ...req.body,
     authorId: req.authenticatedAuthor?.id,
     isDraft: false,
   });
 
-  if (postCreationResult.status === "failure") {
-    res.status(postCreationResult.errorCode).send(postCreationResult.reason);
+  if (postCreationError) {
+    res.status(postCreationError.code).send(postCreationError.reason);
     return;
   }
 
@@ -78,17 +78,15 @@ async function updatePost(req: Request, res: Response) {
     return;
   }
 
-  const postUpdateResult = await services.updatePost(
+  const postUpdateError = await services.updatePost(
     { id: Number(req.params.id) },
     req.body
   );
 
-  if (postUpdateResult.status === "failure") {
-    res.status(postUpdateResult.errorCode);
+  if (postUpdateError) {
+    res.status(postUpdateError.code);
 
-    postUpdateResult.errorCode === 404
-      ? res.end()
-      : res.send(postUpdateResult.reason);
+    postUpdateError.reason ? res.send(postUpdateError.reason) : res.end();
 
     return;
   }
@@ -97,12 +95,12 @@ async function updatePost(req: Request, res: Response) {
 }
 
 async function deletePost(req: Request, res: Response) {
-  const postDeletionResult = await services.deletePost({
+  const postDeletionError = await services.deletePost({
     id: Number(req.params.id),
   });
 
-  if (postDeletionResult.status === "failure") {
-    res.status(postDeletionResult.errorCode).end();
+  if (postDeletionError) {
+    res.status(postDeletionError.code).end();
     return;
   }
 

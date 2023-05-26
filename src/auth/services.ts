@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 
 import env from "src/shared/env";
 import prisma from "src/shared/prisma/client";
+import { ApiError } from "src/shared/errors/classes";
 
 async function logIn({
   username,
@@ -10,14 +11,11 @@ async function logIn({
 }: {
   username: string;
   password: string;
-}): Promise<
-  | { status: "success"; jwt: string }
-  | { status: "failure"; errorCode: 403 | 404 }
-> {
+}) {
   const userToLogIn = await prisma.user.findUnique({ where: { username } });
 
   if (!userToLogIn) {
-    return { status: "failure", errorCode: 404 };
+    return new ApiError(404);
   }
 
   const isProvidedPasswordCorrect = bcrypt.compareSync(
@@ -26,13 +24,10 @@ async function logIn({
   );
 
   if (!isProvidedPasswordCorrect) {
-    return { status: "failure", errorCode: 403 };
+    return new ApiError(403);
   }
 
-  return {
-    status: "success",
-    jwt: jwt.sign(String(userToLogIn.id), env.JWT_SECRET_KEY),
-  };
+  return jwt.sign(String(userToLogIn.id), env.JWT_SECRET_KEY);
 }
 
 export { logIn };

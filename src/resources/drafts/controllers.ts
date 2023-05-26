@@ -16,14 +16,14 @@ async function createDraft(req: Request, res: Response) {
     return;
   }
 
-  const draftCreationResult = await postServices.createPost({
+  const draftCreationError = await postServices.createPost({
     ...req.body,
     authorId: req.authenticatedAuthor?.id,
     isDraft: true,
   });
 
-  if (draftCreationResult.status === "failure") {
-    res.status(draftCreationResult.errorCode).send(draftCreationResult.reason);
+  if (draftCreationError) {
+    res.status(draftCreationError.code).send(draftCreationError.reason);
     return;
   }
 
@@ -66,7 +66,7 @@ async function updateDraft(req: Request, res: Response) {
     return;
   }
 
-  const draftUpdateResult = await postServices.updatePost(
+  const draftUpdateError = await postServices.updatePost(
     {
       id: Number(req.params.id),
       authorId: req.authenticatedAuthor?.id,
@@ -75,12 +75,10 @@ async function updateDraft(req: Request, res: Response) {
     req.body
   );
 
-  if (draftUpdateResult.status === "failure") {
-    res.status(draftUpdateResult.errorCode);
+  if (draftUpdateError) {
+    res.status(draftUpdateError.code);
 
-    draftUpdateResult.errorCode === 404
-      ? res.end()
-      : res.send(draftUpdateResult.reason);
+    draftUpdateError.reason ? res.send(draftUpdateError.reason) : res.end();
 
     return;
   }
@@ -89,7 +87,7 @@ async function updateDraft(req: Request, res: Response) {
 }
 
 async function publishDraft(req: Request, res: Response) {
-  const draftUpdateResult = await postServices.updatePost(
+  const draftUpdateError = await postServices.updatePost(
     {
       id: Number(req.params.id),
       authorId: req.authenticatedAuthor?.id,
@@ -98,8 +96,8 @@ async function publishDraft(req: Request, res: Response) {
     { isDraft: false }
   );
 
-  if (draftUpdateResult.status === "failure") {
-    res.status(draftUpdateResult.errorCode).end();
+  if (draftUpdateError) {
+    res.status(draftUpdateError.code).end();
     return;
   }
 
@@ -107,14 +105,14 @@ async function publishDraft(req: Request, res: Response) {
 }
 
 async function deleteDraft(req: Request, res: Response) {
-  const draftDeletionResult = await postServices.deletePost({
+  const draftDeletionError = await postServices.deletePost({
     id: Number(req.params.id),
     authorId: req.authenticatedAuthor?.id,
     isDraft: true,
   });
 
-  if (draftDeletionResult.status === "failure") {
-    res.status(draftDeletionResult.errorCode).end();
+  if (draftDeletionError) {
+    res.status(draftDeletionError.code).end();
     return;
   }
 

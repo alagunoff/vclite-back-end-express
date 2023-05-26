@@ -6,7 +6,7 @@ function createPaginationParameters({
 }: {
   pageNumber?: string;
   itemsNumber?: string;
-}): PaginationParameters {
+}) {
   const result: PaginationParameters = {};
 
   if (pageNumber && itemsNumber) {

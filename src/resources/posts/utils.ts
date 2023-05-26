@@ -24,7 +24,7 @@ function createFilterParameters({
   createdAt?: string;
   createdAtLt?: string;
   createdAtGt?: string;
-}): Prisma.PostWhereInput {
+}) {
   const filterParameters: Prisma.PostWhereInput = { isDraft: false };
 
   if (titleContains) {

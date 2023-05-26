@@ -10,6 +10,7 @@ import {
 } from "src/shared/images/utils";
 import { type PaginationParameters } from "src/shared/pagination/types";
 import { calculatePagesTotalNumber } from "src/shared/pagination/utils";
+import { ApiError } from "src/shared/errors/classes";
 import { includeSubcategories } from "src/resources/categories/utils";
 
 async function createPost({
@@ -30,24 +31,14 @@ async function createPost({
   categoryId: number;
   tagsIds: number[];
   isDraft: boolean;
-}): Promise<
-  { status: "success" } | { status: "failure"; errorCode: 422; reason: string }
-> {
+}) {
   if (!(await prisma.category.findUnique({ where: { id: categoryId } }))) {
-    return {
-      status: "failure",
-      errorCode: 422,
-      reason: "categoryNotFound",
-    };
+    return new ApiError(422, "categoryNotFound");
   }
 
   for (const tagId of tagsIds) {
     if (!(await prisma.tag.findUnique({ where: { id: tagId } }))) {
-      return {
-        status: "failure",
-        errorCode: 422,
-        reason: `tag with id ${tagId} not found`,
-      };
+      return new ApiError(422, `tag with id ${tagId} not found`);
     }
   }
 
@@ -77,8 +68,6 @@ async function createPost({
       isDraft,
     },
   });
-
-  return { status: "success" };
 }
 
 async function getPosts(
@@ -165,37 +154,22 @@ async function updatePost(
     tagsIds?: number[];
     isDraft?: boolean;
   }
-): Promise<
-  | { status: "success" }
-  | { status: "failure"; errorCode: 404 }
-  | { status: "failure"; errorCode: 422; reason: string }
-> {
+) {
   if (!(await prisma.post.findUnique({ where: filterParameters }))) {
-    return {
-      status: "failure",
-      errorCode: 404,
-    };
+    return new ApiError(404);
   }
 
   if (
     categoryId &&
     !(await prisma.category.findUnique({ where: { id: categoryId } }))
   ) {
-    return {
-      status: "failure",
-      errorCode: 422,
-      reason: "categoryNotFound",
-    };
+    return new ApiError(422, "categoryNotFound");
   }
 
   if (tagsIds) {
     for (const tagId of tagsIds) {
       if (!(await prisma.tag.findUnique({ where: { id: tagId } }))) {
-        return {
-          status: "failure",
-          errorCode: 422,
-          reason: `tag with id ${tagId} not found`,
-        };
+        return new ApiError(422, `tag with id ${tagId} not found`);
       }
     }
   }
@@ -253,21 +227,15 @@ async function updatePost(
       });
     }
   }
-
-  return { status: "success" };
 }
 
-async function deletePost(
-  filterParameters: Prisma.PostWhereUniqueInput
-): Promise<{ status: "success" } | { status: "failure"; errorCode: 404 }> {
+async function deletePost(filterParameters: Prisma.PostWhereUniqueInput) {
   if (!(await prisma.post.findUnique({ where: filterParameters }))) {
-    return { status: "failure", errorCode: 404 };
+    return new ApiError(404);
   }
 
   const deletedPost = await prisma.post.delete({ where: filterParameters });
   deleteHostedImageFolder(deletedPost.image);
-
-  return { status: "success" };
 }
 
 export { createPost, getPosts, updatePost, deletePost };

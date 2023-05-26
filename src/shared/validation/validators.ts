@@ -1,12 +1,12 @@
-function isNotEmptyString(value: unknown): value is string {
+function isNotEmptyString(value: unknown) {
   return typeof value === "string" && value !== "";
 }
 
-function isPositiveInteger(value: unknown): value is number {
+function isPositiveInteger(value: unknown) {
   return Number.isInteger(value) && (value as number) > 0;
 }
 
-function isStringPositiveInteger(value: unknown): value is string {
+function isStringPositiveInteger(value: unknown) {
   return isPositiveInteger(Number(value));
 }
 
@@ -16,7 +16,7 @@ function isBase64ImageDataUrl(value: unknown) {
   );
 }
 
-function isDateString(value: unknown): value is string {
+function isDateString(value: unknown) {
   return typeof value === "string" ? !Number.isNaN(Date.parse(value)) : false;
 }
 
@@ -30,9 +30,7 @@ function isPositiveIntegersNotEmptyArray(value: unknown) {
   );
 }
 
-function isStringPositiveIntegersNotEmptyArray(
-  value: unknown
-): value is string[] {
+function isStringPositiveIntegersNotEmptyArray(value: unknown) {
   return (
     Array.isArray(value) &&
     !!value.length &&
