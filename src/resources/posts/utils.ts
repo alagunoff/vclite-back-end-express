@@ -92,7 +92,7 @@ function createOrderParameters({
   orderBy,
 }: {
   orderBy?: (typeof ORDER_VALID_OPTIONS)[number];
-}): Prisma.PostOrderByWithRelationInput {
+}): Prisma.PostOrderByWithRelationInput | undefined {
   switch (orderBy) {
     case "createdAt":
       return { createdAt: "asc" };
@@ -111,8 +111,6 @@ function createOrderParameters({
     case "-imagesNumber":
       return { extraImages: { _count: "desc" } };
   }
-
-  return { id: "asc" };
 }
 
 export { createFilterParameters, createOrderParameters };

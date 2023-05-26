@@ -1,4 +1,5 @@
 import prisma from "src/shared/prisma/client";
+import { DEFAULT_ORDER_PARAMETERS } from "src/shared/ordering/constants";
 import { type PaginationParameters } from "src/shared/pagination/types";
 import { calculatePagesTotalNumber } from "src/shared/pagination/utils";
 import { ApiError } from "src/shared/errors/classes";
@@ -38,7 +39,7 @@ async function getCategories(paginationParameters: PaginationParameters) {
   const categories = await prisma.category.findMany({
     where: filterParameters,
     ...paginationParameters,
-    orderBy: { id: "asc" },
+    orderBy: DEFAULT_ORDER_PARAMETERS,
     select: { id: true, name: true },
   });
   const categoriesTotalNumber = await prisma.category.count({

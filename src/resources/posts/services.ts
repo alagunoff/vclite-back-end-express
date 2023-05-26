@@ -8,6 +8,7 @@ import {
   deleteHostedImage,
   deleteHostedImageFolder,
 } from "src/shared/images/utils";
+import { DEFAULT_ORDER_PARAMETERS } from "src/shared/ordering/constants";
 import { type PaginationParameters } from "src/shared/pagination/types";
 import { calculatePagesTotalNumber } from "src/shared/pagination/utils";
 import { ApiError } from "src/shared/errors/classes";
@@ -78,7 +79,7 @@ async function getPosts(
   const posts = await prisma.post.findMany({
     where: filterParameters,
     ...paginationParameters,
-    orderBy: orderParameters ?? { id: "asc" },
+    orderBy: orderParameters ?? DEFAULT_ORDER_PARAMETERS,
     select: {
       id: true,
       image: true,

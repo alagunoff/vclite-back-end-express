@@ -1,6 +1,7 @@
 import { type Prisma } from "@prisma/client";
 
 import prisma from "src/shared/prisma/client";
+import { DEFAULT_ORDER_PARAMETERS } from "src/shared/ordering/constants";
 import { type PaginationParameters } from "src/shared/pagination/types";
 import { calculatePagesTotalNumber } from "src/shared/pagination/utils";
 import { ApiError } from "src/shared/errors/classes";
@@ -28,7 +29,7 @@ async function getComments(
   const comments = await prisma.comment.findMany({
     where: filterParameters,
     ...paginationParameters,
-    orderBy: { id: "asc" },
+    orderBy: DEFAULT_ORDER_PARAMETERS,
     select: { id: true, content: true },
   });
   const commentsTotalNumber = await prisma.comment.count({

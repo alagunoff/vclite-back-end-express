@@ -1,4 +1,5 @@
 import prisma from "src/shared/prisma/client";
+import { DEFAULT_ORDER_PARAMETERS } from "src/shared/ordering/constants";
 import { type PaginationParameters } from "src/shared/pagination/types";
 import { calculatePagesTotalNumber } from "src/shared/pagination/utils";
 import { ApiError } from "src/shared/errors/classes";
@@ -14,9 +15,7 @@ async function createTag({ name }: { name: string }) {
 async function getTags(paginationParameters: PaginationParameters) {
   const tags = await prisma.tag.findMany({
     ...paginationParameters,
-    orderBy: {
-      id: "asc",
-    },
+    orderBy: DEFAULT_ORDER_PARAMETERS,
   });
   const tagsTotalNumber = await prisma.tag.count();
 

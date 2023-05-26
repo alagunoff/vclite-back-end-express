@@ -1,6 +1,7 @@
 import prisma from "src/shared/prisma/client";
 import { type PaginationParameters } from "src/shared/pagination/types";
 import { calculatePagesTotalNumber } from "src/shared/pagination/utils";
+import { DEFAULT_ORDER_PARAMETERS } from "src/shared/ordering/constants";
 import { ApiError } from "src/shared/errors/classes";
 
 async function createAuthor({
@@ -20,7 +21,7 @@ async function createAuthor({
 async function getAuthors(paginationParameters: PaginationParameters) {
   const authors = await prisma.author.findMany({
     ...paginationParameters,
-    orderBy: { id: "asc" },
+    orderBy: DEFAULT_ORDER_PARAMETERS,
     select: { id: true, description: true },
   });
   const authorsTotalNumber = await prisma.author.count();
