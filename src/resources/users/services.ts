@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import prisma from "src/shared/prisma/client";
 import env from "src/shared/env";
 import { saveImage, deleteHostedImage } from "src/shared/images/utils";
-import { type ApiError } from "src/shared/errors/types";
+import { ApiError } from "src/shared/errors/classes";
 
 async function createUser({
   image,
@@ -18,11 +18,9 @@ async function createUser({
   password: string;
   firstName?: string;
   lastName?: string;
-}): Promise<
-  { status: "success"; jwt: string } | { status: "failure"; errorCode: 422 }
-> {
+}) {
   if (await prisma.user.findUnique({ where: { username } })) {
-    return { status: "failure", errorCode: 422 };
+    return new ApiError(422);
   }
 
   const createdUser = await prisma.user.create({
@@ -35,15 +33,12 @@ async function createUser({
     },
   });
 
-  return {
-    status: "success",
-    jwt: jwt.sign(String(createdUser.id), env.JWT_SECRET_KEY),
-  };
+  return jwt.sign(String(createdUser.id), env.JWT_SECRET_KEY);
 }
 
-async function deleteUserById(id: number): Promise<ApiError | undefined> {
+async function deleteUserById(id: number) {
   if (!(await prisma.user.findUnique({ where: { id } }))) {
-    return { code: 404 };
+    return new ApiError(404);
   }
 
   const deletedUser = await prisma.user.delete({ where: { id } });

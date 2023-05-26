@@ -14,10 +14,10 @@ async function createTag(req: Request, res: Response) {
     return;
   }
 
-  const tagCreationResult = await services.createTag(req.body);
+  const tagCreationError = await services.createTag(req.body);
 
-  if (tagCreationResult.status === "failure") {
-    res.status(tagCreationResult.errorCode).end();
+  if (tagCreationError) {
+    res.status(tagCreationError.code).end();
     return;
   }
 
@@ -44,13 +44,13 @@ async function updateTag(req: Request, res: Response) {
     return;
   }
 
-  const tagUpdateResult = await services.updateTagById(
+  const tagUpdateError = await services.updateTagById(
     Number(req.params.id),
     req.body
   );
 
-  if (tagUpdateResult.status === "failure") {
-    res.status(tagUpdateResult.errorCode).end();
+  if (tagUpdateError) {
+    res.status(tagUpdateError.code).end();
     return;
   }
 
@@ -58,10 +58,10 @@ async function updateTag(req: Request, res: Response) {
 }
 
 async function deleteTag(req: Request, res: Response) {
-  const tagDeletionResult = await services.deleteTagById(Number(req.params.id));
+  const tagDeletionError = await services.deleteTagById(Number(req.params.id));
 
-  if (tagDeletionResult.status === "failure") {
-    res.status(tagDeletionResult.errorCode).end();
+  if (tagDeletionError) {
+    res.status(tagDeletionError.code).end();
     return;
   }
 

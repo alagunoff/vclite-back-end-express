@@ -1,6 +1,7 @@
 import prisma from "src/shared/prisma/client";
 import { type PaginationParameters } from "src/shared/pagination/types";
 import { calculatePagesTotalNumber } from "src/shared/pagination/utils";
+import { ApiError } from "src/shared/errors/classes";
 
 async function createAuthor({
   description,
@@ -8,26 +9,19 @@ async function createAuthor({
 }: {
   description?: string;
   userId: number;
-}): Promise<{ status: "success" } | { status: "failure"; errorCode: 422 }> {
+}) {
   if (!(await prisma.user.findUnique({ where: { id: userId } }))) {
-    return { status: "failure", errorCode: 422 };
+    return new ApiError(422);
   }
 
   await prisma.author.create({ data: { description, userId } });
-
-  return { status: "success" };
 }
 
 async function getAuthors(paginationParameters: PaginationParameters) {
   const authors = await prisma.author.findMany({
     ...paginationParameters,
-    orderBy: {
-      id: "asc",
-    },
-    select: {
-      id: true,
-      description: true,
-    },
+    orderBy: { id: "asc" },
+    select: { id: true, description: true },
   });
   const authorsTotalNumber = await prisma.author.count();
 
@@ -44,26 +38,20 @@ async function getAuthors(paginationParameters: PaginationParameters) {
 async function updateAuthorById(
   id: number,
   { description }: { description?: string }
-): Promise<{ status: "success" } | { status: "failure"; errorCode: 404 }> {
+) {
   if (!(await prisma.author.findUnique({ where: { id } }))) {
-    return { status: "failure", errorCode: 404 };
+    return new ApiError(404);
   }
 
   await prisma.author.update({ where: { id }, data: { description } });
-
-  return { status: "success" };
 }
 
-async function deleteAuthorById(
-  id: number
-): Promise<{ status: "success" } | { status: "failure"; errorCode: 404 }> {
+async function deleteAuthorById(id: number) {
   if (!(await prisma.author.findUnique({ where: { id } }))) {
-    return { status: "failure", errorCode: 404 };
+    return new ApiError(404);
   }
 
   await prisma.author.delete({ where: { id } });
-
-  return { status: "success" };
 }
 
 export { createAuthor, getAuthors, updateAuthorById, deleteAuthorById };

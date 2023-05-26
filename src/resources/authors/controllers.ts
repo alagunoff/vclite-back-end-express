@@ -14,10 +14,10 @@ async function createAuthor(req: Request, res: Response) {
     return;
   }
 
-  const authorCreationResult = await services.createAuthor(req.body);
+  const authorCreationError = await services.createAuthor(req.body);
 
-  if (authorCreationResult.status === "failure") {
-    res.status(authorCreationResult.errorCode).end();
+  if (authorCreationError) {
+    res.status(authorCreationError.code).end();
     return;
   }
 
@@ -44,13 +44,13 @@ async function updateAuthor(req: Request, res: Response) {
     return;
   }
 
-  const authorUpdateResult = await services.updateAuthorById(
+  const authorUpdateError = await services.updateAuthorById(
     Number(req.params.id),
     req.body
   );
 
-  if (authorUpdateResult.status === "failure") {
-    res.status(authorUpdateResult.errorCode).end();
+  if (authorUpdateError) {
+    res.status(authorUpdateError.code).end();
     return;
   }
 
@@ -58,12 +58,12 @@ async function updateAuthor(req: Request, res: Response) {
 }
 
 async function deleteAuthor(req: Request, res: Response) {
-  const authorDeletionResult = await services.deleteAuthorById(
+  const authorDeletionError = await services.deleteAuthorById(
     Number(req.params.id)
   );
 
-  if (authorDeletionResult.status === "failure") {
-    res.status(authorDeletionResult.errorCode).end();
+  if (authorDeletionError) {
+    res.status(authorDeletionError.code).end();
     return;
   }
 

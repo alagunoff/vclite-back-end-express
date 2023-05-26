@@ -13,12 +13,12 @@ async function createUser(req: Request, res: Response) {
 
   const userCreationResult = await services.createUser(req.body);
 
-  if (userCreationResult.status === "failure") {
-    res.status(userCreationResult.errorCode).end();
+  if (typeof userCreationResult !== "string") {
+    res.status(userCreationResult.code).end();
     return;
   }
 
-  res.status(201).send(userCreationResult.jwt);
+  res.status(201).send(userCreationResult);
 }
 
 function getUser(req: Request, res: Response) {

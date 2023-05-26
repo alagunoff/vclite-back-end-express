@@ -1,19 +1,14 @@
 import prisma from "src/shared/prisma/client";
 import { type PaginationParameters } from "src/shared/pagination/types";
 import { calculatePagesTotalNumber } from "src/shared/pagination/utils";
+import { ApiError } from "src/shared/errors/classes";
 
-async function createTag({
-  name,
-}: {
-  name: string;
-}): Promise<{ status: "success" } | { status: "failure"; errorCode: 422 }> {
+async function createTag({ name }: { name: string }) {
   if (await prisma.tag.findUnique({ where: { name } })) {
-    return { status: "failure", errorCode: 422 };
+    return new ApiError(422);
   }
 
   await prisma.tag.create({ data: { name } });
-
-  return { status: "success" };
 }
 
 async function getTags(paginationParameters: PaginationParameters) {
@@ -35,35 +30,24 @@ async function getTags(paginationParameters: PaginationParameters) {
   };
 }
 
-async function updateTagById(
-  id: number,
-  { name }: { name?: string }
-): Promise<
-  { status: "success" } | { status: "failure"; errorCode: 404 | 422 }
-> {
+async function updateTagById(id: number, { name }: { name?: string }) {
   if (!(await prisma.tag.findUnique({ where: { id } }))) {
-    return { status: "failure", errorCode: 404 };
+    return new ApiError(404);
   }
 
   if (name && (await prisma.tag.findUnique({ where: { name } }))) {
-    return { status: "failure", errorCode: 422 };
+    return new ApiError(422);
   }
 
   await prisma.tag.update({ where: { id }, data: { name } });
-
-  return { status: "success" };
 }
 
-async function deleteTagById(
-  id: number
-): Promise<{ status: "success" } | { status: "failure"; errorCode: 404 }> {
+async function deleteTagById(id: number) {
   if (!(await prisma.tag.findUnique({ where: { id } }))) {
-    return { status: "failure", errorCode: 404 };
+    return new ApiError(404);
   }
 
   await prisma.tag.delete({ where: { id } });
-
-  return { status: "success" };
 }
 
 export { createTag, getTags, updateTagById, deleteTagById };

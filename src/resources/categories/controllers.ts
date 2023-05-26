@@ -14,12 +14,10 @@ async function createCategory(req: Request, res: Response) {
     return;
   }
 
-  const categoryCreationResult = await services.createCategory(req.body);
+  const categoryCreationError = await services.createCategory(req.body);
 
-  if (categoryCreationResult.status === "failure") {
-    res
-      .status(categoryCreationResult.errorCode)
-      .send(categoryCreationResult.reason);
+  if (categoryCreationError) {
+    res.status(categoryCreationError.code).send(categoryCreationError.reason);
     return;
   }
 
@@ -46,17 +44,17 @@ async function updateCategory(req: Request, res: Response) {
     return;
   }
 
-  const categoryUpdateResult = await services.updateCategoryById(
+  const categoryUpdateError = await services.updateCategoryById(
     Number(req.params.id),
     req.body
   );
 
-  if (categoryUpdateResult.status === "failure") {
-    res.status(categoryUpdateResult.errorCode);
+  if (categoryUpdateError) {
+    res.status(categoryUpdateError.code);
 
-    categoryUpdateResult.errorCode === 404
-      ? res.end()
-      : res.send(categoryUpdateResult.reason);
+    categoryUpdateError.reason
+      ? res.send(categoryUpdateError.reason)
+      : res.end();
 
     return;
   }
@@ -65,12 +63,12 @@ async function updateCategory(req: Request, res: Response) {
 }
 
 async function deleteCategory(req: Request, res: Response) {
-  const categoryDeletionResult = await services.deleteCategoryById(
+  const categoryDeletionError = await services.deleteCategoryById(
     Number(req.params.id)
   );
 
-  if (categoryDeletionResult.status === "failure") {
-    res.status(categoryDeletionResult.errorCode).end();
+  if (categoryDeletionError) {
+    res.status(categoryDeletionError.code).end();
     return;
   }
 
