@@ -1,5 +1,9 @@
 function isNotEmptyString(value: unknown): value is string {
-  return typeof value === "string" && value !== "";
+  return typeof value === "string" && value.length !== 0;
+}
+
+function isNotEmptyArray(value: unknown): value is unknown[] {
+  return Array.isArray(value) && value.length !== 0;
 }
 
 function isPositiveInteger(value: unknown) {
@@ -22,19 +26,15 @@ function isDateString(value: unknown) {
 
 function isPositiveIntegersArray(value: unknown) {
   return (
-    Array.isArray(value) &&
-    !!value.length &&
-    !value.some(
-      (item: unknown) => !Number.isInteger(item) || (item as number) <= 0
-    )
+    isNotEmptyArray(value) &&
+    !value.some((item) => !Number.isInteger(item) || (item as number) <= 0)
   );
 }
 
 function isStringPositiveIntegersArray(value: unknown) {
   return (
-    Array.isArray(value) &&
-    !!value.length &&
-    !value.some((item: unknown) => {
+    isNotEmptyArray(value) &&
+    !value.some((item) => {
       const itemAsNumber = Number(item);
 
       return !Number.isInteger(itemAsNumber) || itemAsNumber <= 0;
@@ -44,9 +44,7 @@ function isStringPositiveIntegersArray(value: unknown) {
 
 function isBase64ImageDataUrlsArray(value: unknown) {
   return (
-    Array.isArray(value) &&
-    !!value.length &&
-    !value.some((item: unknown) => !isBase64ImageDataUrl(item))
+    isNotEmptyArray(value) && !value.some((item) => !isBase64ImageDataUrl(item))
   );
 }
 

@@ -1,6 +1,6 @@
 import { type Request } from "express";
 
-import { ERROR_MESSAGES } from "src/shared/validation/constants";
+import { VALIDATION_ERROR_MESSAGES } from "src/shared/validation/constants";
 import {
   isBase64ImageDataUrl,
   isNotEmptyString,
@@ -20,46 +20,46 @@ function validateCreationData(data: any) {
 
   if ("image" in data) {
     if (!isBase64ImageDataUrl(data.image)) {
-      errors.image = ERROR_MESSAGES.base64ImageDataUrl;
+      errors.image = VALIDATION_ERROR_MESSAGES.base64ImageDataUrl;
     }
   } else {
-    errors.image = ERROR_MESSAGES.required;
+    errors.image = VALIDATION_ERROR_MESSAGES.required;
   }
 
   if ("extraImages" in data && !isBase64ImageDataUrlsArray(data.extraImages)) {
-    errors.extraImages = ERROR_MESSAGES.base64ImageDataUrlsArray;
+    errors.extraImages = VALIDATION_ERROR_MESSAGES.base64ImageDataUrlsArray;
   }
 
   if ("title" in data) {
     if (!isNotEmptyString(data.title)) {
-      errors.title = ERROR_MESSAGES.notEmptyString;
+      errors.title = VALIDATION_ERROR_MESSAGES.notEmptyString;
     }
   } else {
-    errors.title = ERROR_MESSAGES.required;
+    errors.title = VALIDATION_ERROR_MESSAGES.required;
   }
 
   if ("content" in data) {
     if (!isNotEmptyString(data.content)) {
-      errors.content = ERROR_MESSAGES.notEmptyString;
+      errors.content = VALIDATION_ERROR_MESSAGES.notEmptyString;
     }
   } else {
-    errors.content = ERROR_MESSAGES.required;
+    errors.content = VALIDATION_ERROR_MESSAGES.required;
   }
 
   if ("categoryId" in data) {
     if (!isPositiveInteger(data.categoryId)) {
-      errors.categoryId = ERROR_MESSAGES.positiveInteger;
+      errors.categoryId = VALIDATION_ERROR_MESSAGES.positiveInteger;
     }
   } else {
-    errors.categoryId = ERROR_MESSAGES.required;
+    errors.categoryId = VALIDATION_ERROR_MESSAGES.required;
   }
 
   if ("tagsIds" in data) {
     if (!isPositiveIntegersArray(data.tagsIds)) {
-      errors.tagsIds = ERROR_MESSAGES.positiveIntegersArray;
+      errors.tagsIds = VALIDATION_ERROR_MESSAGES.positiveIntegersArray;
     }
   } else {
-    errors.tagsIds = ERROR_MESSAGES.required;
+    errors.tagsIds = VALIDATION_ERROR_MESSAGES.required;
   }
 
   if (Object.keys(errors).length) {
@@ -85,35 +85,35 @@ function validateFilterQueryParameters(queryParameters: Request["query"]) {
     "titleContains" in queryParameters &&
     !isNotEmptyString(queryParameters.titleContains)
   ) {
-    errors.titleContains = ERROR_MESSAGES.notEmptyString;
+    errors.titleContains = VALIDATION_ERROR_MESSAGES.notEmptyString;
   }
 
   if (
     "contentContains" in queryParameters &&
     !isNotEmptyString(queryParameters.contentContains)
   ) {
-    errors.contentContains = ERROR_MESSAGES.notEmptyString;
+    errors.contentContains = VALIDATION_ERROR_MESSAGES.notEmptyString;
   }
 
   if (
     "authorFirstName" in queryParameters &&
     !isNotEmptyString(queryParameters.authorFirstName)
   ) {
-    errors.authorFirstName = ERROR_MESSAGES.notEmptyString;
+    errors.authorFirstName = VALIDATION_ERROR_MESSAGES.notEmptyString;
   }
 
   if (
     "categoryId" in queryParameters &&
     !isStringPositiveInteger(queryParameters.categoryId)
   ) {
-    errors.categoryId = ERROR_MESSAGES.positiveInteger;
+    errors.categoryId = VALIDATION_ERROR_MESSAGES.positiveInteger;
   }
 
   if (
     "tagId" in queryParameters &&
     !isStringPositiveInteger(queryParameters.tagId)
   ) {
-    errors.tagId = ERROR_MESSAGES.positiveInteger;
+    errors.tagId = VALIDATION_ERROR_MESSAGES.positiveInteger;
   }
 
   if (
@@ -134,21 +134,21 @@ function validateFilterQueryParameters(queryParameters: Request["query"]) {
     "createdAt" in queryParameters &&
     !isDateString(queryParameters.createdAt)
   ) {
-    errors.createdAt = ERROR_MESSAGES.date;
+    errors.createdAt = VALIDATION_ERROR_MESSAGES.dateString;
   }
 
   if (
     "createdAtLt" in queryParameters &&
     !isDateString(queryParameters.createdAtLt)
   ) {
-    errors.createdAtLt = ERROR_MESSAGES.date;
+    errors.createdAtLt = VALIDATION_ERROR_MESSAGES.dateString;
   }
 
   if (
     "createdAtGt" in queryParameters &&
     !isDateString(queryParameters.createdAtGt)
   ) {
-    errors.createdAtGt = ERROR_MESSAGES.date;
+    errors.createdAtGt = VALIDATION_ERROR_MESSAGES.dateString;
   }
 
   if (Object.keys(errors).length) {
@@ -180,27 +180,27 @@ function validateUpdateData(data: any) {
   const errors: ValidationErrors = {};
 
   if ("image" in data && !isBase64ImageDataUrl(data.image)) {
-    errors.image = ERROR_MESSAGES.base64ImageDataUrl;
+    errors.image = VALIDATION_ERROR_MESSAGES.base64ImageDataUrl;
   }
 
   if ("extraImages" in data && !isBase64ImageDataUrlsArray(data.extraImages)) {
-    errors.extraImages = ERROR_MESSAGES.base64ImageDataUrlsArray;
+    errors.extraImages = VALIDATION_ERROR_MESSAGES.base64ImageDataUrlsArray;
   }
 
   if ("title" in data && !isNotEmptyString(data.title)) {
-    errors.title = ERROR_MESSAGES.notEmptyString;
+    errors.title = VALIDATION_ERROR_MESSAGES.notEmptyString;
   }
 
   if ("content" in data && !isNotEmptyString(data.content)) {
-    errors.content = ERROR_MESSAGES.notEmptyString;
+    errors.content = VALIDATION_ERROR_MESSAGES.notEmptyString;
   }
 
   if ("categoryId" in data && !isPositiveInteger(data.categoryId)) {
-    errors.categoryId = ERROR_MESSAGES.positiveInteger;
+    errors.categoryId = VALIDATION_ERROR_MESSAGES.positiveInteger;
   }
 
   if ("tagsIds" in data && !isPositiveIntegersArray(data.tagsIds)) {
-    errors.tagsIds = ERROR_MESSAGES.positiveIntegersArray;
+    errors.tagsIds = VALIDATION_ERROR_MESSAGES.positiveIntegersArray;
   }
 
   if (Object.keys(errors).length) {

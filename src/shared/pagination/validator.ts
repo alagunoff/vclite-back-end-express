@@ -1,6 +1,6 @@
 import { type Request } from "express";
 
-import { ERROR_MESSAGES } from "src/shared/validation/constants";
+import { VALIDATION_ERROR_MESSAGES } from "src/shared/validation/constants";
 import { isStringPositiveInteger } from "src/shared/validation/validators";
 
 export default function validatePaginationQueryParameters(
@@ -10,21 +10,21 @@ export default function validatePaginationQueryParameters(
 
   if ("pageNumber" in queryParameters) {
     if (!isStringPositiveInteger(queryParameters.pageNumber)) {
-      errors.pageNumber = ERROR_MESSAGES.positiveInteger;
+      errors.pageNumber = VALIDATION_ERROR_MESSAGES.positiveInteger;
     }
 
     if (!("itemsNumber" in queryParameters)) {
-      errors.itemsNumber = ERROR_MESSAGES.required;
+      errors.itemsNumber = VALIDATION_ERROR_MESSAGES.required;
     }
   }
 
   if ("itemsNumber" in queryParameters) {
     if (!isStringPositiveInteger(queryParameters.itemsNumber)) {
-      errors.itemsNumber = ERROR_MESSAGES.positiveInteger;
+      errors.itemsNumber = VALIDATION_ERROR_MESSAGES.positiveInteger;
     }
 
     if (!("pageNumber" in queryParameters)) {
-      errors.pageNumber = ERROR_MESSAGES.required;
+      errors.pageNumber = VALIDATION_ERROR_MESSAGES.required;
     }
   }
 

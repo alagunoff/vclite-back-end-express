@@ -1,4 +1,4 @@
-import { ERROR_MESSAGES } from "src/shared/validation/constants";
+import { VALIDATION_ERROR_MESSAGES } from "src/shared/validation/constants";
 import { isNotEmptyString } from "src/shared/validation/validators";
 
 function validateCreationData(data: any) {
@@ -8,10 +8,10 @@ function validateCreationData(data: any) {
 
   if ("content" in data) {
     if (!isNotEmptyString(data.content)) {
-      errors.content = ERROR_MESSAGES.notEmptyString;
+      errors.content = VALIDATION_ERROR_MESSAGES.notEmptyString;
     }
   } else {
-    errors.content = ERROR_MESSAGES.required;
+    errors.content = VALIDATION_ERROR_MESSAGES.required;
   }
 
   if (Object.keys(errors).length) {

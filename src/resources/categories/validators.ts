@@ -1,4 +1,4 @@
-import { ERROR_MESSAGES } from "src/shared/validation/constants";
+import { VALIDATION_ERROR_MESSAGES } from "src/shared/validation/constants";
 import {
   isNotEmptyString,
   isPositiveInteger,
@@ -11,14 +11,14 @@ function validateCreationData(data: any) {
 
   if ("name" in data) {
     if (!isNotEmptyString(data.name)) {
-      errors.name = ERROR_MESSAGES.notEmptyString;
+      errors.name = VALIDATION_ERROR_MESSAGES.notEmptyString;
     }
   } else {
-    errors.name = ERROR_MESSAGES.required;
+    errors.name = VALIDATION_ERROR_MESSAGES.required;
   }
 
   if ("parentCategoryId" in data && !isPositiveInteger(data.parentCategoryId)) {
-    errors.parentCategoryId = ERROR_MESSAGES.positiveInteger;
+    errors.parentCategoryId = VALIDATION_ERROR_MESSAGES.positiveInteger;
   }
 
   if (Object.keys(errors).length) {
@@ -30,7 +30,7 @@ function validateUpdateData(data: any) {
   const errors: ValidationErrors = {};
 
   if ("name" in data && !isNotEmptyString(data.name)) {
-    errors.name = ERROR_MESSAGES.notEmptyString;
+    errors.name = VALIDATION_ERROR_MESSAGES.notEmptyString;
   }
 
   if (
