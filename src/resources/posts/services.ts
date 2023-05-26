@@ -9,7 +9,6 @@ import {
   deleteHostedImageFolder,
 } from "src/shared/images/utils";
 import { DEFAULT_ORDER_PARAMETERS } from "src/shared/ordering/constants";
-import { type PaginationParameters } from "src/shared/pagination/types";
 import { calculatePagesTotalNumber } from "src/shared/pagination/utils";
 import { ApiError } from "src/shared/errors/classes";
 import { includeSubcategories } from "src/resources/categories/utils";
@@ -71,56 +70,31 @@ async function createPost({
   });
 }
 
-async function getPosts(
-  filterParameters: Prisma.PostWhereInput,
-  paginationParameters: PaginationParameters,
-  orderParameters?: Prisma.PostOrderByWithRelationInput
-) {
+async function getPosts({
+  where,
+  skip,
+  take,
+  orderBy,
+}: Prisma.PostFindManyArgs) {
   const posts = await prisma.post.findMany({
-    where: filterParameters,
-    ...paginationParameters,
-    orderBy: orderParameters ?? DEFAULT_ORDER_PARAMETERS,
+    where,
+    skip,
+    take,
+    orderBy: orderBy ?? DEFAULT_ORDER_PARAMETERS,
     select: {
       id: true,
       image: true,
-      extraImages: {
-        select: {
-          id: true,
-          image: true,
-        },
-      },
+      extraImages: { select: { id: true, image: true } },
       title: true,
       content: true,
-      author: {
-        select: {
-          id: true,
-          description: true,
-        },
-      },
-      category: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      tags: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      comments: {
-        select: {
-          id: true,
-          content: true,
-        },
-      },
+      author: { select: { id: true, description: true } },
+      category: { select: { id: true, name: true } },
+      tags: { select: { id: true, name: true } },
+      comments: { select: { id: true, content: true } },
       createdAt: true,
     },
   });
-  const postsTotalNumber = await prisma.post.count({
-    where: filterParameters,
-  });
+  const postsTotalNumber = await prisma.post.count({ where });
 
   for (const post of posts) {
     await includeSubcategories(post.category);
@@ -129,10 +103,7 @@ async function getPosts(
   return {
     posts,
     postsTotalNumber,
-    pagesTotalNumber: calculatePagesTotalNumber(
-      postsTotalNumber,
-      paginationParameters.take
-    ),
+    pagesTotalNumber: calculatePagesTotalNumber(postsTotalNumber, take),
   };
 }
 

@@ -1,4 +1,4 @@
-const ORDER_VALID_OPTIONS = [
+const VALID_ORDER_OPTIONS = [
   "createdAt",
   "-createdAt",
   "authorFirstName",
@@ -9,4 +9,4 @@ const ORDER_VALID_OPTIONS = [
   "-imagesNumber",
 ] as const;
 
-export { ORDER_VALID_OPTIONS };
+export { VALID_ORDER_OPTIONS };

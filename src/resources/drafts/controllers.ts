@@ -43,13 +43,13 @@ async function getDrafts(req: Request, res: Response) {
     posts: drafts,
     postsTotalNumber: draftsTotalNumber,
     pagesTotalNumber,
-  } = await postServices.getPosts(
-    {
+  } = await postServices.getPosts({
+    where: {
       authorId: req.authenticatedAuthor?.id,
       isDraft: true,
     },
-    createPaginationParameters(req.query)
-  );
+    ...createPaginationParameters(req.query),
+  });
 
   res.json({
     drafts,

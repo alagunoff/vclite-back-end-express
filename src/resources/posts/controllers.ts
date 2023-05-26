@@ -62,11 +62,11 @@ async function getPosts(req: Request, res: Response) {
   }
 
   res.json(
-    await services.getPosts(
-      createFilterParameters(req.query),
-      createPaginationParameters(req.query),
-      createOrderParameters(req.query)
-    )
+    await services.getPosts({
+      where: createFilterParameters(req.query),
+      ...createPaginationParameters(req.query),
+      orderBy: createOrderParameters(req.query),
+    })
   );
 }
 

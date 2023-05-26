@@ -1,6 +1,6 @@
 import { type Prisma } from "@prisma/client";
 
-import { type ORDER_VALID_OPTIONS } from "./constants";
+import { type VALID_ORDER_OPTIONS } from "./constants";
 
 function createFilterParameters({
   titleContains,
@@ -91,7 +91,7 @@ function createFilterParameters({
 function createOrderParameters({
   orderBy,
 }: {
-  orderBy?: (typeof ORDER_VALID_OPTIONS)[number];
+  orderBy?: (typeof VALID_ORDER_OPTIONS)[number];
 }): Prisma.PostOrderByWithRelationInput | undefined {
   switch (orderBy) {
     case "createdAt":

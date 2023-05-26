@@ -13,7 +13,7 @@ import {
 } from "src/shared/validation/validators";
 
 import { type ValidationErrors } from "./types";
-import { ORDER_VALID_OPTIONS } from "./constants";
+import { VALID_ORDER_OPTIONS } from "./constants";
 
 function validateCreationData(data: any) {
   const errors: ValidationErrors = {};
@@ -167,10 +167,10 @@ function validateOrderQueryParameters(queryParameters: Request["query"]) {
   if (
     "orderBy" in queryParameters &&
     (typeof queryParameters.orderBy !== "string" ||
-      !ORDER_VALID_OPTIONS.includes(queryParameters.orderBy as any))
+      !VALID_ORDER_OPTIONS.includes(queryParameters.orderBy as any))
   ) {
     errors.orderBy = `must be one of the following options [${String(
-      ORDER_VALID_OPTIONS
+      VALID_ORDER_OPTIONS
     )}]`;
   }
 
