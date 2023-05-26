@@ -6,6 +6,10 @@ function isNotEmptyArray(value: unknown): value is unknown[] {
   return Array.isArray(value) && value.length !== 0;
 }
 
+function isUsername(value: unknown) {
+  return isNotEmptyString(value) && /^[a-z][a-z0-9]*$/.test(value);
+}
+
 function isPositiveInteger(value: unknown) {
   return Number.isInteger(value) && (value as number) > 0;
 }
@@ -50,6 +54,7 @@ function isBase64ImageDataUrlsArray(value: unknown) {
 
 export {
   isNotEmptyString,
+  isUsername,
   isPositiveInteger,
   isStringPositiveInteger,
   isBase64ImageDataUrl,

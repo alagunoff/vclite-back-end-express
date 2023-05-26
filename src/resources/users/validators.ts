@@ -1,5 +1,6 @@
 import { VALIDATION_ERROR_MESSAGES } from "src/shared/validation/constants";
 import {
+  isUsername,
   isNotEmptyString,
   isBase64ImageDataUrl,
 } from "src/shared/validation/validators";
@@ -22,8 +23,9 @@ function validateCreationData(data: any) {
   }
 
   if ("username" in data) {
-    if (!isNotEmptyString(data.username)) {
-      errors.username = VALIDATION_ERROR_MESSAGES.notEmptyString;
+    if (!isUsername(data.username)) {
+      errors.username =
+        "username must start with lowercased latin letter optionally followed by any number of lowercased latin letters or numbers";
     }
   } else {
     errors.username = VALIDATION_ERROR_MESSAGES.required;
