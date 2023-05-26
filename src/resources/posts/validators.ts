@@ -7,9 +7,9 @@ import {
   isPositiveInteger,
   isStringPositiveInteger,
   isDateString,
-  isPositiveIntegersNotEmptyArray,
-  isStringPositiveIntegersNotEmptyArray,
-  isBase64ImageDataUrlsNotEmptyArray,
+  isPositiveIntegersArray,
+  isStringPositiveIntegersArray,
+  isBase64ImageDataUrlsArray,
 } from "src/shared/validation/validators";
 
 import { type ValidationErrors } from "./types";
@@ -26,10 +26,7 @@ function validateCreationData(data: any) {
     errors.image = ERROR_MESSAGES.required;
   }
 
-  if (
-    "extraImages" in data &&
-    !isBase64ImageDataUrlsNotEmptyArray(data.extraImages)
-  ) {
+  if ("extraImages" in data && !isBase64ImageDataUrlsArray(data.extraImages)) {
     errors.extraImages = ERROR_MESSAGES.base64ImageDataUrlsArray;
   }
 
@@ -58,7 +55,7 @@ function validateCreationData(data: any) {
   }
 
   if ("tagsIds" in data) {
-    if (!isPositiveIntegersNotEmptyArray(data.tagsIds)) {
+    if (!isPositiveIntegersArray(data.tagsIds)) {
       errors.tagsIds = ERROR_MESSAGES.positiveIntegersArray;
     }
   } else {
@@ -121,14 +118,14 @@ function validateFilterQueryParameters(queryParameters: Request["query"]) {
 
   if (
     "tagIdIn" in queryParameters &&
-    !isStringPositiveIntegersNotEmptyArray(queryParameters.tagIdIn)
+    !isStringPositiveIntegersArray(queryParameters.tagIdIn)
   ) {
     errors.tagIdIn = "must be positive integers delimited by ampersand";
   }
 
   if (
     "tagIdAll" in queryParameters &&
-    !isStringPositiveIntegersNotEmptyArray(queryParameters.tagIdAll)
+    !isStringPositiveIntegersArray(queryParameters.tagIdAll)
   ) {
     errors.tagIdAll = "must be positive integers delimited by ampersand";
   }
@@ -186,10 +183,7 @@ function validateUpdateData(data: any) {
     errors.image = ERROR_MESSAGES.base64ImageDataUrl;
   }
 
-  if (
-    "extraImages" in data &&
-    !isBase64ImageDataUrlsNotEmptyArray(data.extraImages)
-  ) {
+  if ("extraImages" in data && !isBase64ImageDataUrlsArray(data.extraImages)) {
     errors.extraImages = ERROR_MESSAGES.base64ImageDataUrlsArray;
   }
 
@@ -205,7 +199,7 @@ function validateUpdateData(data: any) {
     errors.categoryId = ERROR_MESSAGES.positiveInteger;
   }
 
-  if ("tagsIds" in data && !isPositiveIntegersNotEmptyArray(data.tagsIds)) {
+  if ("tagsIds" in data && !isPositiveIntegersArray(data.tagsIds)) {
     errors.tagsIds = ERROR_MESSAGES.positiveIntegersArray;
   }
 

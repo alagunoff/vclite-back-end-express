@@ -4,13 +4,8 @@ import { type CategoryWithSubcategories } from "./types";
 
 async function includeSubcategories(category: CategoryWithSubcategories) {
   const subcategories = await prisma.category.findMany({
-    where: {
-      parentCategoryId: category.id,
-    },
-    select: {
-      id: true,
-      name: true,
-    },
+    where: { parentCategoryId: category.id },
+    select: { id: true, name: true },
   });
 
   if (subcategories.length) {

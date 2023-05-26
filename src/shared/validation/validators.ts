@@ -1,4 +1,4 @@
-function isNotEmptyString(value: unknown) {
+function isNotEmptyString(value: unknown): value is string {
   return typeof value === "string" && value !== "";
 }
 
@@ -12,15 +12,15 @@ function isStringPositiveInteger(value: unknown) {
 
 function isBase64ImageDataUrl(value: unknown) {
   return (
-    typeof value === "string" && /^data:image\/(jpeg|png);base64,/.test(value)
+    isNotEmptyString(value) && /^data:image\/(jpeg|png);base64,/.test(value)
   );
 }
 
 function isDateString(value: unknown) {
-  return typeof value === "string" ? !Number.isNaN(Date.parse(value)) : false;
+  return isNotEmptyString(value) && !Number.isNaN(Date.parse(value));
 }
 
-function isPositiveIntegersNotEmptyArray(value: unknown) {
+function isPositiveIntegersArray(value: unknown) {
   return (
     Array.isArray(value) &&
     !!value.length &&
@@ -30,7 +30,7 @@ function isPositiveIntegersNotEmptyArray(value: unknown) {
   );
 }
 
-function isStringPositiveIntegersNotEmptyArray(value: unknown) {
+function isStringPositiveIntegersArray(value: unknown) {
   return (
     Array.isArray(value) &&
     !!value.length &&
@@ -42,7 +42,7 @@ function isStringPositiveIntegersNotEmptyArray(value: unknown) {
   );
 }
 
-function isBase64ImageDataUrlsNotEmptyArray(value: unknown) {
+function isBase64ImageDataUrlsArray(value: unknown) {
   return (
     Array.isArray(value) &&
     !!value.length &&
@@ -56,7 +56,7 @@ export {
   isStringPositiveInteger,
   isBase64ImageDataUrl,
   isDateString,
-  isPositiveIntegersNotEmptyArray,
-  isStringPositiveIntegersNotEmptyArray,
-  isBase64ImageDataUrlsNotEmptyArray,
+  isPositiveIntegersArray,
+  isStringPositiveIntegersArray,
+  isBase64ImageDataUrlsArray,
 };
