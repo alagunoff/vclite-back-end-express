@@ -1,6 +1,7 @@
 import express from "express";
 import "express-async-errors";
 import helmet from "helmet";
+import compression from "compression";
 import swaggerUi from "swagger-ui-express";
 
 import apiDocs from "../api-docs.json";
@@ -18,6 +19,7 @@ const app = express();
 
 app.use(express.json());
 app.use(helmet());
+app.use(compression());
 app.use("/api/static", express.static(`${projectAbsolutePath}/static`));
 app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
