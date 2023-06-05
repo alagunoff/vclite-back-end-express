@@ -15,10 +15,9 @@ import { projectAbsolutePath } from "./shared/app/constants";
 import { handleError } from "./shared/errors/middlewares";
 
 const app = express();
-app.listen(3000);
+
 app.use(express.json());
 app.use(helmet());
-
 app.use("/api/static", express.static(`${projectAbsolutePath}/static`));
 app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
@@ -29,3 +28,5 @@ app.use("/api/posts", postsRouter);
 app.use("/api/drafts", draftsRouter);
 app.use("/api/swagger", swaggerUi.serve, swaggerUi.setup(apiDocs));
 app.use(handleError);
+
+export default app;

@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "dev": "tsup ./src/index.ts --watch --onSuccess \"node ./dist/index.js\"",
-    "build": "tsup ./src/index.ts",
+    "dev": "tsup ./src/server.ts --watch --onSuccess \"node ./dist/index.js\"",
+    "build": "tsup ./src/server.ts",
     "prepare": "husky install",
     "eslint": "eslint ./src --ext .ts",
     "eslint:fix": "eslint ./src --ext .ts --fix"
