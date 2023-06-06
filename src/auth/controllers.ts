@@ -1,5 +1,7 @@
 import { type Request, type Response } from "express";
 
+import { ApiError } from "shared/errors/classes";
+
 import * as services from "./services";
 import { validateLoginData } from "./validators";
 
@@ -13,7 +15,7 @@ async function logIn(req: Request, res: Response) {
 
   const loginResult = await services.logIn(req.body);
 
-  if (typeof loginResult !== "string") {
+  if (loginResult instanceof ApiError) {
     res.status(loginResult.code).end();
     return;
   }
