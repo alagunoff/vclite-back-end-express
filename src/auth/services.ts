@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 
 import env from "src/shared/env";
 import prisma from "src/shared/prisma/client";
 import { ApiError } from "src/shared/errors/classes";
+import { hashPassword } from "src/shared/hashing/utils";
 
 async function logIn({
   username,
@@ -18,12 +18,7 @@ async function logIn({
     return new ApiError(404);
   }
 
-  const isProvidedPasswordCorrect = bcrypt.compareSync(
-    password,
-    userToLogIn.password
-  );
-
-  if (!isProvidedPasswordCorrect) {
+  if (hashPassword(password) !== userToLogIn.password) {
     return new ApiError(403);
   }
 

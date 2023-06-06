@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 
 import prisma from "src/shared/prisma/client";
 import env from "src/shared/env";
 import { saveImage, deleteHostedImage } from "src/shared/images/utils";
 import { ApiError } from "src/shared/errors/classes";
+import { hashPassword } from "src/shared/hashing/utils";
 
 async function createUser({
   image,
@@ -27,7 +27,7 @@ async function createUser({
     data: {
       image: saveImage(image, "users", username),
       username,
-      password: bcrypt.hashSync(password),
+      password: hashPassword(password),
       firstName,
       lastName,
     },

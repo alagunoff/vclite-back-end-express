@@ -12,4 +12,4 @@ COPY --from=builder ["/app/package.json", "/app/package-lock.json", "/app/api-do
 COPY --from=builder ./app/prisma ./prisma
 COPY --from=builder ./app/dist ./dist
 RUN npm install
-CMD ["node", "./dist/index.js"]
+CMD ["node", "./dist/server.js"]
