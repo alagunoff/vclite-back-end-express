@@ -1,7 +1,7 @@
-import path from "path";
-import fs from "fs";
+import fs from "node:fs";
+import path from "node:path";
 
-import { HOST_NAME, projectAbsolutePath } from "src/shared/app/constants";
+import { HOST_NAME, projectAbsolutePath } from "shared/app/constants";
 
 function saveImage(
   base64ImageDataUrl: string,

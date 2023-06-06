@@ -1,19 +1,19 @@
+import compression from "compression";
 import express from "express";
 import "express-async-errors";
 import helmet from "helmet";
-import compression from "compression";
 import swaggerUi from "swagger-ui-express";
 
-import apiDocs from "../api-docs.json";
 import authRouter from "./auth/router";
-import usersRouter from "./resources/users/router";
 import authorsRouter from "./resources/authors/router";
-import tagsRouter from "./resources/tags/router";
 import categoriesRouter from "./resources/categories/router";
-import postsRouter from "./resources/posts/router";
 import draftsRouter from "./resources/drafts/router";
+import postsRouter from "./resources/posts/router";
+import tagsRouter from "./resources/tags/router";
+import usersRouter from "./resources/users/router";
 import { projectAbsolutePath } from "./shared/app/constants";
 import { handleError } from "./shared/errors/middlewares";
+import apiDocs from "../api-docs.json";
 
 const app = express();
 

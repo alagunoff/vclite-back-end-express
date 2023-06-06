@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { authenticateUser } from "src/auth/middlewares";
+import { authenticateUser } from "auth/middlewares";
 
 import { createComment, getComments, deleteComments } from "./controllers";
 

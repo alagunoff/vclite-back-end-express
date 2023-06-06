@@ -1,7 +1,7 @@
 import { type Request } from "express";
 
-import { VALIDATION_ERROR_MESSAGES } from "src/shared/validation/constants";
-import { isStringPositiveInteger } from "src/shared/validation/validators";
+import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
+import { isStringPositiveInteger } from "shared/validation/validators";
 
 export default function validatePaginationQueryParameters(
   queryParameters: Request["query"]

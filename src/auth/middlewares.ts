@@ -1,8 +1,8 @@
 import { type Request, type Response, type NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-import prisma from "src/shared/prisma/client";
-import env from "src/shared/env";
+import env from "shared/env";
+import prisma from "shared/prisma";
 
 function authenticateUser(as?: "admin" | "author") {
   const isAdminAuthentication = as === "admin";

@@ -1,7 +1,7 @@
 import { type Request, type Response } from "express";
 
-import { validateCreationData } from "./validators";
 import * as services from "./services";
+import { validateCreationData } from "./validators";
 
 async function createUser(req: Request, res: Response) {
   const creationDataValidationErrors = validateCreationData(req.body);

@@ -1,7 +1,7 @@
 import { type Request, type Response } from "express";
 
-import { validateLoginData } from "./validators";
 import * as services from "./services";
+import { validateLoginData } from "./validators";
 
 async function logIn(req: Request, res: Response) {
   const loginDataValidationErrors = validateLoginData(req.body);

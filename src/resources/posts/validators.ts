@@ -1,6 +1,6 @@
 import { type Request } from "express";
 
-import { VALIDATION_ERROR_MESSAGES } from "src/shared/validation/constants";
+import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
 import {
   isBase64ImageDataUrl,
   isNotEmptyString,
@@ -10,10 +10,10 @@ import {
   isPositiveIntegersArray,
   isStringPositiveIntegersArray,
   isBase64ImageDataUrlsArray,
-} from "src/shared/validation/validators";
+} from "shared/validation/validators";
 
-import { type ValidationErrors } from "./types";
 import { VALID_ORDER_OPTIONS } from "./constants";
+import { type ValidationErrors } from "./types";
 
 function validateCreationData(data: any) {
   const errors: ValidationErrors = {};

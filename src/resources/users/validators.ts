@@ -1,9 +1,9 @@
-import { VALIDATION_ERROR_MESSAGES } from "src/shared/validation/constants";
+import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
 import {
   isUsername,
   isNotEmptyString,
   isBase64ImageDataUrl,
-} from "src/shared/validation/validators";
+} from "shared/validation/validators";
 
 function validateCreationData(data: any) {
   const errors: {

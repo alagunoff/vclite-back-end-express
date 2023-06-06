@@ -1,8 +1,8 @@
-import { VALIDATION_ERROR_MESSAGES } from "src/shared/validation/constants";
+import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
 import {
   isNotEmptyString,
   isPositiveInteger,
-} from "src/shared/validation/validators";
+} from "shared/validation/validators";
 
 import { type ValidationErrors } from "./types";
 

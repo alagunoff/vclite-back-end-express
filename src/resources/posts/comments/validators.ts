@@ -1,5 +1,5 @@
-import { VALIDATION_ERROR_MESSAGES } from "src/shared/validation/constants";
-import { isNotEmptyString } from "src/shared/validation/validators";
+import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
+import { isNotEmptyString } from "shared/validation/validators";
 
 function validateCreationData(data: any) {
   const errors: {

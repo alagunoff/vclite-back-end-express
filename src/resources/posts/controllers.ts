@@ -1,16 +1,16 @@
 import { type Request, type Response } from "express";
 
-import validatePaginationQueryParameters from "src/shared/pagination/validator";
-import { createPaginationParameters } from "src/shared/pagination/utils";
+import { createPaginationParameters } from "shared/pagination/utils";
+import validatePaginationQueryParameters from "shared/pagination/validator";
 
 import * as services from "./services";
+import { createFilterParameters, createOrderParameters } from "./utils";
 import {
   validateCreationData,
   validateFilterQueryParameters,
   validateOrderQueryParameters,
   validateUpdateData,
 } from "./validators";
-import { createFilterParameters, createOrderParameters } from "./utils";
 
 async function createPost(req: Request, res: Response) {
   const creationDataValidationErrors = validateCreationData(req.body);

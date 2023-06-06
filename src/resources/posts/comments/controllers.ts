@@ -1,11 +1,11 @@
 import { type Request, type Response } from "express";
 
-import validatePaginationQueryParameters from "src/shared/pagination/validator";
-import { createPaginationParameters } from "src/shared/pagination/utils";
+import { ApiError } from "shared/errors/classes";
+import { createPaginationParameters } from "shared/pagination/utils";
+import validatePaginationQueryParameters from "shared/pagination/validator";
 
 import * as services from "./services";
 import { validateCreationData } from "./validators";
-import { ApiError } from "src/shared/errors/classes";
 
 async function createComment(req: Request, res: Response) {
   const creationDataValidationErrors = validateCreationData(req.body);

@@ -1,17 +1,17 @@
 import { type Prisma } from "@prisma/client";
-import crypto from "crypto";
+import crypto from "node:crypto";
 
-import prisma from "src/shared/prisma/client";
+import { includeSubcategories } from "resources/categories/utils";
+import { ApiError } from "shared/errors/classes";
 import {
   saveImage,
   getHostedImageFolderName,
   deleteHostedImage,
   deleteHostedImageFolder,
-} from "src/shared/images/utils";
-import { DEFAULT_ORDER_PARAMETERS } from "src/shared/ordering/constants";
-import { calculatePagesTotalNumber } from "src/shared/pagination/utils";
-import { ApiError } from "src/shared/errors/classes";
-import { includeSubcategories } from "src/resources/categories/utils";
+} from "shared/images/utils";
+import { DEFAULT_ORDER_PARAMETERS } from "shared/ordering/constants";
+import { calculatePagesTotalNumber } from "shared/pagination/utils";
+import prisma from "shared/prisma";
 
 async function createPost({
   image,
