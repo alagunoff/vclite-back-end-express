@@ -11,7 +11,7 @@ import draftsRouter from "./resources/drafts/router";
 import postsRouter from "./resources/posts/router";
 import tagsRouter from "./resources/tags/router";
 import usersRouter from "./resources/users/router";
-import { projectAbsolutePath } from "./shared/app/constants";
+import { projectAbsolutePath } from "./shared/constants";
 import { handleError } from "./shared/errors/middlewares";
 import apiDocs from "../api-docs.json";
 
