@@ -42,11 +42,8 @@
           "400": {
             "description": "Login data is invalid"
           },
-          "403": {
-            "description": "Password is incorrect"
-          },
-          "404": {
-            "description": "User with this username not found"
+          "401": {
+            "description": "User with this username not found or password is incorrect"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -136,7 +133,7 @@
             "description": "User has been deleted"
           },
           "404": {
-            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or user to delete not found"
+            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or user not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -246,7 +243,7 @@
             "$ref": "#/components/responses/InvalidUpdateData"
           },
           "404": {
-            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or author to update not found"
+            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or author not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -266,7 +263,7 @@
             "description": "Author has been deleted"
           },
           "404": {
-            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or author to delete not found"
+            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or author not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -368,7 +365,7 @@
             "$ref": "#/components/responses/InvalidUpdateData"
           },
           "404": {
-            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or tag to update not found"
+            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or tag not found"
           },
           "422": {
             "description": "Tag with this name already exists"
@@ -391,7 +388,7 @@
             "description": "Tag has been deleted"
           },
           "404": {
-            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or tag to delete not found"
+            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or tag not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -502,7 +499,7 @@
             "$ref": "#/components/responses/InvalidUpdateData"
           },
           "404": {
-            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or category to update not found"
+            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or category not found"
           },
           "422": {
             "description": "Category with this name already exists or parent category with this id not found"
@@ -525,7 +522,7 @@
             "description": "Category has been deleted"
           },
           "404": {
-            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or category to delete not found"
+            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or category not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -800,7 +797,7 @@
             "$ref": "#/components/responses/InvalidUpdateData"
           },
           "404": {
-            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or post to update not found"
+            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or post not found"
           },
           "422": {
             "description": "Category with this id not found or some tag in provided array of tags ids not found"
@@ -823,7 +820,7 @@
             "description": "Post has been deleted"
           },
           "404": {
-            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or post to delete not found"
+            "description": "JWT isn't provided or invalid or authenticated user isn't an admin or post not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"

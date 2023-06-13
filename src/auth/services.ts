@@ -14,12 +14,8 @@ async function logIn({
 }) {
   const userToLogIn = await prisma.user.findUnique({ where: { username } });
 
-  if (!userToLogIn) {
-    return new ApiError(404);
-  }
-
-  if (hashPassword(password) !== userToLogIn.password) {
-    return new ApiError(403);
+  if (!userToLogIn || hashPassword(password) !== userToLogIn.password) {
+    return new ApiError(401);
   }
 
   return jwt.sign(String(userToLogIn.id), env.JWT_SECRET_KEY);
