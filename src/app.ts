@@ -19,7 +19,7 @@ import apiDocs from "../api-docs.json";
 
 const app = express();
 
-if (env.isDev) {
+if (!env.isProd) {
   app.use(cors());
 }
 

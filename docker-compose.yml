@@ -2,18 +2,9 @@ version: "3.9"
 services:
   db:
     image: postgres:15.2
-    environment:
-      - POSTGRES_PASSWORD=postgres
     ports:
       - 5432:5432
-    volumes:
-      - db:/var/lib/postgresql/data
   pgadmin:
     image: dpage/pgadmin4:7.3
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=oleg@oleg.com
-      - PGADMIN_DEFAULT_PASSWORD=oleg
     ports:
       - 5433:80
-volumes:
-  db:
