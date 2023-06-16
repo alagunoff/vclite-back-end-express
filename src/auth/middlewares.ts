@@ -21,9 +21,7 @@ function authenticateUser(as?: "admin" | "author") {
       }
 
       const authenticatedUser = await prisma.user.findUnique({
-        where: {
-          id: Number(decodedJwt),
-        },
+        where: { id: Number(decodedJwt) },
       });
 
       if (!authenticatedUser) {
@@ -40,9 +38,7 @@ function authenticateUser(as?: "admin" | "author") {
 
       if (as === "author") {
         const authenticatedAuthor = await prisma.author.findUnique({
-          where: {
-            userId: authenticatedUser.id,
-          },
+          where: { userId: authenticatedUser.id },
         });
 
         if (!authenticatedAuthor) {
