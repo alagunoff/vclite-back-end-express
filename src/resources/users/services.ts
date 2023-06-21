@@ -26,7 +26,7 @@ async function createUser({
 
   await prisma.user.create({
     data: {
-      image: saveImage(image, "users", username),
+      image: await saveImage(image, "users", username),
       username,
       password: hashPassword(password),
       email,
@@ -48,7 +48,7 @@ async function deleteUserById(id: number) {
   }
 
   const deletedUser = await prisma.user.delete({ where: { id } });
-  deleteHostedImage(deletedUser.image);
+  await deleteHostedImage(deletedUser.image);
 }
 
 export { createUser, deleteUserById };

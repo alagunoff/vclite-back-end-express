@@ -46,17 +46,19 @@ async function createPost({
 
   await prisma.post.create({
     data: {
-      image: saveImage(image, postImagesFolderName, "main"),
+      image: await saveImage(image, postImagesFolderName, "main"),
       extraImages: extraImages
         ? {
             createMany: {
-              data: extraImages.map((extraImage, index) => ({
-                image: saveImage(
-                  extraImage,
-                  postImagesFolderName,
-                  `extra-${index}`
-                ),
-              })),
+              data: await Promise.all(
+                extraImages.map(async (extraImage, index) => ({
+                  image: await saveImage(
+                    extraImage,
+                    postImagesFolderName,
+                    `extra-${index}`
+                  ),
+                }))
+              ),
             },
           }
         : undefined,
@@ -165,7 +167,7 @@ async function updatePost(
     )}`;
 
     if (image) {
-      saveImage(image, updatedPostImagesFolderName, "main");
+      await saveImage(image, updatedPostImagesFolderName, "main");
     }
 
     if (extraImages) {
@@ -178,7 +180,7 @@ async function updatePost(
           where: { id: extraImage.id },
         });
 
-        deleteHostedImage(deletedExtraImage.image);
+        await deleteHostedImage(deletedExtraImage.image);
       }
 
       await prisma.post.update({
@@ -186,13 +188,15 @@ async function updatePost(
         data: {
           extraImages: {
             createMany: {
-              data: extraImages.map((extraImage, index) => ({
-                image: saveImage(
-                  extraImage,
-                  updatedPostImagesFolderName,
-                  `extra-${index}`
-                ),
-              })),
+              data: await Promise.all(
+                extraImages.map(async (extraImage, index) => ({
+                  image: await saveImage(
+                    extraImage,
+                    updatedPostImagesFolderName,
+                    `extra-${index}`
+                  ),
+                }))
+              ),
             },
           },
         },
@@ -207,7 +211,7 @@ async function deletePost(filterParameters: Prisma.PostWhereUniqueInput) {
   }
 
   const deletedPost = await prisma.post.delete({ where: filterParameters });
-  deleteHostedImageFolder(deletedPost.image);
+  await deleteHostedImageFolder(deletedPost.image);
 }
 
 export { createPost, getPosts, updatePost, deletePost };
