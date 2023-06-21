@@ -24,8 +24,8 @@ function validateCreationData(data: any) {
 
   if (Object.hasOwn(data, "username")) {
     if (
-      checkIfValueIsNotEmptyString(data.username) &&
-      /^[a-z][a-z0-9]*$/.test(data.username)
+      !checkIfValueIsNotEmptyString(data.username) ||
+      !/^[a-z][a-z0-9]*$/.test(data.username)
     ) {
       errors.username =
         "username must start with lowercased latin letter optionally followed by any number of lowercased latin letters or numbers";

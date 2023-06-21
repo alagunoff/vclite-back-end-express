@@ -1,7 +1,6 @@
 {
   "scripts": {
     "dev": "tsup ./src/server.ts --watch --onSuccess \"dotenv -e .env.dev -- node ./dist/server.js\"",
-    "a": "dotenv -e .env.dev -- npx prisma migrate dev",
     "build": "tsup ./src/server.ts --minify",
     "prepare": "husky install",
     "eslint": "eslint ./src --ext .ts",

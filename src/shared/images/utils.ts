@@ -1,7 +1,7 @@
 import fsPromises from "node:fs/promises";
 import path from "node:path";
 
-import { SERVER_URL, projectAbsolutePath } from "shared/constants";
+import { HOST_URL, projectAbsolutePath } from "shared/constants";
 
 async function saveImage(
   base64WebpImageDataUrl: string,
@@ -23,11 +23,11 @@ async function saveImage(
     Buffer.from(base64Image, "base64url")
   );
 
-  return `${SERVER_URL}/static/images/${folderName}/${imageFileNameWithExtension}`;
+  return `${HOST_URL}/api/static/images/${folderName}/${imageFileNameWithExtension}`;
 }
 
 function getHostedImageAbsolutePath(imageUrl: string) {
-  return `${projectAbsolutePath}/${imageUrl.replace(`${SERVER_URL}/`, "")}`;
+  return `${projectAbsolutePath}/${imageUrl.replace(`${HOST_URL}/api/`, "")}`;
 }
 
 function getHostedImageFolderName(imageUrl: string) {
