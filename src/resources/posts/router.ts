@@ -15,4 +15,4 @@ router
 
 router.use("/:postId(\\d+)/comments", commentsRouter);
 
-export default router;
+export { router };

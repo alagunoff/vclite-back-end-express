@@ -23,4 +23,4 @@ router
 
 router.post("/:id(\\d+)/publish", authenticateUser("author"), publishDraft);
 
-export default router;
+export { router };

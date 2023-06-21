@@ -12,4 +12,4 @@ router
   .get(getComments)
   .delete(authenticateUser("admin"), deleteComments);
 
-export default router;
+export { router };

@@ -1,8 +1,8 @@
-import env from "shared/env";
+import { env } from "shared/env";
 import { ApiError } from "shared/errors/classes";
 import { hashPassword } from "shared/hashing/utils";
 import { saveImage, deleteHostedImage } from "shared/images/utils";
-import prisma from "shared/prisma";
+import { prisma } from "shared/prisma";
 import { transporter } from "shared/transporter";
 
 async function createUser({

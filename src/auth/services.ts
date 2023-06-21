@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
 
-import env from "shared/env";
+import { env } from "shared/env";
 import { ApiError } from "shared/errors/classes";
 import { hashPassword } from "shared/hashing/utils";
-import prisma from "shared/prisma";
+import { prisma } from "shared/prisma";
 
 async function logIn({
   username,

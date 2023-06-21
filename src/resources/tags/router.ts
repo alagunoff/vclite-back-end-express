@@ -12,4 +12,4 @@ router
   .patch(authenticateUser("admin"), updateTag)
   .delete(authenticateUser("admin"), deleteTag);
 
-export default router;
+export { router };

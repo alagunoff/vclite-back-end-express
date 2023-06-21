@@ -11,7 +11,7 @@ import {
 } from "shared/images/utils";
 import { DEFAULT_ORDER_PARAMETERS } from "shared/ordering/constants";
 import { calculatePagesTotalNumber } from "shared/pagination/utils";
-import prisma from "shared/prisma";
+import { prisma } from "shared/prisma";
 
 async function createPost({
   image,

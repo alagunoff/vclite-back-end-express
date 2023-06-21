@@ -20,4 +20,4 @@ router
   .patch(authenticateUser("admin"), updateAuthor)
   .delete(authenticateUser("admin"), deleteAuthor);
 
-export default router;
+export { router };
