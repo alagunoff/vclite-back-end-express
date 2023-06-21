@@ -13,16 +13,12 @@ import postsRouter from "./resources/posts/router";
 import tagsRouter from "./resources/tags/router";
 import usersRouter from "./resources/users/router";
 import { projectAbsolutePath } from "./shared/constants";
-import env from "./shared/env";
 import { handleError } from "./shared/errors/middlewares";
 import apiDocs from "../api-docs.json";
 
 const app = express();
 
-if (!env.isProd) {
-  app.use(cors());
-}
-
+app.use(cors());
 app.use(express.json());
 app.use(helmet());
 app.use(compression());
