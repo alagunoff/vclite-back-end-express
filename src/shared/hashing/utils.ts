@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 
-function hashPassword(password: string) {
-  return crypto.createHash("sha256").update(password).digest("hex");
+function hashText(text: string) {
+  return crypto.createHash("sha256").update(text).digest("hex");
 }
 
-export { hashPassword };
+export { hashText };

@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 import { env } from "shared/env";
 import { ApiError } from "shared/errors/classes";
-import { hashPassword } from "shared/hashing/utils";
+import { hashText } from "shared/hashing/utils";
 import { prisma } from "shared/prisma";
 
 async function logIn({
@@ -14,7 +14,7 @@ async function logIn({
 }) {
   const userToLogIn = await prisma.user.findUnique({ where: { username } });
 
-  if (!userToLogIn || hashPassword(password) !== userToLogIn.password) {
+  if (!userToLogIn || hashText(password) !== userToLogIn.password) {
     return new ApiError(401);
   }
 

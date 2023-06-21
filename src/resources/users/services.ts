@@ -1,6 +1,6 @@
 import { env } from "shared/env";
 import { ApiError } from "shared/errors/classes";
-import { hashPassword } from "shared/hashing/utils";
+import { hashText } from "shared/hashing/utils";
 import { saveImage, deleteHostedImage } from "shared/images/utils";
 import { prisma } from "shared/prisma";
 import { transporter } from "shared/transporter";
@@ -28,7 +28,7 @@ async function createUser({
     data: {
       image: await saveImage(image, "users", username),
       username,
-      password: hashPassword(password),
+      password: hashText(password),
       email,
       firstName,
       lastName,
