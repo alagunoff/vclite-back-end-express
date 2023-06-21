@@ -1,30 +1,29 @@
 import { type Request } from "express";
 
-import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
-import { isStringPositiveInteger } from "shared/validation/validators";
+import { checkIfValueIsStringPositiveInteger } from "shared/validation/validators";
 
 export default function validatePaginationQueryParameters(
   queryParameters: Request["query"]
 ) {
   const errors: { pageNumber?: string; itemsNumber?: string } = {};
 
-  if ("pageNumber" in queryParameters) {
-    if (!isStringPositiveInteger(queryParameters.pageNumber)) {
-      errors.pageNumber = VALIDATION_ERROR_MESSAGES.positiveInteger;
+  if (Object.hasOwn(queryParameters, "pageNumber")) {
+    if (!checkIfValueIsStringPositiveInteger(queryParameters.pageNumber)) {
+      errors.pageNumber = "must be positive integer";
     }
 
-    if (!("itemsNumber" in queryParameters)) {
-      errors.itemsNumber = VALIDATION_ERROR_MESSAGES.required;
+    if (!Object.hasOwn(queryParameters, "itemsNumber")) {
+      errors.itemsNumber = "required";
     }
   }
 
-  if ("itemsNumber" in queryParameters) {
-    if (!isStringPositiveInteger(queryParameters.itemsNumber)) {
-      errors.itemsNumber = VALIDATION_ERROR_MESSAGES.positiveInteger;
+  if (Object.hasOwn(queryParameters, "itemsNumber")) {
+    if (!checkIfValueIsStringPositiveInteger(queryParameters.itemsNumber)) {
+      errors.itemsNumber = "must be positive integer";
     }
 
-    if (!("pageNumber" in queryParameters)) {
-      errors.pageNumber = VALIDATION_ERROR_MESSAGES.required;
+    if (!Object.hasOwn(queryParameters, "pageNumber")) {
+      errors.pageNumber = "required";
     }
   }
 

@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { authenticateUser } from "auth/middlewares";
 
-import commentsRouter from "./comments/router";
+import * as commentsRouter from "./comments/router";
 import { createPost, getPosts, updatePost, deletePost } from "./controllers";
 
 const router = Router();
@@ -13,6 +13,6 @@ router
   .patch(authenticateUser("admin"), updatePost)
   .delete(authenticateUser("admin"), deletePost);
 
-router.use("/:postId(\\d+)/comments", commentsRouter);
+router.use("/:postId(\\d+)/comments", commentsRouter.router);
 
 export { router };

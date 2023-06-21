@@ -1,7 +1,7 @@
 import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
 import {
   checkIfValueIsNotEmptyString,
-  isPositiveInteger,
+  checkIfValueIsPositiveInteger,
 } from "shared/validation/validators";
 
 import { type ValidationErrors } from "./types";
@@ -17,7 +17,10 @@ function validateCreationData(data: any) {
     errors.name = VALIDATION_ERROR_MESSAGES.required;
   }
 
-  if ("parentCategoryId" in data && !isPositiveInteger(data.parentCategoryId)) {
+  if (
+    "parentCategoryId" in data &&
+    !checkIfValueIsPositiveInteger(data.parentCategoryId)
+  ) {
     errors.parentCategoryId = VALIDATION_ERROR_MESSAGES.positiveInteger;
   }
 
@@ -35,7 +38,7 @@ function validateUpdateData(data: any) {
 
   if (
     "parentCategoryId" in data &&
-    !isPositiveInteger(data.parentCategoryId) &&
+    !checkIfValueIsPositiveInteger(data.parentCategoryId) &&
     data.parentCategoryId !== null
   ) {
     errors.parentCategoryId = "must be positive integer or null";

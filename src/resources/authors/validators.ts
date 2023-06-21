@@ -1,7 +1,7 @@
 import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
 import {
   checkIfValueIsNotEmptyString,
-  isPositiveInteger,
+  checkIfValueIsPositiveInteger,
 } from "shared/validation/validators";
 
 import { type ValidationErrors } from "./types";
@@ -17,7 +17,7 @@ function validateCreationData(data: any) {
   }
 
   if ("userId" in data) {
-    if (!isPositiveInteger(data.userId)) {
+    if (!checkIfValueIsPositiveInteger(data.userId)) {
       errors.userId = VALIDATION_ERROR_MESSAGES.positiveInteger;
     }
   } else {

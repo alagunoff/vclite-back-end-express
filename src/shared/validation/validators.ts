@@ -2,16 +2,16 @@ function checkIfValueIsNotEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.length !== 0;
 }
 
-function isNotEmptyArray(value: unknown): value is unknown[] {
+function checkIfValueIsNotEmptyArray(value: unknown): value is unknown[] {
   return Array.isArray(value) && value.length !== 0;
 }
 
-function isPositiveInteger(value: unknown) {
+function checkIfValueIsPositiveInteger(value: unknown) {
   return Number.isInteger(value) && (value as number) > 0;
 }
 
-function isStringPositiveInteger(value: unknown) {
-  return isPositiveInteger(Number(value));
+function checkIfValueIsStringPositiveInteger(value: unknown) {
+  return checkIfValueIsPositiveInteger(Number(value));
 }
 
 function checkIfValueIsBase64WebpImageDataUrl(value: unknown) {
@@ -21,22 +21,22 @@ function checkIfValueIsBase64WebpImageDataUrl(value: unknown) {
   );
 }
 
-function isDateString(value: unknown) {
+function checkIfValueIsDateString(value: unknown) {
   return (
     checkIfValueIsNotEmptyString(value) && !Number.isNaN(Date.parse(value))
   );
 }
 
-function isPositiveIntegers(value: unknown) {
+function checkIfValueIsPositiveIntegers(value: unknown) {
   return (
-    isNotEmptyArray(value) &&
+    checkIfValueIsNotEmptyArray(value) &&
     !value.some((item) => !Number.isInteger(item) || (item as number) <= 0)
   );
 }
 
-function isStringPositiveIntegers(value: unknown) {
+function checkIfValueIsStringPositiveIntegers(value: unknown) {
   return (
-    isNotEmptyArray(value) &&
+    checkIfValueIsNotEmptyArray(value) &&
     !value.some((item) => {
       const itemAsNumber = Number(item);
 
@@ -47,18 +47,18 @@ function isStringPositiveIntegers(value: unknown) {
 
 function checkIfValueIsBase64WebpImageDataUrls(value: unknown) {
   return (
-    isNotEmptyArray(value) &&
+    checkIfValueIsNotEmptyArray(value) &&
     !value.some((item) => !checkIfValueIsBase64WebpImageDataUrl(item))
   );
 }
 
 export {
   checkIfValueIsNotEmptyString,
-  isPositiveInteger,
-  isStringPositiveInteger,
+  checkIfValueIsPositiveInteger,
+  checkIfValueIsStringPositiveInteger,
   checkIfValueIsBase64WebpImageDataUrl,
-  isDateString,
-  isPositiveIntegers,
-  isStringPositiveIntegers,
+  checkIfValueIsDateString,
+  checkIfValueIsPositiveIntegers,
+  checkIfValueIsStringPositiveIntegers,
   checkIfValueIsBase64WebpImageDataUrls,
 };

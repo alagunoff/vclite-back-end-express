@@ -1,4 +1,3 @@
-import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
 import { checkIfValueIsNotEmptyString } from "shared/validation/validators";
 
 function validateLoginData(data: any) {
@@ -7,20 +6,20 @@ function validateLoginData(data: any) {
     password?: string;
   } = {};
 
-  if ("username" in data) {
+  if (Object.hasOwn(data, "username")) {
     if (!checkIfValueIsNotEmptyString(data.username)) {
-      errors.username = VALIDATION_ERROR_MESSAGES.notEmptyString;
+      errors.username = "must be not empty string";
     }
   } else {
-    errors.username = VALIDATION_ERROR_MESSAGES.required;
+    errors.username = "required";
   }
 
-  if ("password" in data) {
+  if (Object.hasOwn(data, "password")) {
     if (!checkIfValueIsNotEmptyString(data.password)) {
-      errors.password = VALIDATION_ERROR_MESSAGES.notEmptyString;
+      errors.password = "must be not empty string";
     }
   } else {
-    errors.password = VALIDATION_ERROR_MESSAGES.required;
+    errors.password = "required";
   }
 
   if (Object.keys(errors).length !== 0) {
