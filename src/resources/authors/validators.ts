@@ -1,27 +1,24 @@
-import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
 import {
   checkIfValueIsNotEmptyString,
   checkIfValueIsPositiveInteger,
 } from "shared/validation/validators";
 
-import { type ValidationErrors } from "./types";
-
 function validateCreationData(data: any) {
-  const errors: ValidationErrors = {};
+  const errors: { description?: string; userId?: string } = {};
 
   if (
-    "description" in data &&
+    Object.hasOwn(data, "description") &&
     !checkIfValueIsNotEmptyString(data.description)
   ) {
-    errors.description = VALIDATION_ERROR_MESSAGES.notEmptyString;
+    errors.description = "must be not empty string";
   }
 
-  if ("userId" in data) {
+  if (Object.hasOwn(data, "userId")) {
     if (!checkIfValueIsPositiveInteger(data.userId)) {
-      errors.userId = VALIDATION_ERROR_MESSAGES.positiveInteger;
+      errors.userId = "must be positive integer";
     }
   } else {
-    errors.userId = VALIDATION_ERROR_MESSAGES.required;
+    errors.userId = "required";
   }
 
   if (Object.keys(errors).length !== 0) {
@@ -30,13 +27,13 @@ function validateCreationData(data: any) {
 }
 
 function validateUpdateData(data: any) {
-  const errors: ValidationErrors = {};
+  const errors: { description?: string } = {};
 
   if (
-    "description" in data &&
+    Object.hasOwn(data, "description") &&
     !checkIfValueIsNotEmptyString(data.description)
   ) {
-    errors.description = VALIDATION_ERROR_MESSAGES.notEmptyString;
+    errors.description = "must be not empty string";
   }
 
   if (Object.keys(errors).length !== 0) {
