@@ -2,9 +2,7 @@ import { type Request } from "express";
 
 import { checkIfValueIsStringPositiveInteger } from "shared/validation/validators";
 
-export default function validatePaginationQueryParameters(
-  queryParameters: Request["query"]
-) {
+function validatePaginationQueryParameters(queryParameters: Request["query"]) {
   const errors: { pageNumber?: string; itemsNumber?: string } = {};
 
   if (Object.hasOwn(queryParameters, "pageNumber")) {
@@ -31,3 +29,5 @@ export default function validatePaginationQueryParameters(
     return errors;
   }
 }
+
+export { validatePaginationQueryParameters };

@@ -2,14 +2,14 @@ import { type Request, type Response } from "express";
 
 import { ApiError } from "shared/errors/classes";
 
-import * as services from "./services";
-import { validateLoginData } from "./validators";
+import * as services from "./service";
+import { validateData } from "./validator";
 
 async function logIn(req: Request, res: Response) {
-  const loginDataValidationErrors = validateLoginData(req.body);
+  const dataValidationErrors = validateData(req.body);
 
-  if (loginDataValidationErrors) {
-    res.status(400).json(loginDataValidationErrors);
+  if (dataValidationErrors) {
+    res.status(400).json(dataValidationErrors);
     return;
   }
 

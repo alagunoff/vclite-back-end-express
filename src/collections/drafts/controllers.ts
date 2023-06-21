@@ -1,12 +1,12 @@
 import { type Request, type Response } from "express";
 
-import * as postServices from "resources/posts/services";
+import * as postServices from "collections/posts/services";
 import {
   validateCreationData,
   validateUpdateData,
-} from "resources/posts/validators";
+} from "collections/posts/validators";
 import { createPaginationParameters } from "shared/pagination/utils";
-import validatePaginationQueryParameters from "shared/pagination/validator";
+import { validatePaginationQueryParameters } from "shared/pagination/validator";
 
 async function createDraft(req: Request, res: Response) {
   const creationDataValidationErrors = validateCreationData(req.body);

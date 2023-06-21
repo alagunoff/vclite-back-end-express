@@ -1,7 +1,7 @@
 import { type Request, type Response } from "express";
 
 import { createPaginationParameters } from "shared/pagination/utils";
-import validatePaginationQueryParameters from "shared/pagination/validator";
+import { validatePaginationQueryParameters } from "shared/pagination/validator";
 
 import * as services from "./services";
 import { validateCreationData, validateUpdateData } from "./validators";

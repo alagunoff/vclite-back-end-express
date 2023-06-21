@@ -12,7 +12,7 @@ async function createUser(req: Request, res: Response) {
   }
 
   const userCreationError = await services.createUser(req.body);
-
+  console.log("user created (controller)");
   if (userCreationError) {
     res.status(userCreationError.code).end();
     return;

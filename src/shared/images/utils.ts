@@ -1,7 +1,7 @@
-import fs from "node:fs/promises";
+import fsPromises from "node:fs/promises";
 import path from "node:path";
 
-import { HOST_NAME, projectAbsolutePath } from "shared/constants";
+import { SERVER_URL, projectAbsolutePath } from "shared/constants";
 
 async function saveImage(
   base64WebpImageDataUrl: string,
@@ -10,7 +10,7 @@ async function saveImage(
 ) {
   const folderToSaveAbsolutePath = `${projectAbsolutePath}/static/images/${folderName}`;
 
-  await fs.mkdir(folderToSaveAbsolutePath, { recursive: true });
+  await fsPromises.mkdir(folderToSaveAbsolutePath, { recursive: true });
 
   const [imageMediatype, base64Image] = base64WebpImageDataUrl
     .slice(5)
@@ -18,16 +18,16 @@ async function saveImage(
   const imageExtension = imageMediatype.split("/")[1];
   const imageFileNameWithExtension = `${imageFileName}.${imageExtension}`;
 
-  await fs.writeFile(
+  await fsPromises.writeFile(
     `${folderToSaveAbsolutePath}/${imageFileNameWithExtension}`,
     Buffer.from(base64Image, "base64url")
   );
 
-  return `${HOST_NAME}/api/static/images/${folderName}/${imageFileNameWithExtension}`;
+  return `${SERVER_URL}/static/images/${folderName}/${imageFileNameWithExtension}`;
 }
 
 function getHostedImageAbsolutePath(imageUrl: string) {
-  return `${projectAbsolutePath}/${imageUrl.replace(`${HOST_NAME}/api/`, "")}`;
+  return `${projectAbsolutePath}/${imageUrl.replace(`${SERVER_URL}/`, "")}`;
 }
 
 function getHostedImageFolderName(imageUrl: string) {
@@ -35,11 +35,11 @@ function getHostedImageFolderName(imageUrl: string) {
 }
 
 async function deleteHostedImage(imageUrl: string) {
-  await fs.unlink(getHostedImageAbsolutePath(imageUrl));
+  await fsPromises.unlink(getHostedImageAbsolutePath(imageUrl));
 }
 
 async function deleteHostedImageFolder(imageUrl: string) {
-  await fs.rmdir(path.dirname(getHostedImageAbsolutePath(imageUrl)));
+  await fsPromises.rmdir(path.dirname(getHostedImageAbsolutePath(imageUrl)));
 }
 
 export {

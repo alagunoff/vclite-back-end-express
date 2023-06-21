@@ -1,3 +1,6 @@
+import crypto from "node:crypto";
+
+import { SERVER_URL } from "shared/constants";
 import { env } from "shared/env";
 import { ApiError } from "shared/errors/classes";
 import { hashText } from "shared/hashing/utils";
@@ -24,21 +27,28 @@ async function createUser({
     return new ApiError(422);
   }
 
-  await prisma.user.create({
-    data: {
-      image: await saveImage(image, "users", username),
-      username,
-      password: hashText(password),
-      email,
-      firstName,
-      lastName,
-    },
-  });
-  await transporter.sendMail({
-    from: env.SMTP_SENDER,
-    to: email,
-    subject: "Email confirmation",
-    text: "Hi",
+  crypto.randomBytes(16, async (error, generatedBytes) => {
+    if (error) {
+      throw error;
+    }
+
+    await prisma.user.create({
+      data: {
+        image: await saveImage(image, "users", username),
+        username,
+        password: hashText(password),
+        email,
+        firstName,
+        lastName,
+      },
+    });
+    console.log("user created (service)");
+    await transporter.sendMail({
+      from: env.SMTP_SENDER,
+      to: email,
+      subject: "Account verification on VClite",
+      html: `<p>An account has been registered with this email. If it was you then <a href="${SERVER_URL}/" target="_blank" rel="noreferrer">verify</a> your account otherwise do nothing</p>`,
+    });
   });
 }
 

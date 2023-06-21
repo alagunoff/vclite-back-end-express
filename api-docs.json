@@ -10,9 +10,9 @@
     }
   ],
   "paths": {
-    "/auth/login": {
+    "/login": {
       "post": {
-        "tags": ["auth"],
+        "tags": ["login"],
         "requestBody": {
           "required": true,
           "content": {
@@ -97,7 +97,7 @@
         },
         "responses": {
           "201": {
-            "description": "User has been created"
+            "description": "User has been created and account verification link was sent to provided email"
           },
           "400": {
             "$ref": "#/components/responses/InvalidCreationData"

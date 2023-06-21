@@ -10,19 +10,29 @@ generator client {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  image     String
-  username  String   @unique
-  password  String
-  email     String   @unique
-  firstName String?  @map("first_name")
-  lastName  String?  @map("last_name")
-  createdAt DateTime @default(now()) @map("created_at")
-  isAdmin   Boolean  @default(false) @map("is_admin")
-  verified  Boolean  @default(false)
-  author    Author?
+  id           Int                  @id @default(autoincrement())
+  image        String
+  username     String               @unique
+  password     String
+  email        String               @unique
+  firstName    String?              @map("first_name")
+  lastName     String?              @map("last_name")
+  createdAt    DateTime             @default(now()) @map("created_at")
+  isAdmin      Boolean              @default(false) @map("is_admin")
+  verified     Boolean              @default(false)
+  author       Author?
+  verification AccountVerification?
 
   @@map("users")
+}
+
+model AccountVerification {
+  id     Int    @id @default(autoincrement())
+  code   String
+  userId Int    @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("account_verifications")
 }
 
 model Author {

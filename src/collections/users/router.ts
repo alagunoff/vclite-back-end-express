@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { authenticateUser } from "auth/middlewares";
+import { authenticateUser } from "shared/authentication/middlewares";
 
 import { createUser, getUser, deleteUser } from "./controllers";
 

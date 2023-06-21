@@ -1,6 +1,6 @@
 import { checkIfValueIsNotEmptyString } from "shared/validation/validators";
 
-function validateLoginData(data: any) {
+function validateData(data: any) {
   const errors: { username?: string; password?: string } = {};
 
   if (Object.hasOwn(data, "username")) {
@@ -24,4 +24,4 @@ function validateLoginData(data: any) {
   }
 }
 
-export { validateLoginData };
+export { validateData };

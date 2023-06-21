@@ -1,7 +1,7 @@
 import { type Prisma } from "@prisma/client";
 import crypto from "node:crypto";
 
-import { includeSubcategories } from "resources/categories/utils";
+import { includeSubcategories } from "collections/categories/utils";
 import { ApiError } from "shared/errors/classes";
 import {
   saveImage,

@@ -1,6 +1,6 @@
 import path from "node:path";
 
-const HOST_NAME = "http://localhost:3000";
+const SERVER_URL = "http://localhost:3000/api";
 const projectAbsolutePath = path.dirname(__dirname);
 
-export { HOST_NAME, projectAbsolutePath };
+export { SERVER_URL, projectAbsolutePath };
