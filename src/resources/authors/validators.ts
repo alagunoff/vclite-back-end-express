@@ -1,6 +1,6 @@
 import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
 import {
-  isNotEmptyString,
+  checkIfValueIsNotEmptyString,
   isPositiveInteger,
 } from "shared/validation/validators";
 
@@ -9,7 +9,10 @@ import { type ValidationErrors } from "./types";
 function validateCreationData(data: any) {
   const errors: ValidationErrors = {};
 
-  if ("description" in data && !isNotEmptyString(data.description)) {
+  if (
+    "description" in data &&
+    !checkIfValueIsNotEmptyString(data.description)
+  ) {
     errors.description = VALIDATION_ERROR_MESSAGES.notEmptyString;
   }
 
@@ -21,7 +24,7 @@ function validateCreationData(data: any) {
     errors.userId = VALIDATION_ERROR_MESSAGES.required;
   }
 
-  if (Object.keys(errors).length) {
+  if (Object.keys(errors).length !== 0) {
     return errors;
   }
 }
@@ -29,11 +32,14 @@ function validateCreationData(data: any) {
 function validateUpdateData(data: any) {
   const errors: ValidationErrors = {};
 
-  if ("description" in data && !isNotEmptyString(data.description)) {
+  if (
+    "description" in data &&
+    !checkIfValueIsNotEmptyString(data.description)
+  ) {
     errors.description = VALIDATION_ERROR_MESSAGES.notEmptyString;
   }
 
-  if (Object.keys(errors).length) {
+  if (Object.keys(errors).length !== 0) {
     return errors;
   }
 }

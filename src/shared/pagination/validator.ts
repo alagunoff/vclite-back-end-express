@@ -28,7 +28,7 @@ export default function validatePaginationQueryParameters(
     }
   }
 
-  if (Object.keys(errors).length) {
+  if (Object.keys(errors).length !== 0) {
     return errors;
   }
 }

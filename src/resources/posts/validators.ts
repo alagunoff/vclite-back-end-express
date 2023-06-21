@@ -2,14 +2,14 @@ import { type Request } from "express";
 
 import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
 import {
-  isBase64WebpImageDataUrl,
-  isNotEmptyString,
+  checkIfValueIsBase64WebpImageDataUrl,
+  checkIfValueIsNotEmptyString,
   isPositiveInteger,
   isStringPositiveInteger,
   isDateString,
   isPositiveIntegers,
   isStringPositiveIntegers,
-  isBase64WebpImageDataUrls,
+  checkIfValueIsBase64WebpImageDataUrls,
 } from "shared/validation/validators";
 
 import { VALID_ORDER_OPTIONS } from "./constants";
@@ -19,19 +19,22 @@ function validateCreationData(data: any) {
   const errors: ValidationErrors = {};
 
   if ("image" in data) {
-    if (!isBase64WebpImageDataUrl(data.image)) {
+    if (!checkIfValueIsBase64WebpImageDataUrl(data.image)) {
       errors.image = VALIDATION_ERROR_MESSAGES.base64WebpImageDataUrl;
     }
   } else {
     errors.image = VALIDATION_ERROR_MESSAGES.required;
   }
 
-  if ("extraImages" in data && !isBase64WebpImageDataUrls(data.extraImages)) {
+  if (
+    "extraImages" in data &&
+    !checkIfValueIsBase64WebpImageDataUrls(data.extraImages)
+  ) {
     errors.extraImages = VALIDATION_ERROR_MESSAGES.base64WebpImageDataUrls;
   }
 
   if ("title" in data) {
-    if (!isNotEmptyString(data.title)) {
+    if (!checkIfValueIsNotEmptyString(data.title)) {
       errors.title = VALIDATION_ERROR_MESSAGES.notEmptyString;
     }
   } else {
@@ -39,7 +42,7 @@ function validateCreationData(data: any) {
   }
 
   if ("content" in data) {
-    if (!isNotEmptyString(data.content)) {
+    if (!checkIfValueIsNotEmptyString(data.content)) {
       errors.content = VALIDATION_ERROR_MESSAGES.notEmptyString;
     }
   } else {
@@ -62,7 +65,7 @@ function validateCreationData(data: any) {
     errors.tagsIds = VALIDATION_ERROR_MESSAGES.required;
   }
 
-  if (Object.keys(errors).length) {
+  if (Object.keys(errors).length !== 0) {
     return errors;
   }
 }
@@ -83,21 +86,21 @@ function validateFilterQueryParameters(queryParameters: Request["query"]) {
 
   if (
     "titleContains" in queryParameters &&
-    !isNotEmptyString(queryParameters.titleContains)
+    !checkIfValueIsNotEmptyString(queryParameters.titleContains)
   ) {
     errors.titleContains = VALIDATION_ERROR_MESSAGES.notEmptyString;
   }
 
   if (
     "contentContains" in queryParameters &&
-    !isNotEmptyString(queryParameters.contentContains)
+    !checkIfValueIsNotEmptyString(queryParameters.contentContains)
   ) {
     errors.contentContains = VALIDATION_ERROR_MESSAGES.notEmptyString;
   }
 
   if (
     "authorFirstName" in queryParameters &&
-    !isNotEmptyString(queryParameters.authorFirstName)
+    !checkIfValueIsNotEmptyString(queryParameters.authorFirstName)
   ) {
     errors.authorFirstName = VALIDATION_ERROR_MESSAGES.notEmptyString;
   }
@@ -151,7 +154,7 @@ function validateFilterQueryParameters(queryParameters: Request["query"]) {
     errors.createdAtGt = VALIDATION_ERROR_MESSAGES.dateString;
   }
 
-  if (Object.keys(errors).length) {
+  if (Object.keys(errors).length !== 0) {
     return errors;
   }
 }
@@ -171,7 +174,7 @@ function validateOrderQueryParameters(queryParameters: Request["query"]) {
     )}]`;
   }
 
-  if (Object.keys(errors).length) {
+  if (Object.keys(errors).length !== 0) {
     return errors;
   }
 }
@@ -179,19 +182,22 @@ function validateOrderQueryParameters(queryParameters: Request["query"]) {
 function validateUpdateData(data: any) {
   const errors: ValidationErrors = {};
 
-  if ("image" in data && !isBase64WebpImageDataUrl(data.image)) {
+  if ("image" in data && !checkIfValueIsBase64WebpImageDataUrl(data.image)) {
     errors.image = VALIDATION_ERROR_MESSAGES.base64WebpImageDataUrl;
   }
 
-  if ("extraImages" in data && !isBase64WebpImageDataUrls(data.extraImages)) {
+  if (
+    "extraImages" in data &&
+    !checkIfValueIsBase64WebpImageDataUrls(data.extraImages)
+  ) {
     errors.extraImages = VALIDATION_ERROR_MESSAGES.base64WebpImageDataUrls;
   }
 
-  if ("title" in data && !isNotEmptyString(data.title)) {
+  if ("title" in data && !checkIfValueIsNotEmptyString(data.title)) {
     errors.title = VALIDATION_ERROR_MESSAGES.notEmptyString;
   }
 
-  if ("content" in data && !isNotEmptyString(data.content)) {
+  if ("content" in data && !checkIfValueIsNotEmptyString(data.content)) {
     errors.content = VALIDATION_ERROR_MESSAGES.notEmptyString;
   }
 
@@ -203,7 +209,7 @@ function validateUpdateData(data: any) {
     errors.tagsIds = VALIDATION_ERROR_MESSAGES.positiveIntegersArray;
   }
 
-  if (Object.keys(errors).length) {
+  if (Object.keys(errors).length !== 0) {
     return errors;
   }
 }

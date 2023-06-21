@@ -1,5 +1,5 @@
 import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
-import { isNotEmptyString } from "shared/validation/validators";
+import { checkIfValueIsNotEmptyString } from "shared/validation/validators";
 
 function validateCreationData(data: any) {
   const errors: {
@@ -7,14 +7,14 @@ function validateCreationData(data: any) {
   } = {};
 
   if ("content" in data) {
-    if (!isNotEmptyString(data.content)) {
+    if (!checkIfValueIsNotEmptyString(data.content)) {
       errors.content = VALIDATION_ERROR_MESSAGES.notEmptyString;
     }
   } else {
     errors.content = VALIDATION_ERROR_MESSAGES.required;
   }
 
-  if (Object.keys(errors).length) {
+  if (Object.keys(errors).length !== 0) {
     return errors;
   }
 }

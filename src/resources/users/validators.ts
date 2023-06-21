@@ -1,8 +1,6 @@
-import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
 import {
-  isUsername,
-  isNotEmptyString,
-  isBase64WebpImageDataUrl,
+  checkIfValueIsNotEmptyString,
+  checkIfValueIsBase64WebpImageDataUrl,
 } from "shared/validation/validators";
 
 function validateCreationData(data: any) {
@@ -15,48 +13,58 @@ function validateCreationData(data: any) {
     lastName?: string;
   } = {};
 
-  if ("image" in data) {
-    if (!isBase64WebpImageDataUrl(data.image)) {
-      errors.image = VALIDATION_ERROR_MESSAGES.base64WebpImageDataUrl;
+  if (Object.hasOwn(data, "image")) {
+    if (!checkIfValueIsBase64WebpImageDataUrl(data.image)) {
+      errors.image =
+        'must be base64 image in data URL format with "image/webp" mediatype';
     }
   } else {
-    errors.image = VALIDATION_ERROR_MESSAGES.required;
+    errors.image = "required";
   }
 
-  if ("username" in data) {
-    if (!isUsername(data.username)) {
+  if (Object.hasOwn(data, "username")) {
+    if (
+      checkIfValueIsNotEmptyString(data.username) &&
+      /^[a-z][a-z0-9]*$/.test(data.username)
+    ) {
       errors.username =
         "username must start with lowercased latin letter optionally followed by any number of lowercased latin letters or numbers";
     }
   } else {
-    errors.username = VALIDATION_ERROR_MESSAGES.required;
+    errors.username = "required";
   }
 
-  if ("password" in data) {
-    if (!isNotEmptyString(data.password)) {
-      errors.password = VALIDATION_ERROR_MESSAGES.notEmptyString;
+  if (Object.hasOwn(data, "password")) {
+    if (!checkIfValueIsNotEmptyString(data.password)) {
+      errors.password = "must be not empty string";
     }
   } else {
-    errors.password = VALIDATION_ERROR_MESSAGES.required;
+    errors.password = "required";
   }
 
-  if ("email" in data) {
+  if (Object.hasOwn(data, "email")) {
     if (!/[a-z0-9]+@[a-z]+\.[a-z]{2,3}/.test(data.email)) {
       errors.email = "must be valid email";
     }
   } else {
-    errors.email = VALIDATION_ERROR_MESSAGES.required;
+    errors.email = "required";
   }
 
-  if ("firstName" in data && !isNotEmptyString(data.firstName)) {
-    errors.firstName = VALIDATION_ERROR_MESSAGES.notEmptyString;
+  if (
+    Object.hasOwn(data, "firstName") &&
+    !checkIfValueIsNotEmptyString(data.firstName)
+  ) {
+    errors.firstName = "must be not empty string";
   }
 
-  if ("lastName" in data && !isNotEmptyString(data.lastName)) {
-    errors.lastName = VALIDATION_ERROR_MESSAGES.notEmptyString;
+  if (
+    Object.hasOwn(data, "lastName") &&
+    !checkIfValueIsNotEmptyString(data.lastName)
+  ) {
+    errors.lastName = "must be not empty string";
   }
 
-  if (Object.keys(errors).length) {
+  if (Object.keys(errors).length !== 0) {
     return errors;
   }
 }

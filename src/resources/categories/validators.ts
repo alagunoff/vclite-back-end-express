@@ -1,6 +1,6 @@
 import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
 import {
-  isNotEmptyString,
+  checkIfValueIsNotEmptyString,
   isPositiveInteger,
 } from "shared/validation/validators";
 
@@ -10,7 +10,7 @@ function validateCreationData(data: any) {
   const errors: ValidationErrors = {};
 
   if ("name" in data) {
-    if (!isNotEmptyString(data.name)) {
+    if (!checkIfValueIsNotEmptyString(data.name)) {
       errors.name = VALIDATION_ERROR_MESSAGES.notEmptyString;
     }
   } else {
@@ -21,7 +21,7 @@ function validateCreationData(data: any) {
     errors.parentCategoryId = VALIDATION_ERROR_MESSAGES.positiveInteger;
   }
 
-  if (Object.keys(errors).length) {
+  if (Object.keys(errors).length !== 0) {
     return errors;
   }
 }
@@ -29,7 +29,7 @@ function validateCreationData(data: any) {
 function validateUpdateData(data: any) {
   const errors: ValidationErrors = {};
 
-  if ("name" in data && !isNotEmptyString(data.name)) {
+  if ("name" in data && !checkIfValueIsNotEmptyString(data.name)) {
     errors.name = VALIDATION_ERROR_MESSAGES.notEmptyString;
   }
 
@@ -41,7 +41,7 @@ function validateUpdateData(data: any) {
     errors.parentCategoryId = "must be positive integer or null";
   }
 
-  if (Object.keys(errors).length) {
+  if (Object.keys(errors).length !== 0) {
     return errors;
   }
 }

@@ -1,13 +1,9 @@
-function isNotEmptyString(value: unknown): value is string {
+function checkIfValueIsNotEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.length !== 0;
 }
 
 function isNotEmptyArray(value: unknown): value is unknown[] {
   return Array.isArray(value) && value.length !== 0;
-}
-
-function isUsername(value: unknown) {
-  return isNotEmptyString(value) && /^[a-z][a-z0-9]*$/.test(value);
 }
 
 function isPositiveInteger(value: unknown) {
@@ -18,12 +14,17 @@ function isStringPositiveInteger(value: unknown) {
   return isPositiveInteger(Number(value));
 }
 
-function isBase64WebpImageDataUrl(value: unknown) {
-  return isNotEmptyString(value) && value.startsWith("data:image/webp;base64,");
+function checkIfValueIsBase64WebpImageDataUrl(value: unknown) {
+  return (
+    checkIfValueIsNotEmptyString(value) &&
+    value.startsWith("data:image/webp;base64,")
+  );
 }
 
 function isDateString(value: unknown) {
-  return isNotEmptyString(value) && !Number.isNaN(Date.parse(value));
+  return (
+    checkIfValueIsNotEmptyString(value) && !Number.isNaN(Date.parse(value))
+  );
 }
 
 function isPositiveIntegers(value: unknown) {
@@ -44,21 +45,20 @@ function isStringPositiveIntegers(value: unknown) {
   );
 }
 
-function isBase64WebpImageDataUrls(value: unknown) {
+function checkIfValueIsBase64WebpImageDataUrls(value: unknown) {
   return (
     isNotEmptyArray(value) &&
-    !value.some((item) => !isBase64WebpImageDataUrl(item))
+    !value.some((item) => !checkIfValueIsBase64WebpImageDataUrl(item))
   );
 }
 
 export {
-  isNotEmptyString,
-  isUsername,
+  checkIfValueIsNotEmptyString,
   isPositiveInteger,
   isStringPositiveInteger,
-  isBase64WebpImageDataUrl,
+  checkIfValueIsBase64WebpImageDataUrl,
   isDateString,
   isPositiveIntegers,
   isStringPositiveIntegers,
-  isBase64WebpImageDataUrls,
+  checkIfValueIsBase64WebpImageDataUrls,
 };

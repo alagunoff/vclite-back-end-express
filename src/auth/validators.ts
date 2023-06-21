@@ -1,5 +1,5 @@
 import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
-import { isNotEmptyString } from "shared/validation/validators";
+import { checkIfValueIsNotEmptyString } from "shared/validation/validators";
 
 function validateLoginData(data: any) {
   const errors: {
@@ -8,7 +8,7 @@ function validateLoginData(data: any) {
   } = {};
 
   if ("username" in data) {
-    if (!isNotEmptyString(data.username)) {
+    if (!checkIfValueIsNotEmptyString(data.username)) {
       errors.username = VALIDATION_ERROR_MESSAGES.notEmptyString;
     }
   } else {
@@ -16,14 +16,14 @@ function validateLoginData(data: any) {
   }
 
   if ("password" in data) {
-    if (!isNotEmptyString(data.password)) {
+    if (!checkIfValueIsNotEmptyString(data.password)) {
       errors.password = VALIDATION_ERROR_MESSAGES.notEmptyString;
     }
   } else {
     errors.password = VALIDATION_ERROR_MESSAGES.required;
   }
 
-  if (Object.keys(errors).length) {
+  if (Object.keys(errors).length !== 0) {
     return errors;
   }
 }
