@@ -18,7 +18,7 @@ async function logIn({
     return new ApiError(401);
   }
 
-  if (!userToLogIn.isConfirmed) {
+  if (!userToLogIn.verified) {
     return new ApiError(403);
   }
 

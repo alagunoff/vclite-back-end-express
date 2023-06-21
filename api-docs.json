@@ -46,7 +46,7 @@
             "description": "User with this username not found or password is incorrect"
           },
           "403": {
-            "description": "Account is not confirmed"
+            "description": "Account is not verified"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
