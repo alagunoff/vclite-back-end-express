@@ -45,6 +45,9 @@
           "401": {
             "description": "User with this username not found or password is incorrect"
           },
+          "403": {
+            "description": "Account is not confirmed"
+          },
           "500": {
             "$ref": "#/components/responses/UnknownError"
           }
@@ -74,6 +77,10 @@
                     "format": "password",
                     "minLength": 1
                   },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
                   "firstName": {
                     "type": "string",
                     "minLength": 1
@@ -83,7 +90,7 @@
                     "minLength": 1
                   }
                 },
-                "required": ["image", "username", "password"]
+                "required": ["image", "username", "password", "email"]
               }
             }
           }

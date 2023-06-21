@@ -10,15 +10,17 @@ generator client {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  image     String
-  username  String   @unique
-  password  String
-  firstName String?  @map("first_name")
-  lastName  String?  @map("last_name")
-  isAdmin   Boolean  @default(false) @map("is_admin")
-  createdAt DateTime @default(now()) @map("created_at")
-  author    Author?
+  id          Int      @id @default(autoincrement())
+  image       String
+  username    String   @unique
+  password    String
+  email       String   @unique
+  firstName   String?  @map("first_name")
+  lastName    String?  @map("last_name")
+  createdAt   DateTime @default(now()) @map("created_at")
+  isAdmin     Boolean  @default(false) @map("is_admin")
+  isConfirmed Boolean  @default(false) @map("is_confirmed")
+  author      Author?
 
   @@map("users")
 }

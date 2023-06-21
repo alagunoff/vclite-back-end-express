@@ -18,6 +18,10 @@ async function logIn({
     return new ApiError(401);
   }
 
+  if (!userToLogIn.isConfirmed) {
+    return new ApiError(403);
+  }
+
   return jwt.sign(String(userToLogIn.id), env.JWT_SECRET_KEY);
 }
 

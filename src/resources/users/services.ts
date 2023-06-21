@@ -1,6 +1,3 @@
-import jwt from "jsonwebtoken";
-
-import env from "shared/env";
 import { ApiError } from "shared/errors/classes";
 import { hashPassword } from "shared/hashing/utils";
 import { saveImage, deleteHostedImage } from "shared/images/utils";
@@ -10,12 +7,14 @@ async function createUser({
   image,
   username,
   password,
+  email,
   firstName,
   lastName,
 }: {
   image: string;
   username: string;
   password: string;
+  email: string;
   firstName?: string;
   lastName?: string;
 }) {
@@ -23,17 +22,16 @@ async function createUser({
     return new ApiError(422);
   }
 
-  const createdUser = await prisma.user.create({
+  await prisma.user.create({
     data: {
       image: saveImage(image, "users", username),
       username,
       password: hashPassword(password),
+      email,
       firstName,
       lastName,
     },
   });
-
-  return jwt.sign(String(createdUser.id), env.JWT_SECRET_KEY);
 }
 
 async function deleteUserById(id: number) {

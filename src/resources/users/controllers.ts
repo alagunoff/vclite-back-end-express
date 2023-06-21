@@ -1,7 +1,5 @@
 import { type Request, type Response } from "express";
 
-import { ApiError } from "shared/errors/classes";
-
 import * as services from "./services";
 import { validateCreationData } from "./validators";
 
@@ -13,14 +11,14 @@ async function createUser(req: Request, res: Response) {
     return;
   }
 
-  const userCreationResult = await services.createUser(req.body);
+  const userCreationError = await services.createUser(req.body);
 
-  if (userCreationResult instanceof ApiError) {
-    res.status(userCreationResult.code).end();
+  if (userCreationError) {
+    res.status(userCreationError.code).end();
     return;
   }
 
-  res.status(201).send(userCreationResult);
+  res.status(201).end();
 }
 
 function getUser(req: Request, res: Response) {

@@ -10,6 +10,7 @@ function validateCreationData(data: any) {
     image?: string;
     username?: string;
     password?: string;
+    email?: string;
     firstName?: string;
     lastName?: string;
   } = {};
@@ -37,6 +38,14 @@ function validateCreationData(data: any) {
     }
   } else {
     errors.password = VALIDATION_ERROR_MESSAGES.required;
+  }
+
+  if ("email" in data) {
+    if (!/[a-z0-9]+@[a-z]+\.[a-z]{2,3}/.test(data.email)) {
+      errors.email = "must be valid email";
+    }
+  } else {
+    errors.email = VALIDATION_ERROR_MESSAGES.required;
   }
 
   if ("firstName" in data && !isNotEmptyString(data.firstName)) {
