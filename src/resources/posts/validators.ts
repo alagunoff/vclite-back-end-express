@@ -2,14 +2,14 @@ import { type Request } from "express";
 
 import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
 import {
-  isBase64ImageDataUrl,
+  isBase64WebpImageDataUrl,
   isNotEmptyString,
   isPositiveInteger,
   isStringPositiveInteger,
   isDateString,
-  isPositiveIntegersArray,
-  isStringPositiveIntegersArray,
-  isBase64ImageDataUrlsArray,
+  isPositiveIntegers,
+  isStringPositiveIntegers,
+  isBase64WebpImageDataUrls,
 } from "shared/validation/validators";
 
 import { VALID_ORDER_OPTIONS } from "./constants";
@@ -19,15 +19,15 @@ function validateCreationData(data: any) {
   const errors: ValidationErrors = {};
 
   if ("image" in data) {
-    if (!isBase64ImageDataUrl(data.image)) {
-      errors.image = VALIDATION_ERROR_MESSAGES.base64ImageDataUrl;
+    if (!isBase64WebpImageDataUrl(data.image)) {
+      errors.image = VALIDATION_ERROR_MESSAGES.base64WebpImageDataUrl;
     }
   } else {
     errors.image = VALIDATION_ERROR_MESSAGES.required;
   }
 
-  if ("extraImages" in data && !isBase64ImageDataUrlsArray(data.extraImages)) {
-    errors.extraImages = VALIDATION_ERROR_MESSAGES.base64ImageDataUrlsArray;
+  if ("extraImages" in data && !isBase64WebpImageDataUrls(data.extraImages)) {
+    errors.extraImages = VALIDATION_ERROR_MESSAGES.base64WebpImageDataUrls;
   }
 
   if ("title" in data) {
@@ -55,7 +55,7 @@ function validateCreationData(data: any) {
   }
 
   if ("tagsIds" in data) {
-    if (!isPositiveIntegersArray(data.tagsIds)) {
+    if (!isPositiveIntegers(data.tagsIds)) {
       errors.tagsIds = VALIDATION_ERROR_MESSAGES.positiveIntegersArray;
     }
   } else {
@@ -118,14 +118,14 @@ function validateFilterQueryParameters(queryParameters: Request["query"]) {
 
   if (
     "tagIdIn" in queryParameters &&
-    !isStringPositiveIntegersArray(queryParameters.tagIdIn)
+    !isStringPositiveIntegers(queryParameters.tagIdIn)
   ) {
     errors.tagIdIn = "must be positive integers delimited by ampersand";
   }
 
   if (
     "tagIdAll" in queryParameters &&
-    !isStringPositiveIntegersArray(queryParameters.tagIdAll)
+    !isStringPositiveIntegers(queryParameters.tagIdAll)
   ) {
     errors.tagIdAll = "must be positive integers delimited by ampersand";
   }
@@ -179,12 +179,12 @@ function validateOrderQueryParameters(queryParameters: Request["query"]) {
 function validateUpdateData(data: any) {
   const errors: ValidationErrors = {};
 
-  if ("image" in data && !isBase64ImageDataUrl(data.image)) {
-    errors.image = VALIDATION_ERROR_MESSAGES.base64ImageDataUrl;
+  if ("image" in data && !isBase64WebpImageDataUrl(data.image)) {
+    errors.image = VALIDATION_ERROR_MESSAGES.base64WebpImageDataUrl;
   }
 
-  if ("extraImages" in data && !isBase64ImageDataUrlsArray(data.extraImages)) {
-    errors.extraImages = VALIDATION_ERROR_MESSAGES.base64ImageDataUrlsArray;
+  if ("extraImages" in data && !isBase64WebpImageDataUrls(data.extraImages)) {
+    errors.extraImages = VALIDATION_ERROR_MESSAGES.base64WebpImageDataUrls;
   }
 
   if ("title" in data && !isNotEmptyString(data.title)) {
@@ -199,7 +199,7 @@ function validateUpdateData(data: any) {
     errors.categoryId = VALIDATION_ERROR_MESSAGES.positiveInteger;
   }
 
-  if ("tagsIds" in data && !isPositiveIntegersArray(data.tagsIds)) {
+  if ("tagsIds" in data && !isPositiveIntegers(data.tagsIds)) {
     errors.tagsIds = VALIDATION_ERROR_MESSAGES.positiveIntegersArray;
   }
 

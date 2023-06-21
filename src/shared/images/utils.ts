@@ -4,7 +4,7 @@ import path from "node:path";
 import { HOST_NAME, projectAbsolutePath } from "shared/constants";
 
 function saveImage(
-  base64ImageDataUrl: string,
+  base64WebpImageDataUrl: string,
   folderName: string,
   imageFileName: string
 ) {
@@ -12,7 +12,7 @@ function saveImage(
 
   fs.mkdirSync(folderToSaveAbsolutePath, { recursive: true });
 
-  const [imageMediatype, base64Image] = base64ImageDataUrl
+  const [imageMediatype, base64Image] = base64WebpImageDataUrl
     .slice(5)
     .split(";base64,");
   const imageExtension = imageMediatype.split("/")[1];

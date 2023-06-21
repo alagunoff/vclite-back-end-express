@@ -2,7 +2,7 @@ import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
 import {
   isUsername,
   isNotEmptyString,
-  isBase64ImageDataUrl,
+  isBase64WebpImageDataUrl,
 } from "shared/validation/validators";
 
 function validateCreationData(data: any) {
@@ -16,8 +16,8 @@ function validateCreationData(data: any) {
   } = {};
 
   if ("image" in data) {
-    if (!isBase64ImageDataUrl(data.image)) {
-      errors.image = VALIDATION_ERROR_MESSAGES.base64ImageDataUrl;
+    if (!isBase64WebpImageDataUrl(data.image)) {
+      errors.image = VALIDATION_ERROR_MESSAGES.base64WebpImageDataUrl;
     }
   } else {
     errors.image = VALIDATION_ERROR_MESSAGES.required;

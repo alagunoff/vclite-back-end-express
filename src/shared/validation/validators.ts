@@ -18,24 +18,22 @@ function isStringPositiveInteger(value: unknown) {
   return isPositiveInteger(Number(value));
 }
 
-function isBase64ImageDataUrl(value: unknown) {
-  return (
-    isNotEmptyString(value) && /^data:image\/(jpeg|png);base64,/.test(value)
-  );
+function isBase64WebpImageDataUrl(value: unknown) {
+  return isNotEmptyString(value) && value.startsWith("data:image/webp;base64,");
 }
 
 function isDateString(value: unknown) {
   return isNotEmptyString(value) && !Number.isNaN(Date.parse(value));
 }
 
-function isPositiveIntegersArray(value: unknown) {
+function isPositiveIntegers(value: unknown) {
   return (
     isNotEmptyArray(value) &&
     !value.some((item) => !Number.isInteger(item) || (item as number) <= 0)
   );
 }
 
-function isStringPositiveIntegersArray(value: unknown) {
+function isStringPositiveIntegers(value: unknown) {
   return (
     isNotEmptyArray(value) &&
     !value.some((item) => {
@@ -46,9 +44,10 @@ function isStringPositiveIntegersArray(value: unknown) {
   );
 }
 
-function isBase64ImageDataUrlsArray(value: unknown) {
+function isBase64WebpImageDataUrls(value: unknown) {
   return (
-    isNotEmptyArray(value) && !value.some((item) => !isBase64ImageDataUrl(item))
+    isNotEmptyArray(value) &&
+    !value.some((item) => !isBase64WebpImageDataUrl(item))
   );
 }
 
@@ -57,9 +56,9 @@ export {
   isUsername,
   isPositiveInteger,
   isStringPositiveInteger,
-  isBase64ImageDataUrl,
+  isBase64WebpImageDataUrl,
   isDateString,
-  isPositiveIntegersArray,
-  isStringPositiveIntegersArray,
-  isBase64ImageDataUrlsArray,
+  isPositiveIntegers,
+  isStringPositiveIntegers,
+  isBase64WebpImageDataUrls,
 };

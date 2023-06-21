@@ -1,3 +1,5 @@
+import nodemailer from "nodemailer";
+
 import { ApiError } from "shared/errors/classes";
 import { hashPassword } from "shared/hashing/utils";
 import { saveImage, deleteHostedImage } from "shared/images/utils";
@@ -32,6 +34,18 @@ async function createUser({
       lastName,
     },
   });
+
+  await nodemailer
+    .createTransport({
+      host: "smtp.freesmtpservers.com",
+      port: 25,
+    })
+    .sendMail({
+      from: "oleg@oleg.com",
+      to: email,
+      subject: "Email confirmation",
+      text: "Hi",
+    });
 }
 
 async function deleteUserById(id: number) {
