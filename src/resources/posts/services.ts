@@ -20,7 +20,7 @@ async function createPost({
   content,
   authorId,
   categoryId,
-  tagsIds,
+  tagIds,
   isDraft,
 }: {
   image: string;
@@ -29,14 +29,14 @@ async function createPost({
   content: string;
   authorId: number;
   categoryId: number;
-  tagsIds: number[];
+  tagIds: number[];
   isDraft: boolean;
 }) {
   if (!(await prisma.category.findUnique({ where: { id: categoryId } }))) {
     return new ApiError(422, "categoryNotFound");
   }
 
-  for (const tagId of tagsIds) {
+  for (const tagId of tagIds) {
     if (!(await prisma.tag.findUnique({ where: { id: tagId } }))) {
       return new ApiError(422, `tag with id ${tagId} not found`);
     }
@@ -66,7 +66,7 @@ async function createPost({
       content,
       authorId,
       categoryId,
-      tags: { connect: tagsIds.map((tagId) => ({ id: tagId })) },
+      tags: { connect: tagIds.map((tagId) => ({ id: tagId })) },
       isDraft,
     },
   });
@@ -117,7 +117,7 @@ async function updatePost(
     title,
     content,
     categoryId,
-    tagsIds,
+    tagIds,
     isDraft,
   }: {
     image?: string;
@@ -125,7 +125,7 @@ async function updatePost(
     title?: string;
     content?: string;
     categoryId?: number;
-    tagsIds?: number[];
+    tagIds?: number[];
     isDraft?: boolean;
   }
 ) {
@@ -140,8 +140,8 @@ async function updatePost(
     return new ApiError(422, "categoryNotFound");
   }
 
-  if (tagsIds) {
-    for (const tagId of tagsIds) {
+  if (tagIds) {
+    for (const tagId of tagIds) {
       if (!(await prisma.tag.findUnique({ where: { id: tagId } }))) {
         return new ApiError(422, `tag with id ${tagId} not found`);
       }
@@ -154,8 +154,8 @@ async function updatePost(
       title,
       content,
       categoryId,
-      tags: tagsIds
-        ? { set: tagsIds.map((tagId) => ({ id: tagId })) }
+      tags: tagIds
+        ? { set: tagIds.map((tagId) => ({ id: tagId })) }
         : undefined,
       isDraft,
     },

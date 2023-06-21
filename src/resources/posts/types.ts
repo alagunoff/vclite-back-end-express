@@ -4,7 +4,7 @@ interface ValidationErrors {
   title?: string;
   content?: string;
   categoryId?: string;
-  tagsIds?: string;
+  tagIds?: string;
 }
 
 export type { ValidationErrors };

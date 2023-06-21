@@ -55,11 +55,7 @@ function createFilterParameters({
 
   if (tagIdAll) {
     filterParameters.AND = tagIdAll.map((tagId) => ({
-      tags: {
-        some: {
-          id: Number(tagId),
-        },
-      },
+      tags: { some: { id: Number(tagId) } },
     }));
   }
 

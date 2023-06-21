@@ -572,7 +572,7 @@
                     "type": "integer",
                     "minimum": 1
                   },
-                  "tagsIds": {
+                  "tagIds": {
                     "type": "array",
                     "items": {
                       "type": "integer",
@@ -586,7 +586,7 @@
                   "title",
                   "content",
                   "categoryId",
-                  "tagsIds"
+                  "tagIds"
                 ]
               }
             }
@@ -783,7 +783,7 @@
                     "type": "integer",
                     "minimum": 1
                   },
-                  "tagsIds": {
+                  "tagIds": {
                     "type": "array",
                     "items": {
                       "type": "integer",
@@ -963,7 +963,7 @@
                     "type": "integer",
                     "minimum": 1
                   },
-                  "tagsIds": {
+                  "tagIds": {
                     "type": "array",
                     "items": {
                       "type": "integer",
@@ -977,7 +977,7 @@
                   "title",
                   "content",
                   "categoryId",
-                  "tagsIds"
+                  "tagIds"
                 ]
               }
             }
@@ -1074,7 +1074,7 @@
                     "type": "integer",
                     "minimum": 1
                   },
-                  "tagsIds": {
+                  "tagIds": {
                     "type": "array",
                     "items": {
                       "type": "integer",

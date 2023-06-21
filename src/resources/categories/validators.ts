@@ -1,4 +1,3 @@
-import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
 import {
   checkIfValueIsNotEmptyString,
   checkIfValueIsPositiveInteger,
@@ -9,19 +8,19 @@ import { type ValidationErrors } from "./types";
 function validateCreationData(data: any) {
   const errors: ValidationErrors = {};
 
-  if ("name" in data) {
+  if (Object.hasOwn(data, "name")) {
     if (!checkIfValueIsNotEmptyString(data.name)) {
-      errors.name = VALIDATION_ERROR_MESSAGES.notEmptyString;
+      errors.name = "must be not empty string";
     }
   } else {
-    errors.name = VALIDATION_ERROR_MESSAGES.required;
+    errors.name = "required";
   }
 
   if (
-    "parentCategoryId" in data &&
+    Object.hasOwn(data, "parentCategoryId") &&
     !checkIfValueIsPositiveInteger(data.parentCategoryId)
   ) {
-    errors.parentCategoryId = VALIDATION_ERROR_MESSAGES.positiveInteger;
+    errors.parentCategoryId = "must be positive integer";
   }
 
   if (Object.keys(errors).length !== 0) {
@@ -32,12 +31,12 @@ function validateCreationData(data: any) {
 function validateUpdateData(data: any) {
   const errors: ValidationErrors = {};
 
-  if ("name" in data && !checkIfValueIsNotEmptyString(data.name)) {
-    errors.name = VALIDATION_ERROR_MESSAGES.notEmptyString;
+  if (Object.hasOwn(data, "name") && !checkIfValueIsNotEmptyString(data.name)) {
+    errors.name = "must be not empty string";
   }
 
   if (
-    "parentCategoryId" in data &&
+    Object.hasOwn(data, "parentCategoryId") &&
     !checkIfValueIsPositiveInteger(data.parentCategoryId) &&
     data.parentCategoryId !== null
   ) {

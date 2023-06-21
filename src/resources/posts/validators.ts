@@ -1,6 +1,5 @@
 import { type Request } from "express";
 
-import { VALIDATION_ERROR_MESSAGES } from "shared/validation/constants";
 import {
   checkIfValueIsBase64WebpImageDataUrl,
   checkIfValueIsNotEmptyString,
@@ -18,51 +17,53 @@ import { type ValidationErrors } from "./types";
 function validateCreationData(data: any) {
   const errors: ValidationErrors = {};
 
-  if ("image" in data) {
+  if (Object.hasOwn(data, "image")) {
     if (!checkIfValueIsBase64WebpImageDataUrl(data.image)) {
-      errors.image = VALIDATION_ERROR_MESSAGES.base64WebpImageDataUrl;
+      errors.image =
+        'must be base64 image in data URL format with "image/webp" mediatype';
     }
   } else {
-    errors.image = VALIDATION_ERROR_MESSAGES.required;
+    errors.image = "required";
   }
 
   if (
-    "extraImages" in data &&
+    Object.hasOwn(data, "extraImages") &&
     !checkIfValueIsBase64WebpImageDataUrls(data.extraImages)
   ) {
-    errors.extraImages = VALIDATION_ERROR_MESSAGES.base64WebpImageDataUrls;
+    errors.extraImages =
+      'must be array of base64 images in data URL format with "image/webp" mediatype';
   }
 
-  if ("title" in data) {
+  if (Object.hasOwn(data, "title")) {
     if (!checkIfValueIsNotEmptyString(data.title)) {
-      errors.title = VALIDATION_ERROR_MESSAGES.notEmptyString;
+      errors.title = "must be not empty string";
     }
   } else {
-    errors.title = VALIDATION_ERROR_MESSAGES.required;
+    errors.title = "required";
   }
 
-  if ("content" in data) {
+  if (Object.hasOwn(data, "content")) {
     if (!checkIfValueIsNotEmptyString(data.content)) {
-      errors.content = VALIDATION_ERROR_MESSAGES.notEmptyString;
+      errors.content = "must be not empty string";
     }
   } else {
-    errors.content = VALIDATION_ERROR_MESSAGES.required;
+    errors.content = "required";
   }
 
-  if ("categoryId" in data) {
+  if (Object.hasOwn(data, "categoryId")) {
     if (!checkIfValueIsPositiveInteger(data.categoryId)) {
-      errors.categoryId = VALIDATION_ERROR_MESSAGES.positiveInteger;
+      errors.categoryId = "must be positive integer";
     }
   } else {
-    errors.categoryId = VALIDATION_ERROR_MESSAGES.required;
+    errors.categoryId = "required";
   }
 
-  if ("tagsIds" in data) {
-    if (!checkIfValueIsPositiveIntegers(data.tagsIds)) {
-      errors.tagsIds = VALIDATION_ERROR_MESSAGES.positiveIntegersArray;
+  if (Object.hasOwn(data, "tagIds")) {
+    if (!checkIfValueIsPositiveIntegers(data.tagIds)) {
+      errors.tagIds = "must be array of positive integers";
     }
   } else {
-    errors.tagsIds = VALIDATION_ERROR_MESSAGES.required;
+    errors.tagIds = "required";
   }
 
   if (Object.keys(errors).length !== 0) {
@@ -85,73 +86,76 @@ function validateFilterQueryParameters(queryParameters: Request["query"]) {
   } = {};
 
   if (
-    "titleContains" in queryParameters &&
+    Object.hasOwn(queryParameters, "titleContains") &&
     !checkIfValueIsNotEmptyString(queryParameters.titleContains)
   ) {
-    errors.titleContains = VALIDATION_ERROR_MESSAGES.notEmptyString;
+    errors.titleContains = "must be not empty string";
   }
 
   if (
-    "contentContains" in queryParameters &&
+    Object.hasOwn(queryParameters, "contentContains") &&
     !checkIfValueIsNotEmptyString(queryParameters.contentContains)
   ) {
-    errors.contentContains = VALIDATION_ERROR_MESSAGES.notEmptyString;
+    errors.contentContains = "must be not empty string";
   }
 
   if (
-    "authorFirstName" in queryParameters &&
+    Object.hasOwn(queryParameters, "authorFirstName") &&
     !checkIfValueIsNotEmptyString(queryParameters.authorFirstName)
   ) {
-    errors.authorFirstName = VALIDATION_ERROR_MESSAGES.notEmptyString;
+    errors.authorFirstName = "must be not empty string";
   }
 
   if (
-    "categoryId" in queryParameters &&
+    Object.hasOwn(queryParameters, "categoryId") &&
     !checkIfValueIsStringPositiveInteger(queryParameters.categoryId)
   ) {
-    errors.categoryId = VALIDATION_ERROR_MESSAGES.positiveInteger;
+    errors.categoryId = "must be positive integer";
   }
 
   if (
-    "tagId" in queryParameters &&
+    Object.hasOwn(queryParameters, "tagId") &&
     !checkIfValueIsStringPositiveInteger(queryParameters.tagId)
   ) {
-    errors.tagId = VALIDATION_ERROR_MESSAGES.positiveInteger;
+    errors.tagId = "must be positive integer";
   }
 
   if (
-    "tagIdIn" in queryParameters &&
+    Object.hasOwn(queryParameters, "tagIdIn") &&
     !checkIfValueIsStringPositiveIntegers(queryParameters.tagIdIn)
   ) {
     errors.tagIdIn = "must be positive integers delimited by ampersand";
   }
 
   if (
-    "tagIdAll" in queryParameters &&
+    Object.hasOwn(queryParameters, "tagIdAll") &&
     !checkIfValueIsStringPositiveIntegers(queryParameters.tagIdAll)
   ) {
     errors.tagIdAll = "must be positive integers delimited by ampersand";
   }
 
   if (
-    "createdAt" in queryParameters &&
+    Object.hasOwn(queryParameters, "createdAt") &&
     !checkIfValueIsDateString(queryParameters.createdAt)
   ) {
-    errors.createdAt = VALIDATION_ERROR_MESSAGES.dateString;
+    errors.createdAt =
+      'must be string representation of a date in "ISO 8601" format';
   }
 
   if (
-    "createdAtLt" in queryParameters &&
+    Object.hasOwn(queryParameters, "createdAtLt") &&
     !checkIfValueIsDateString(queryParameters.createdAtLt)
   ) {
-    errors.createdAtLt = VALIDATION_ERROR_MESSAGES.dateString;
+    errors.createdAtLt =
+      'must be string representation of a date in "ISO 8601" format';
   }
 
   if (
-    "createdAtGt" in queryParameters &&
+    Object.hasOwn(queryParameters, "createdAtGt") &&
     !checkIfValueIsDateString(queryParameters.createdAtGt)
   ) {
-    errors.createdAtGt = VALIDATION_ERROR_MESSAGES.dateString;
+    errors.createdAtGt =
+      'must be string representation of a date in "ISO 8601" format';
   }
 
   if (Object.keys(errors).length !== 0) {
@@ -160,12 +164,10 @@ function validateFilterQueryParameters(queryParameters: Request["query"]) {
 }
 
 function validateOrderQueryParameters(queryParameters: Request["query"]) {
-  const errors: {
-    orderBy?: string;
-  } = {};
+  const errors: { orderBy?: string } = {};
 
   if (
-    "orderBy" in queryParameters &&
+    Object.hasOwn(queryParameters, "orderBy") &&
     (typeof queryParameters.orderBy !== "string" ||
       !VALID_ORDER_OPTIONS.includes(queryParameters.orderBy as any))
   ) {
@@ -182,31 +184,48 @@ function validateOrderQueryParameters(queryParameters: Request["query"]) {
 function validateUpdateData(data: any) {
   const errors: ValidationErrors = {};
 
-  if ("image" in data && !checkIfValueIsBase64WebpImageDataUrl(data.image)) {
-    errors.image = VALIDATION_ERROR_MESSAGES.base64WebpImageDataUrl;
+  if (
+    Object.hasOwn(data, "image") &&
+    !checkIfValueIsBase64WebpImageDataUrl(data.image)
+  ) {
+    errors.image =
+      'must be base64 image in data URL format with "image/webp" mediatype';
   }
 
   if (
-    "extraImages" in data &&
+    Object.hasOwn(data, "extraImages") &&
     !checkIfValueIsBase64WebpImageDataUrls(data.extraImages)
   ) {
-    errors.extraImages = VALIDATION_ERROR_MESSAGES.base64WebpImageDataUrls;
+    errors.extraImages =
+      'must be array of base64 images in data URL format with "image/webp" mediatype';
   }
 
-  if ("title" in data && !checkIfValueIsNotEmptyString(data.title)) {
-    errors.title = VALIDATION_ERROR_MESSAGES.notEmptyString;
+  if (
+    Object.hasOwn(data, "title") &&
+    !checkIfValueIsNotEmptyString(data.title)
+  ) {
+    errors.title = "must be not empty string";
   }
 
-  if ("content" in data && !checkIfValueIsNotEmptyString(data.content)) {
-    errors.content = VALIDATION_ERROR_MESSAGES.notEmptyString;
+  if (
+    Object.hasOwn(data, "content") &&
+    !checkIfValueIsNotEmptyString(data.content)
+  ) {
+    errors.content = "must be not empty string";
   }
 
-  if ("categoryId" in data && !checkIfValueIsPositiveInteger(data.categoryId)) {
-    errors.categoryId = VALIDATION_ERROR_MESSAGES.positiveInteger;
+  if (
+    Object.hasOwn(data, "categoryId") &&
+    !checkIfValueIsPositiveInteger(data.categoryId)
+  ) {
+    errors.categoryId = "must be positive integer";
   }
 
-  if ("tagsIds" in data && !checkIfValueIsPositiveIntegers(data.tagsIds)) {
-    errors.tagsIds = VALIDATION_ERROR_MESSAGES.positiveIntegersArray;
+  if (
+    Object.hasOwn(data, "tagIds") &&
+    !checkIfValueIsPositiveIntegers(data.tagIds)
+  ) {
+    errors.tagIds = "must be array of positive integers";
   }
 
   if (Object.keys(errors).length !== 0) {
