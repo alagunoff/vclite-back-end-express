@@ -1,6 +1,6 @@
 import { cleanEnv, str, num } from "envalid";
 
-export const env = cleanEnv(process.env, {
+const env = cleanEnv(process.env, {
   JWT_SECRET_KEY: str(),
   DATABASE_URL: str(),
   SMTP_HOST: str(),
@@ -9,3 +9,5 @@ export const env = cleanEnv(process.env, {
   SMTP_PASSWORD: str(),
   SMTP_SENDER: str(),
 });
+
+export { env };
