@@ -66,7 +66,7 @@
                 "properties": {
                   "image": {
                     "type": "string",
-                    "format": "base64"
+                    "format": "base64-image-data-url"
                   },
                   "username": {
                     "type": "string",
@@ -550,13 +550,13 @@
                 "properties": {
                   "image": {
                     "type": "string",
-                    "format": "base64"
+                    "format": "base64-image-data-url"
                   },
                   "extraImages": {
                     "type": "array",
                     "items": {
                       "type": "string",
-                      "format": "base64"
+                      "format": "base64-image-data-url"
                     },
                     "minItems": 1
                   },
@@ -761,13 +761,13 @@
                 "properties": {
                   "image": {
                     "type": "string",
-                    "format": "base64"
+                    "format": "base64-image-data-url"
                   },
                   "extraImages": {
                     "type": "array",
                     "items": {
                       "type": "string",
-                      "format": "base64"
+                      "format": "base64-image-data-url"
                     },
                     "minItems": 1
                   },
@@ -941,13 +941,13 @@
                 "properties": {
                   "image": {
                     "type": "string",
-                    "format": "base64"
+                    "format": "base64-image-data-url"
                   },
                   "extraImages": {
                     "type": "array",
                     "items": {
                       "type": "string",
-                      "format": "base64"
+                      "format": "base64-image-data-url"
                     },
                     "minItems": 1
                   },
@@ -1052,13 +1052,13 @@
                 "properties": {
                   "image": {
                     "type": "string",
-                    "format": "base64"
+                    "format": "base64-image-data-url"
                   },
                   "extraImages": {
                     "type": "array",
                     "items": {
                       "type": "string",
-                      "format": "base64"
+                      "format": "base64-image-data-url"
                     },
                     "minItems": 1
                   },
