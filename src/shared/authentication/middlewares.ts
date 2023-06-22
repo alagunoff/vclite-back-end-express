@@ -13,44 +13,52 @@ function authenticateUser(as?: "admin" | "author") {
       return;
     }
 
-    const encodedJwt = req.headers.authorization.slice(7);
-    jwt.verify(encodedJwt, env.JWT_SECRET_KEY, async (error, decodedJwt) => {
-      if (error) {
-        res.status(isAdminAuthentication ? 404 : 401).end();
-        return;
-      }
-
-      const authenticatedUser = await prisma.user.findUnique({
-        where: { id: Number(decodedJwt) },
-      });
-
-      if (!authenticatedUser) {
-        res.status(isAdminAuthentication ? 404 : 401).end();
-        return;
-      }
-
-      req.authenticatedUser = authenticatedUser;
-
-      if (isAdminAuthentication && !authenticatedUser.isAdmin) {
-        res.status(404).end();
-        return;
-      }
-
-      if (as === "author") {
-        const authenticatedAuthor = await prisma.author.findUnique({
-          where: { userId: authenticatedUser.id },
-        });
-
-        if (!authenticatedAuthor) {
-          res.status(403).end();
+    jwt.verify(
+      req.headers.authorization.slice(7),
+      env.JWT_SECRET_KEY,
+      async (error, decodedPayload) => {
+        if (error) {
+          res.status(isAdminAuthentication ? 404 : 401).end();
           return;
         }
 
-        req.authenticatedAuthor = authenticatedAuthor;
-      }
+        if (typeof decodedPayload !== "string") {
+          res.status(isAdminAuthentication ? 404 : 401).end();
+          return;
+        }
 
-      next();
-    });
+        const authenticatedUser = await prisma.user.findUnique({
+          where: { id: Number(decodedPayload.split("|").at(-1)) },
+        });
+
+        if (!authenticatedUser) {
+          res.status(isAdminAuthentication ? 404 : 401).end();
+          return;
+        }
+
+        req.authenticatedUser = authenticatedUser;
+
+        if (isAdminAuthentication && !authenticatedUser.isAdmin) {
+          res.status(404).end();
+          return;
+        }
+
+        if (as === "author") {
+          const authenticatedAuthor = await prisma.author.findUnique({
+            where: { userId: authenticatedUser.id },
+          });
+
+          if (!authenticatedAuthor) {
+            res.status(403).end();
+            return;
+          }
+
+          req.authenticatedAuthor = authenticatedAuthor;
+        }
+
+        next();
+      }
+    );
   };
 }
 

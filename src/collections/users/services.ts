@@ -1,12 +1,10 @@
-import crypto from "node:crypto";
-
-import { HOST_URL } from "shared/constants";
-import { env } from "shared/env";
+// import { HOST_URL } from "shared/constants";
+// import { env } from "shared/env";
 import { ApiError } from "shared/errors/classes";
 import { hashText } from "shared/hashing/utils";
 import { saveImage, deleteHostedImage } from "shared/images/utils";
 import { prisma } from "shared/prisma";
-import { transporter } from "shared/transporter";
+// import { transporter } from "shared/transporter";
 
 async function createUser({
   image,
@@ -27,34 +25,23 @@ async function createUser({
     return new ApiError(422);
   }
 
-  crypto.randomBytes(16, async (error, generatedBytes) => {
-    if (error) {
-      throw error;
-    }
-
-    const accountVerificationCode = generatedBytes.toString("hex");
-
-    const createdUser = await prisma.user.create({
-      data: {
-        image: await saveImage(image, "users", username),
-        username,
-        password: hashText(password),
-        email,
-        firstName,
-        lastName,
-        accountVerification: {
-          create: { code: hashText(accountVerificationCode) },
-        },
-      },
-    });
-
-    await transporter.sendMail({
-      from: env.SMTP_SENDER,
-      to: email,
-      subject: "Account verification on VClite",
-      html: `<p>An account has been registered with this email. If it was you, then <a href="${HOST_URL}/api/account-verification?userId=${createdUser.id}&code=${accountVerificationCode}" target="_blank" rel="noreferrer">verify</a> your account, otherwise do nothing.</p>`,
-    });
+  await prisma.user.create({
+    data: {
+      image: await saveImage(image, "users", username),
+      username,
+      password: hashText(password),
+      email,
+      firstName,
+      lastName,
+    },
   });
+
+  // await transporter.sendMail({
+  //   from: env.SMTP_SENDER,
+  //   to: email,
+  //   subject: "Account verification on VClite",
+  //   html: `<p>An account has been registered with this email. If it was you, then <a href="${HOST_URL}/api/account-verification?userId=${createdUser.id}&code=${accountVerificationCode}" target="_blank" rel="noreferrer">verify</a> your account, otherwise do nothing.</p>`,
+  // });
 }
 
 async function deleteUserById(id: number) {

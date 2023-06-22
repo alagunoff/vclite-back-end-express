@@ -18,11 +18,15 @@ async function logIn({
     return new ApiError(401);
   }
 
-  if (!userToLogIn.verified) {
-    return new ApiError(403);
-  }
+  // if (!userToLogIn.verified) {
+  //   return new ApiError(403);
+  // }
 
-  return jwt.sign(String(userToLogIn.id), env.JWT_SECRET_KEY);
+  return jwt.sign(
+    `vclite|authentication|${String(userToLogIn.id)}`,
+    env.JWT_SECRET_KEY,
+    { expiresIn: 60 }
+  );
 }
 
 export { logIn };
