@@ -28,10 +28,10 @@ function authenticateUser(as?: "admin" | "author") {
         }
 
         const authenticatedUser = await prisma.user.findUnique({
-          where: { id: decodedPayload.userId },
+          where: { id: decodedPayload.data },
         });
 
-        if (!authenticatedUser) {
+        if (!authenticatedUser?.verified) {
           res.status(isAdminAuthentication ? 404 : 401).end();
           return;
         }
