@@ -25,7 +25,8 @@ async function createUser({
   lastName?: string;
 }) {
   if (
-    await prisma.user.findFirst({ where: { OR: [{ username }, { email }] } })
+    (await prisma.user.findUnique({ where: { username } })) ??
+    (await prisma.user.findUnique({ where: { email } }))
   ) {
     return new ApiError(422);
   }
