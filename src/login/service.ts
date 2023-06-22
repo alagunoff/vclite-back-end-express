@@ -23,7 +23,7 @@ async function logIn({
   }
 
   return jwt.sign({ data: userToLogIn.id }, env.JWT_SECRET_KEY, {
-    expiresIn: "1d",
+    expiresIn: "1 day",
   });
 }
 
