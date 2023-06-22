@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 
 import { env } from "shared/env";
 import { prisma } from "shared/prisma";
+import { checkIfValueIsPositiveInteger } from "shared/validation/validators";
 
 function authenticateUser(as?: "admin" | "author") {
   const isAdminAuthentication = as === "admin";
@@ -17,12 +18,11 @@ function authenticateUser(as?: "admin" | "author") {
       req.headers.authorization.slice(7),
       env.JWT_SECRET_KEY,
       async (error, decodedPayload) => {
-        if (error) {
-          res.status(isAdminAuthentication ? 404 : 401).end();
-          return;
-        }
-
-        if (!decodedPayload || typeof decodedPayload === "string") {
+        if (
+          error ??
+          (typeof decodedPayload !== "object" ||
+            !checkIfValueIsPositiveInteger(decodedPayload.data))
+        ) {
           res.status(isAdminAuthentication ? 404 : 401).end();
           return;
         }
@@ -35,8 +35,6 @@ function authenticateUser(as?: "admin" | "author") {
           res.status(isAdminAuthentication ? 404 : 401).end();
           return;
         }
-
-        req.authenticatedUser = authenticatedUser;
 
         if (isAdminAuthentication && !authenticatedUser.isAdmin) {
           res.status(404).end();
@@ -56,6 +54,7 @@ function authenticateUser(as?: "admin" | "author") {
           req.authenticatedAuthor = authenticatedAuthor;
         }
 
+        req.authenticatedUser = authenticatedUser;
         next();
       }
     );

@@ -10,9 +10,42 @@
     }
   ],
   "paths": {
+    "/account-verification/{jwt}": {
+      "post": {
+        "tags": ["account"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "jwt",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "jwt"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verification successful"
+          },
+          "400": {
+            "description": "JWT is invalid"
+          },
+          "404": {
+            "description": "User not found or already verified"
+          },
+          "422": {
+            "description": "JWT is expired"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      }
+    },
     "/login": {
       "post": {
-        "tags": ["login"],
+        "tags": ["account"],
         "requestBody": {
           "required": true,
           "content": {
@@ -103,7 +136,7 @@
             "$ref": "#/components/responses/InvalidCreationData"
           },
           "422": {
-            "description": "User with this username already exists"
+            "description": "User with this username or email already exists"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -1179,8 +1212,8 @@
     "pathParameters": {
       "id": {
         "in": "path",
-        "required": true,
         "name": "id",
+        "required": true,
         "schema": {
           "type": "integer",
           "minimum": 1

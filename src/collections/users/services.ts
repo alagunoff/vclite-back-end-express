@@ -1,3 +1,4 @@
+import { type Prisma } from "@prisma/client";
 import jwt from "jsonwebtoken";
 
 import { HOST_URL } from "shared/constants";
@@ -23,7 +24,9 @@ async function createUser({
   firstName?: string;
   lastName?: string;
 }) {
-  if (await prisma.user.findUnique({ where: { username } })) {
+  if (
+    await prisma.user.findFirst({ where: { OR: [{ username }, { email }] } })
+  ) {
     return new ApiError(422);
   }
 
@@ -38,7 +41,6 @@ async function createUser({
     },
   });
   await transporter.sendMail({
-    from: env.SMTP_SENDER,
     to: email,
     subject: "Account verification on VClite",
     html: `<p>An account has been registered with this email. If it was you, then <a href="${HOST_URL}/api/account-verification/${jwt.sign(
@@ -47,6 +49,17 @@ async function createUser({
       { expiresIn: "10 minutes" }
     )}" target="_blank" rel="noreferrer">verify</a> your account within 10 minutes, otherwise do nothing.</p>`,
   });
+}
+
+async function updateUser(
+  filterParameters: Prisma.UserWhereUniqueInput,
+  { verified }: Prisma.UserUpdateInput
+) {
+  if (!(await prisma.user.findUnique({ where: filterParameters }))) {
+    return new ApiError(404);
+  }
+
+  await prisma.user.update({ where: filterParameters, data: { verified } });
 }
 
 async function deleteUserById(id: number) {
@@ -58,4 +71,4 @@ async function deleteUserById(id: number) {
   await deleteHostedImage(deletedUser.image);
 }
 
-export { createUser, deleteUserById };
+export { createUser, updateUser, deleteUserById };
