@@ -9,14 +9,13 @@ import "express-async-errors";
 import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
 
-import { verifyAccount } from "./accountVerification/controller";
+import * as accountRouter from "./account/router";
 import * as authorsRouter from "./collections/authors/router";
 import * as categoriesRouter from "./collections/categories/router";
 import * as draftsRouter from "./collections/drafts/router";
 import * as postsRouter from "./collections/posts/router";
 import * as tagsRouter from "./collections/tags/router";
 import * as usersRouter from "./collections/users/router";
-import { logIn } from "./login/controller";
 import { projectAbsolutePath } from "./shared/constants";
 import apiDocs from "../api-docs.json";
 
@@ -27,8 +26,7 @@ app.use(express.json());
 app.use(helmet());
 app.use(compression());
 app.use("/api/static", express.static(`${projectAbsolutePath}/static`));
-app.post("/api/login", logIn);
-app.get("/api/account-verification/:encodedJwt", verifyAccount);
+app.use("/api/account", accountRouter.router);
 app.use("/api/users", usersRouter.router);
 app.use("/api/authors", authorsRouter.router);
 app.use("/api/tags", tagsRouter.router);

@@ -3,7 +3,11 @@ import jwt from "jsonwebtoken";
 
 import * as userServices from "collections/users/services";
 import { env } from "shared/env";
+import { ApiError } from "shared/errors/classes";
 import { checkIfValueIsPositiveInteger } from "shared/validation/validators";
+
+import * as services from "./services";
+import { validateLoginData } from "./validators";
 
 function verifyAccount(req: Request, res: Response) {
   jwt.verify(
@@ -39,4 +43,22 @@ function verifyAccount(req: Request, res: Response) {
   );
 }
 
-export { verifyAccount };
+async function logIn(req: Request, res: Response) {
+  const loginDataValidationErrors = validateLoginData(req.body);
+
+  if (loginDataValidationErrors) {
+    res.status(400).json(loginDataValidationErrors);
+    return;
+  }
+
+  const loginResult = await services.logIn(req.body);
+
+  if (loginResult instanceof ApiError) {
+    res.status(loginResult.code).end();
+    return;
+  }
+
+  res.send(loginResult);
+}
+
+export { verifyAccount, logIn };
