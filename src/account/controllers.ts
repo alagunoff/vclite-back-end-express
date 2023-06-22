@@ -11,7 +11,7 @@ import { validateLoginData } from "./validators";
 
 function verifyAccount(req: Request, res: Response) {
   jwt.verify(
-    req.params.encodedJwt,
+    req.params.jwt,
     env.JWT_SECRET_KEY,
     async (error, decodedPayload) => {
       if (error instanceof jwt.TokenExpiredError) {
