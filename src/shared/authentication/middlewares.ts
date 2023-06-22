@@ -22,13 +22,13 @@ function authenticateUser(as?: "admin" | "author") {
           return;
         }
 
-        if (typeof decodedPayload !== "string") {
+        if (!decodedPayload || typeof decodedPayload === "string") {
           res.status(isAdminAuthentication ? 404 : 401).end();
           return;
         }
 
         const authenticatedUser = await prisma.user.findUnique({
-          where: { id: Number(decodedPayload.split("|").at(-1)) },
+          where: { id: decodedPayload.userId },
         });
 
         if (!authenticatedUser) {

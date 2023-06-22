@@ -112,6 +112,7 @@
       },
       "get": {
         "tags": ["users"],
+        "security": [{ "JWT": [] }],
         "description": "Get info about the user assosiated with provided JWT",
         "responses": {
           "200": {
