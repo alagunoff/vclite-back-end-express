@@ -17,10 +17,14 @@ router
   .post(authenticateUser("author"), createDraft)
   .get(authenticateUser("author"), getDrafts);
 router
-  .route("/:id(\\d+)")
+  .route("/:id([1-9][0-9]{0,})")
   .patch(authenticateUser("author"), updateDraft)
   .delete(authenticateUser("author"), deleteDraft);
 
-router.post("/:id(\\d+)/publish", authenticateUser("author"), publishDraft);
+router.post(
+  "/:id([1-9][0-9]{0,})/publish",
+  authenticateUser("author"),
+  publishDraft
+);
 
 export { router };

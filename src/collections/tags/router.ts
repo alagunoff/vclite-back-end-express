@@ -8,7 +8,7 @@ const router = Router();
 
 router.route("").post(authenticateUser("admin"), createTag).get(getTags);
 router
-  .route("/:id(\\d+)")
+  .route("/:id([1-9][0-9]{0,})")
   .patch(authenticateUser("admin"), updateTag)
   .delete(authenticateUser("admin"), deleteTag);
 

@@ -16,7 +16,7 @@ router
   .post(authenticateUser("admin"), createAuthor)
   .get(authenticateUser("admin"), getAuthors);
 router
-  .route("/:id(\\d+)")
+  .route("/:id([1-9][0-9]{0,})")
   .patch(authenticateUser("admin"), updateAuthor)
   .delete(authenticateUser("admin"), deleteAuthor);
 

@@ -16,7 +16,7 @@ router
   .post(authenticateUser("admin"), createCategory)
   .get(getCategories);
 router
-  .route("/:id(\\d+)")
+  .route("/:id([1-9][0-9]{0,})")
   .patch(authenticateUser("admin"), updateCategory)
   .delete(authenticateUser("admin"), deleteCategory);
 
