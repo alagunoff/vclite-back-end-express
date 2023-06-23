@@ -8,7 +8,11 @@ async function saveImage(
   folderName: string,
   imageFileName: string
 ) {
-  const folderToSaveAbsolutePath = `${projectAbsolutePath}/static/images/${folderName}`;
+  const folderToSaveAbsolutePath = path.join(
+    projectAbsolutePath,
+    "static/images",
+    folderName
+  );
 
   await fsPromises.mkdir(folderToSaveAbsolutePath, { recursive: true });
 
@@ -19,7 +23,7 @@ async function saveImage(
   const imageFileNameWithExtension = `${imageFileName}.${imageExtension}`;
 
   await fsPromises.writeFile(
-    `${folderToSaveAbsolutePath}/${imageFileNameWithExtension}`,
+    path.join(folderToSaveAbsolutePath, imageFileNameWithExtension),
     Buffer.from(base64Image, "base64url")
   );
 
@@ -27,7 +31,10 @@ async function saveImage(
 }
 
 function getHostedImageAbsolutePath(imageUrl: string) {
-  return `${projectAbsolutePath}/${imageUrl.replace(`${HOST_URL}/api/`, "")}`;
+  return path.join(
+    projectAbsolutePath,
+    imageUrl.replace(`${HOST_URL}/api/`, "")
+  );
 }
 
 function getHostedImageFolderName(imageUrl: string) {
@@ -39,7 +46,9 @@ async function deleteHostedImage(imageUrl: string) {
 }
 
 async function deleteHostedImageFolder(imageUrl: string) {
-  await fsPromises.rmdir(path.dirname(getHostedImageAbsolutePath(imageUrl)));
+  await fsPromises.rm(path.dirname(getHostedImageAbsolutePath(imageUrl)), {
+    recursive: true,
+  });
 }
 
 export {
