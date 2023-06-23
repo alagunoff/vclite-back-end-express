@@ -1,8 +1,8 @@
 {
   "scripts": {
+    "prepare": "husky install",
     "dev": "tsup ./src/server.ts --watch --onSuccess \"dotenv -e .env.dev -- node ./dist/server.js\"",
     "build": "tsup ./src/server.ts --minify",
-    "prepare": "husky install",
     "eslint": "eslint ./src --ext .ts",
     "eslint:fix": "eslint ./src --ext .ts --fix"
   },
