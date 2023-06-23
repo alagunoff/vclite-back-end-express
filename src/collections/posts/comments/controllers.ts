@@ -37,7 +37,7 @@ async function getComments(req: Request, res: Response) {
     return;
   }
 
-  const commentsGettingResult = await services.getPostComments(
+  const commentsGettingResult = await services.getComments(
     Number(req.params.postId),
     createPaginationParameters(req.query)
   );
@@ -51,7 +51,7 @@ async function getComments(req: Request, res: Response) {
 }
 
 async function deleteComments(req: Request, res: Response) {
-  const commentsDeletionError = await services.deletePostComments(
+  const commentsDeletionError = await services.deleteComments(
     Number(req.params.postId)
   );
 

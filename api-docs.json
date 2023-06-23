@@ -906,7 +906,7 @@
             "$ref": "#/components/responses/Unauthenticated"
           },
           "404": {
-            "description": "Post with this id not found"
+            "description": "Post not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -934,7 +934,7 @@
             "$ref": "#/components/responses/InvalidPaginationQueryParameters"
           },
           "404": {
-            "description": "Post with this id not found"
+            "description": "Post not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
@@ -954,7 +954,7 @@
             "description": "Comments have been deleted"
           },
           "404": {
-            "description": "JWT isn't provided or invalid/expired or authenticated user isn't an admin or post to delete comments for not found"
+            "description": "JWT isn't provided or invalid/expired or authenticated user isn't an admin or post not found"
           },
           "500": {
             "$ref": "#/components/responses/UnknownError"
