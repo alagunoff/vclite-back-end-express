@@ -9,7 +9,7 @@ import { checkIfValueIsPositiveInteger } from "shared/validation/validators";
 import * as services from "./services";
 import { validateLoginData } from "./validators";
 
-function verifyAccount(req: Request, res: Response) {
+function verifyUser(req: Request, res: Response) {
   jwt.verify(
     req.params.jwt,
     env.JWT_SECRET_KEY,
@@ -61,4 +61,4 @@ async function logIn(req: Request, res: Response) {
   res.send(loginResult);
 }
 
-export { verifyAccount, logIn };
+export { verifyUser, logIn };

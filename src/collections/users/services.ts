@@ -44,7 +44,7 @@ async function createUser({
   await transporter.sendMail({
     to: email,
     subject: "Account verification on VClite",
-    html: `<p>An account has been registered with this email. If it was you, then <a href="${HOST_URL}/api/account/verification/${jwt.sign(
+    html: `<p>An account has been registered with this email. If it was you, then <a href="${HOST_URL}/api/verification/${jwt.sign(
       { data: createdUser.id },
       env.JWT_SECRET_KEY,
       { expiresIn: "10 minutes" }

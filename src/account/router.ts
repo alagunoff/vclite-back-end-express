@@ -1,10 +1,10 @@
 import { Router } from "express";
 
-import { verifyAccount, logIn } from "./controllers";
+import { verifyUser, logIn } from "./controllers";
 
 const router = Router();
 
-router.get("/verification/:jwt", verifyAccount);
+router.get("/verification/:jwt", verifyUser);
 router.post("/login", logIn);
 
 export { router };
