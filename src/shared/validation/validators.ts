@@ -30,25 +30,21 @@ function checkIfValueIsDateString(value: unknown) {
 function checkIfValueIsPositiveIntegers(value: unknown) {
   return (
     checkIfValueIsNotEmptyArray(value) &&
-    !value.some((item) => !Number.isInteger(item) || (item as number) <= 0)
+    value.every(checkIfValueIsPositiveInteger)
   );
 }
 
 function checkIfValueIsStringPositiveIntegers(value: unknown) {
   return (
     checkIfValueIsNotEmptyArray(value) &&
-    !value.some((item) => {
-      const itemAsNumber = Number(item);
-
-      return !Number.isInteger(itemAsNumber) || itemAsNumber <= 0;
-    })
+    value.every(checkIfValueIsStringPositiveInteger)
   );
 }
 
 function checkIfValueIsBase64WebpImageDataUrls(value: unknown) {
   return (
     checkIfValueIsNotEmptyArray(value) &&
-    !value.some((item) => !checkIfValueIsBase64WebpImageDataUrl(item))
+    value.every(checkIfValueIsBase64WebpImageDataUrl)
   );
 }
 
