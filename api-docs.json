@@ -10,6 +10,63 @@
     }
   ],
   "paths": {
+    "/registration": {
+      "post": {
+        "tags": ["account"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "base64-image-data-url"
+                  },
+                  "username": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "minLength": 1
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "firstName": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": ["image", "username", "password", "email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Registration successful and account verification link was sent to provided email"
+          },
+          "400": {
+            "description": "Registration data is invalid"
+          },
+          "422": {
+            "description": "User with this username or email already exists"
+          },
+          "500": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        }
+      }
+    },
     "/verification/{jwt}": {
       "get": {
         "tags": ["account"],
@@ -90,6 +147,7 @@
     "/users": {
       "post": {
         "tags": ["users"],
+        "security": [{ "JWT": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -130,10 +188,13 @@
         },
         "responses": {
           "201": {
-            "description": "User has been created and account verification link was sent to provided email"
+            "description": "User has been created"
           },
           "400": {
             "$ref": "#/components/responses/InvalidCreationData"
+          },
+          "404": {
+            "description": "JWT isn't provided or invalid/expired or authenticated user isn't an admin"
           },
           "422": {
             "description": "User with this username or email already exists"

@@ -2,7 +2,7 @@ import { createTransport } from "nodemailer";
 
 import { env } from "./env";
 
-const transporter = createTransport(
+const emailSender = createTransport(
   {
     host: env.SMTP_HOST,
     port: env.SMTP_PORT,
@@ -17,4 +17,4 @@ const transporter = createTransport(
   }
 );
 
-export { transporter };
+export { emailSender };

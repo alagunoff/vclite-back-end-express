@@ -1,13 +1,9 @@
 import { type Prisma } from "@prisma/client";
-import jwt from "jsonwebtoken";
 
-import { HOST_URL } from "shared/constants";
-import { env } from "shared/env";
 import { ApiError } from "shared/errors/classes";
 import { hashText } from "shared/hashing/utils";
 import { saveImage, deleteHostedImage } from "shared/images/utils";
 import { prisma } from "shared/prisma";
-import { transporter } from "shared/transporter";
 
 async function createUser({
   image,
@@ -16,6 +12,7 @@ async function createUser({
   email,
   firstName,
   lastName,
+  verified,
 }: {
   image: string;
   username: string;
@@ -23,6 +20,7 @@ async function createUser({
   email: string;
   firstName?: string;
   lastName?: string;
+  verified: boolean;
 }) {
   if (
     (await prisma.user.findUnique({ where: { username } })) ??
@@ -31,7 +29,7 @@ async function createUser({
     return new ApiError(422);
   }
 
-  const createdUser = await prisma.user.create({
+  return await prisma.user.create({
     data: {
       image: await saveImage(image, "users", username),
       username,
@@ -39,16 +37,8 @@ async function createUser({
       email,
       firstName,
       lastName,
+      verified,
     },
-  });
-  await transporter.sendMail({
-    to: email,
-    subject: "Account verification on VClite",
-    html: `<p>An account has been registered with this email. If it was you, then <a href="${HOST_URL}/api/verification/${jwt.sign(
-      { data: createdUser.id },
-      env.JWT_SECRET_KEY,
-      { expiresIn: "10 minutes" }
-    )}" target="_blank" rel="noreferrer">verify</a> your account within 10 minutes, otherwise do nothing.</p>`,
   });
 }
 

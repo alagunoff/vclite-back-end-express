@@ -2,12 +2,48 @@ import { type Request, type Response } from "express";
 import jwt from "jsonwebtoken";
 
 import * as userServices from "collections/users/services";
+import * as userValidators from "collections/users/validators";
+import { HOST_URL } from "shared/constants";
+import { emailSender } from "shared/email";
 import { env } from "shared/env";
 import { ApiError } from "shared/errors/classes";
 import { checkIfValueIsPositiveInteger } from "shared/validation/validators";
 
 import * as services from "./services";
 import { validateLoginData } from "./validators";
+
+async function register(req: Request, res: Response) {
+  const registrationDataValidationErrors = userValidators.validateCreationData(
+    req.body
+  );
+
+  if (registrationDataValidationErrors) {
+    res.status(400).json(registrationDataValidationErrors);
+    return;
+  }
+
+  const userCreationResult = await userServices.createUser({
+    ...req.body,
+    verified: false,
+  });
+
+  if (userCreationResult instanceof ApiError) {
+    res.status(userCreationResult.code).end();
+    return;
+  }
+
+  await emailSender.sendMail({
+    to: userCreationResult.email,
+    subject: "Account verification on VClite",
+    html: `<p>An account has been registered with this email. If it was you, then <a href="${HOST_URL}/api/verification/${jwt.sign(
+      { data: userCreationResult.id },
+      env.JWT_SECRET_KEY,
+      { expiresIn: "10 minutes" }
+    )}" target="_blank" rel="noreferrer">verify</a> your account within 10 minutes, otherwise do nothing.</p>`,
+  });
+
+  res.status(201).end();
+}
 
 function verifyUser(req: Request, res: Response) {
   jwt.verify(
@@ -61,4 +97,4 @@ async function logIn(req: Request, res: Response) {
   res.send(loginResult);
 }
 
-export { verifyUser, logIn };
+export { register, verifyUser, logIn };

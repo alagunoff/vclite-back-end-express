@@ -1,5 +1,7 @@
 import { type Request, type Response } from "express";
 
+import { ApiError } from "shared/errors/classes";
+
 import * as services from "./services";
 import { validateCreationData } from "./validators";
 
@@ -11,10 +13,13 @@ async function createUser(req: Request, res: Response) {
     return;
   }
 
-  const userCreationError = await services.createUser(req.body);
+  const userCreationResult = await services.createUser({
+    ...req.body,
+    verified: true,
+  });
 
-  if (userCreationError) {
-    res.status(userCreationError.code).end();
+  if (userCreationResult instanceof ApiError) {
+    res.status(userCreationResult.code).end();
     return;
   }
 
@@ -28,7 +33,6 @@ function getUser(req: Request, res: Response) {
     username: req.authenticatedUser?.username,
     firstName: req.authenticatedUser?.firstName,
     lastName: req.authenticatedUser?.lastName,
-    isAdmin: req.authenticatedUser?.isAdmin,
     createdAt: req.authenticatedUser?.createdAt,
   });
 }
