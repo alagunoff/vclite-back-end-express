@@ -4,9 +4,9 @@ import jwt from "jsonwebtoken";
 import * as userServices from "collections/users/services";
 import * as userValidators from "collections/users/validators";
 import { HOST_URL } from "shared/constants";
-import { emailSender } from "shared/email";
 import { env } from "shared/env";
 import { ApiError } from "shared/errors/classes";
+import { mailer } from "shared/mailer";
 import { checkIfValueIsPositiveInteger } from "shared/validation/validators";
 
 import * as services from "./services";
@@ -32,7 +32,7 @@ async function register(req: Request, res: Response) {
     return;
   }
 
-  await emailSender.sendMail({
+  await mailer.sendMail({
     to: userCreationResult.email,
     subject: "Account verification on VClite",
     html: `<p>An account has been registered with this email. If it was you, then <a href="${HOST_URL}/api/verification/${jwt.sign(
