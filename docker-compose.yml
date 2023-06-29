@@ -5,6 +5,6 @@ services:
     ports:
       - 5432:5432
   pgadmin:
-    image: dpage/pgadmin4:7.3
+    image: dpage/pgadmin4:7.4
     ports:
       - 5433:80
