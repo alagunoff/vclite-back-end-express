@@ -1,12 +1,30 @@
-import { vi, describe, test, expect } from "vitest";
+import { type PrismaClient } from "@prisma/client";
+import { vi, beforeEach, describe, test, expect } from "vitest";
+import { mockDeep, mockReset } from "vitest-mock-extended";
 
 import { createUser, updateUser, deleteUser } from "collections/users/services";
-import { prisma } from "shared/database/__mocks__/prisma";
 import { ApiError } from "shared/errors/classes";
+import { prisma } from "shared/prisma";
 
 import { user } from "../mock-data";
 
-vi.mock("shared/database/prisma");
+vi.mock("shared/database/prisma", () => {
+  return {
+    prisma: mockDeep<PrismaClient>(),
+  };
+});
+
+vi.mock("shared/images/utils", async (importOriginal) => {
+  return {
+    ...(await importOriginal()),
+    saveImage: vi.fn(),
+    deleteHostedImage: vi.fn(),
+  };
+});
+
+beforeEach(() => {
+  mockReset(prisma);
+});
 
 describe("createUser", () => {
   const userCreationData = {
@@ -43,7 +61,7 @@ describe("updateUser", () => {
   test("should update the user", async () => {
     prisma.user.findUnique.mockResolvedValue(user);
 
-    expect(await updateUser({ id: -1 }, { verified: true })).not.toBeInstanceOf(
+    expect(await updateUser({ id: 1 }, { verified: true })).not.toBeInstanceOf(
       ApiError
     );
   });
@@ -60,6 +78,6 @@ describe("deleteUser", () => {
     prisma.user.findUnique.mockResolvedValue(user);
     prisma.user.delete.mockResolvedValue(user);
 
-    expect(await deleteUser({ id: -1 })).not.toBeInstanceOf(ApiError);
+    expect(await deleteUser({ id: 1 })).not.toBeInstanceOf(ApiError);
   });
 });

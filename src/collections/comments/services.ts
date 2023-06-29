@@ -1,10 +1,10 @@
 import { type Prisma } from "@prisma/client";
 
-import { prisma } from "shared/database/prisma";
 import { ApiError } from "shared/errors/classes";
 import { DEFAULT_ORDER_PARAMETERS } from "shared/ordering/constants";
 import { type PaginationParameters } from "shared/pagination/types";
 import { calculatePagesTotalNumber } from "shared/pagination/utils";
+import { prisma } from "shared/prisma";
 
 async function createComment({
   content,

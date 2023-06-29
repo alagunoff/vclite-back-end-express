@@ -1,9 +1,9 @@
 import { type Prisma } from "@prisma/client";
 
-import { prisma } from "shared/database/prisma";
 import { ApiError } from "shared/errors/classes";
 import { hashText } from "shared/hashing/utils";
 import { saveImage, deleteHostedImage } from "shared/images/utils";
+import { prisma } from "shared/prisma";
 
 async function createUser({
   image,
