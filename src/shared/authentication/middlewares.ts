@@ -1,8 +1,8 @@
 import { type Request, type Response, type NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
+import { prisma } from "shared/database/prisma";
 import { env } from "shared/env";
-import { prisma } from "shared/prisma";
 import { checkIfValueIsPositiveInteger } from "shared/validation/validators";
 
 function authenticateUser(as?: "admin" | "author") {

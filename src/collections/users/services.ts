@@ -1,9 +1,9 @@
 import { type Prisma } from "@prisma/client";
 
+import { prisma } from "shared/database/prisma";
 import { ApiError } from "shared/errors/classes";
 import { hashText } from "shared/hashing/utils";
 import { saveImage, deleteHostedImage } from "shared/images/utils";
-import { prisma } from "shared/prisma";
 
 async function createUser({
   image,
@@ -53,13 +53,13 @@ async function updateUser(
   await prisma.user.update({ where: filterParameters, data: { verified } });
 }
 
-async function deleteUserById(id: number) {
-  if (!(await prisma.user.findUnique({ where: { id } }))) {
+async function deleteUser(filterParameters: Prisma.UserWhereUniqueInput) {
+  if (!(await prisma.user.findUnique({ where: filterParameters }))) {
     return new ApiError(404);
   }
 
-  const deletedUser = await prisma.user.delete({ where: { id } });
+  const deletedUser = await prisma.user.delete({ where: filterParameters });
   await deleteHostedImage(deletedUser.image);
 }
 
-export { createUser, updateUser, deleteUserById };
+export { createUser, updateUser, deleteUser };

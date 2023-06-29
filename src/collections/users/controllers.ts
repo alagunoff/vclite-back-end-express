@@ -38,9 +38,9 @@ function getUser(req: Request, res: Response) {
 }
 
 async function deleteUser(req: Request, res: Response) {
-  const userDeletionError = await services.deleteUserById(
-    Number(req.params.id)
-  );
+  const userDeletionError = await services.deleteUser({
+    id: Number(req.params.id),
+  });
 
   if (userDeletionError) {
     res.status(userDeletionError.code).end();

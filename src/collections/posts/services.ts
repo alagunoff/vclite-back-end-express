@@ -2,6 +2,7 @@ import { type Prisma } from "@prisma/client";
 import crypto from "node:crypto";
 
 import { includeSubcategories } from "collections/categories/utils";
+import { prisma } from "shared/database/prisma";
 import { ApiError } from "shared/errors/classes";
 import {
   saveImage,
@@ -11,7 +12,6 @@ import {
 } from "shared/images/utils";
 import { DEFAULT_ORDER_PARAMETERS } from "shared/ordering/constants";
 import { calculatePagesTotalNumber } from "shared/pagination/utils";
-import { prisma } from "shared/prisma";
 
 async function createPost({
   image,
