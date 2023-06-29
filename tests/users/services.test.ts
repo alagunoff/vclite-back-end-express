@@ -4,20 +4,9 @@ import { createUser, updateUser, deleteUser } from "collections/users/services";
 import { prisma } from "shared/database/__mocks__/prisma";
 import { ApiError } from "shared/errors/classes";
 
-vi.mock("shared/database/prisma");
+import { user } from "../mock-data";
 
-const fakeUser = {
-  id: 1,
-  image: "http://localhost:3000/api/static/images/users/oleg.webp",
-  username: "oleg",
-  password: "oleg",
-  email: "oleg@ol.eg",
-  firstName: null,
-  lastName: null,
-  createdAt: new Date(),
-  verified: false,
-  isAdmin: false,
-};
+vi.mock("shared/database/prisma");
 
 describe("createUser", () => {
   const userCreationData = {
@@ -30,13 +19,13 @@ describe("createUser", () => {
   };
 
   test("should return error", async () => {
-    prisma.user.findUnique.mockResolvedValue(fakeUser);
+    prisma.user.findUnique.mockResolvedValue(user);
 
     expect(await createUser(userCreationData)).toBeInstanceOf(ApiError);
   });
 
   test("should return created user", async () => {
-    prisma.user.create.mockResolvedValue(fakeUser);
+    prisma.user.create.mockResolvedValue(user);
 
     expect(await createUser(userCreationData)).not.toBeInstanceOf(ApiError);
   });
@@ -52,7 +41,7 @@ describe("updateUser", () => {
   });
 
   test("should update the user", async () => {
-    prisma.user.findUnique.mockResolvedValue(fakeUser);
+    prisma.user.findUnique.mockResolvedValue(user);
 
     expect(await updateUser({ id: -1 }, { verified: true })).not.toBeInstanceOf(
       ApiError
@@ -68,8 +57,8 @@ describe("deleteUser", () => {
   });
 
   test("should delete the user", async () => {
-    prisma.user.findUnique.mockResolvedValue(fakeUser);
-    prisma.user.delete.mockResolvedValue(fakeUser);
+    prisma.user.findUnique.mockResolvedValue(user);
+    prisma.user.delete.mockResolvedValue(user);
 
     expect(await deleteUser({ id: -1 })).not.toBeInstanceOf(ApiError);
   });
