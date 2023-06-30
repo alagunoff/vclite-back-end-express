@@ -2,12 +2,14 @@
   "scripts": {
     "prepare": "husky install",
     "dev": "tsup ./src/server.ts --watch --onSuccess \"dotenv -e .env.dev -- node ./dist/server.js\"",
-    "test": "vitest run",
+    "test": "dotenv -e .env.dev -- jest",
     "build": "tsup ./src/server.ts --minify",
     "eslint": "eslint ./src --ext .ts",
     "eslint:fix": "eslint ./src --ext .ts --fix"
   },
   "devDependencies": {
+    "@jest-mock/express": "^2.0.2",
+    "@jest/globals": "29.5.0",
     "@types/bcryptjs": "2.4.2",
     "@types/compression": "1.7.2",
     "@types/cors": "2.8.13",
@@ -26,10 +28,11 @@
     "eslint-plugin-promise": "6.1.1",
     "husky": "8.0.3",
     "jest": "29.5.0",
+    "jest-mock-extended": "3.0.4",
     "lint-staged": "13.2.3",
     "prettier": "2.8.8",
     "prisma": "4.16.1",
-    "supertest": "6.3.3",
+    "ts-jest": "29.1.0",
     "tsup": "7.1.0",
     "typescript": "5.1.6"
   },

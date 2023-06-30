@@ -1,6 +1,5 @@
-import { type PrismaClient } from "@prisma/client";
-import { vi, afterEach, describe, test, expect } from "vitest";
-import { mockDeep, type DeepMockProxy } from "vitest-mock-extended";
+import { jest, describe, test, expect, afterEach } from "@jest/globals";
+import { mockDeep } from "jest-mock-extended";
 
 import { createUser, updateUser, deleteUser } from "collections/users/services";
 import { ApiError } from "shared/errors/classes";
@@ -8,15 +7,13 @@ import { prisma } from "shared/prisma";
 
 import { user } from "../mock-data";
 
-const mockedPrisma = prisma as DeepMockProxy<PrismaClient>;
+jest.mock("shared/prisma", () => ({ prisma: mockDeep() }));
+jest.mock("shared/images/utils");
 
-vi.mock("shared/prisma", () => ({
-  prisma: mockDeep<PrismaClient>(),
-}));
-vi.mock("shared/images/utils");
+const mockPrisma = jest.mocked(prisma);
 
 afterEach(() => {
-  vi.restoreAllMocks();
+  jest.restoreAllMocks();
 });
 
 describe("createUser", () => {
@@ -29,48 +26,46 @@ describe("createUser", () => {
     verified: false,
   };
 
-  test("should return error", async () => {
-    mockedPrisma.user.findUnique.mockResolvedValue(user);
+  test("should return error when user with this username/email already exists", async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(user);
 
     expect(await createUser(userCreationData)).toBeInstanceOf(ApiError);
   });
 
   test("should return created user", async () => {
-    mockedPrisma.user.create.mockResolvedValue(user);
+    mockPrisma.user.create.mockResolvedValue(user);
 
-    expect(await createUser(userCreationData)).not.toBeInstanceOf(ApiError);
+    expect(await createUser(userCreationData)).toBe(user);
   });
 });
 
 describe("updateUser", () => {
-  test("should return error", async () => {
-    mockedPrisma.user.findUnique.mockResolvedValue(null);
+  test("should return error when user does not exist", async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(null);
 
     expect(await updateUser({ id: -1 }, { verified: true })).toBeInstanceOf(
       ApiError
     );
   });
 
-  test("should update the user", async () => {
-    mockedPrisma.user.findUnique.mockResolvedValue(user);
+  test("should return nothing when user's update successful", async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(user);
 
-    expect(await updateUser({ id: 1 }, { verified: true })).not.toBeInstanceOf(
-      ApiError
-    );
+    expect(await updateUser({ id: 1 }, { verified: true })).toBeUndefined();
   });
 });
 
 describe("deleteUser", () => {
-  test("should return error", async () => {
-    mockedPrisma.user.findUnique.mockResolvedValue(null);
+  test("should return error when user does not exist", async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(null);
 
     expect(await deleteUser({ id: -1 })).toBeInstanceOf(ApiError);
   });
 
-  test("should delete the user", async () => {
-    mockedPrisma.user.findUnique.mockResolvedValue(user);
-    mockedPrisma.user.delete.mockResolvedValue(user);
+  test("should return nothing when user's deletion successfu", async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(user);
+    mockPrisma.user.delete.mockResolvedValue(user);
 
-    expect(await deleteUser({ id: 1 })).not.toBeInstanceOf(ApiError);
+    expect(await deleteUser({ id: 1 })).toBeUndefined();
   });
 });
