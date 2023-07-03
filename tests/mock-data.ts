@@ -1,4 +1,6 @@
-const user = {
+import { type User } from "@prisma/client";
+
+const user: User = {
   id: 1,
   image: "http://localhost:3000/api/static/images/users/oleg.webp",
   username: "oleg",
