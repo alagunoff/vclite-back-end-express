@@ -1,4 +1,5 @@
-import { jest, describe, test, expect, afterEach } from "@jest/globals";
+import { jest, describe, test, expect } from "@jest/globals";
+import { type PrismaClient } from "@prisma/client";
 import { mockDeep } from "jest-mock-extended";
 
 import { createUser, updateUser, deleteUser } from "collections/users/services";
@@ -7,14 +8,10 @@ import { prisma } from "shared/prisma";
 
 import { user } from "../mock-data";
 
-jest.mock("shared/prisma", () => ({ prisma: mockDeep() }));
+jest.mock("shared/prisma", () => ({ prisma: mockDeep<PrismaClient>() }));
 jest.mock("shared/images/utils");
 
 const mockPrisma = jest.mocked(prisma);
-
-afterEach(() => {
-  jest.restoreAllMocks();
-});
 
 describe("createUser", () => {
   const userCreationData = {
