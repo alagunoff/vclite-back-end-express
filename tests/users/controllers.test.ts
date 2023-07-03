@@ -1,10 +1,12 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import { getMockReq, getMockRes } from "@jest-mock/express";
 
-import { createUser } from "collections/users/controllers";
+import { createUser, getUser, deleteUser } from "collections/users/controllers";
 import * as services from "collections/users/services";
 import * as validators from "collections/users/validators";
 import { ApiError } from "shared/errors/classes";
+
+import { user } from "../mock-data";
 
 jest.mock("collections/users/validators");
 jest.mock("collections/users/services");
@@ -23,14 +25,15 @@ describe("createUser", () => {
     expect(mockRes.status).toBeCalledWith(400);
   });
 
-  test("should set response status 422 when there is user's creation error", async () => {
-    mockServices.createUser.mockResolvedValue(new ApiError(422));
+  test("should set response status to api error code when there is user's creation error", async () => {
+    const apiError = new ApiError(422);
+    mockServices.createUser.mockResolvedValue(apiError);
 
     const { res: mockRes } = getMockRes();
 
     await createUser(getMockReq(), mockRes);
 
-    expect(mockRes.status).toBeCalledWith(422);
+    expect(mockRes.status).toBeCalledWith(apiError.code);
   });
 
   test("should set response status 201 when user has been created", async () => {
@@ -39,5 +42,38 @@ describe("createUser", () => {
     await createUser(getMockReq(), mockRes);
 
     expect(mockRes.status).toBeCalledWith(201);
+  });
+});
+
+describe("getUser", () => {
+  test("should return authenticated user", () => {
+    const { res: mockRes } = getMockRes();
+
+    getUser(getMockReq({ authenticatedUser: user }), mockRes);
+
+    expect(mockRes.json).toBeCalledWith(
+      expect.objectContaining({ id: user.id })
+    );
+  });
+});
+
+describe("deleteUser", () => {
+  test("should set response status to api error code when there is user's deletion error", async () => {
+    const apiError = new ApiError(422);
+    mockServices.deleteUser.mockResolvedValue(apiError);
+
+    const { res: mockRes } = getMockRes();
+
+    await deleteUser(getMockReq(), mockRes);
+
+    expect(mockRes.status).toBeCalledWith(apiError.code);
+  });
+
+  test("should set response status 204 when user has been deleted", async () => {
+    const { res: mockRes } = getMockRes();
+
+    await deleteUser(getMockReq(), mockRes);
+
+    expect(mockRes.status).toBeCalledWith(204);
   });
 });
