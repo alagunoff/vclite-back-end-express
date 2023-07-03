@@ -8,7 +8,7 @@ import * as userServices from "collections/users/services";
 import * as userValidators from "collections/users/validators";
 import { ApiError } from "shared/errors/classes";
 
-import { user } from "../mock-data";
+import { unverifiedUser, jwt } from "../mock-data";
 
 jest.mock("account/validators");
 jest.mock("account/services");
@@ -46,7 +46,7 @@ describe("register", () => {
   });
 
   test("should set response status 201 when account has been registered", async () => {
-    mockUserServices.createUser.mockResolvedValue(user);
+    mockUserServices.createUser.mockResolvedValue(unverifiedUser);
 
     const { res: mockRes } = getMockRes();
 
@@ -81,13 +81,12 @@ describe("login", () => {
   });
 
   test("should respond with jwt when login was successful", async () => {
-    const fakeJwt = "j.w.t";
-    mockServices.logIn.mockResolvedValue(fakeJwt);
+    mockServices.logIn.mockResolvedValue(jwt);
 
     const { res: mockRes } = getMockRes();
 
     await logIn(getMockReq(), mockRes);
 
-    expect(mockRes.send).toBeCalledWith(fakeJwt);
+    expect(mockRes.send).toBeCalledWith(jwt);
   });
 });

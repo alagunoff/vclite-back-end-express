@@ -14,7 +14,10 @@ async function createAuthor(req: Request, res: Response) {
     return;
   }
 
-  const authorCreationError = await services.createAuthor(req.body);
+  const authorCreationError = await services.createAuthor({
+    description: req.body.description,
+    userId: req.body.userId,
+  });
 
   if (authorCreationError) {
     res.status(authorCreationError.code).end();
@@ -44,9 +47,9 @@ async function updateAuthor(req: Request, res: Response) {
     return;
   }
 
-  const authorUpdateError = await services.updateAuthorById(
-    Number(req.params.id),
-    req.body
+  const authorUpdateError = await services.updateAuthor(
+    { id: Number(req.params.id) },
+    { description: req.body.description }
   );
 
   if (authorUpdateError) {
@@ -58,9 +61,9 @@ async function updateAuthor(req: Request, res: Response) {
 }
 
 async function deleteAuthor(req: Request, res: Response) {
-  const authorDeletionError = await services.deleteAuthorById(
-    Number(req.params.id)
-  );
+  const authorDeletionError = await services.deleteAuthor({
+    id: Number(req.params.id),
+  });
 
   if (authorDeletionError) {
     res.status(authorDeletionError.code).end();

@@ -6,7 +6,7 @@ import { createUser, updateUser, deleteUser } from "collections/users/services";
 import { ApiError } from "shared/errors/classes";
 import { prisma } from "shared/prisma";
 
-import { user } from "../mock-data";
+import { verifiedUser } from "../mock-data";
 
 jest.mock("shared/prisma", () => ({ prisma: mockDeep<PrismaClient>() }));
 jest.mock("shared/images/utils");
@@ -23,16 +23,16 @@ describe("createUser", () => {
     verified: false,
   };
 
-  test("should return error when user with this username/email already exists", async () => {
-    mockPrisma.user.findUnique.mockResolvedValue(user);
+  test("should return error when user already exists", async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(verifiedUser);
 
     expect(await createUser(userCreationData)).toBeInstanceOf(ApiError);
   });
 
   test("should return created user", async () => {
-    mockPrisma.user.create.mockResolvedValue(user);
+    mockPrisma.user.create.mockResolvedValue(verifiedUser);
 
-    expect(await createUser(userCreationData)).toBe(user);
+    expect(await createUser(userCreationData)).toBe(verifiedUser);
   });
 });
 
@@ -46,7 +46,7 @@ describe("updateUser", () => {
   });
 
   test("should return nothing when user's update successful", async () => {
-    mockPrisma.user.findUnique.mockResolvedValue(user);
+    mockPrisma.user.findUnique.mockResolvedValue(verifiedUser);
 
     expect(await updateUser({ id: 1 }, { verified: true })).toBeUndefined();
   });
@@ -59,9 +59,9 @@ describe("deleteUser", () => {
     expect(await deleteUser({ id: -1 })).toBeInstanceOf(ApiError);
   });
 
-  test("should return nothing when user's deletion successfu", async () => {
-    mockPrisma.user.findUnique.mockResolvedValue(user);
-    mockPrisma.user.delete.mockResolvedValue(user);
+  test("should return nothing when user's deletion successful", async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(verifiedUser);
+    mockPrisma.user.delete.mockResolvedValue(verifiedUser);
 
     expect(await deleteUser({ id: 1 })).toBeUndefined();
   });

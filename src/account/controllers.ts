@@ -1,5 +1,5 @@
 import { type Request, type Response } from "express";
-import jwt from "jsonwebtoken";
+import jsonwebtoken from "jsonwebtoken";
 
 import * as userServices from "collections/users/services";
 import * as userValidators from "collections/users/validators";
@@ -23,7 +23,12 @@ async function register(req: Request, res: Response) {
   }
 
   const userCreationResult = await userServices.createUser({
-    ...req.body,
+    image: req.body.image,
+    username: req.body.username,
+    password: req.body.password,
+    email: req.body.email,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
     verified: false,
   });
 
@@ -35,7 +40,7 @@ async function register(req: Request, res: Response) {
   await mailer.sendMail({
     to: userCreationResult.email,
     subject: "Account verification on VClite",
-    html: `<p>An account has been registered with this email. If it was you, then <a href="${HOST_URL}/api/verification/${jwt.sign(
+    html: `<p>An account has been registered with this email. If it was you, then <a href="${HOST_URL}/api/verification/${jsonwebtoken.sign(
       { data: userCreationResult.id },
       env.JWT_SECRET_KEY,
       { expiresIn: "10 minutes" }
@@ -46,11 +51,11 @@ async function register(req: Request, res: Response) {
 }
 
 function verifyUser(req: Request, res: Response) {
-  jwt.verify(
+  jsonwebtoken.verify(
     req.params.jwt,
     env.JWT_SECRET_KEY,
     async (error, decodedPayload) => {
-      if (error instanceof jwt.TokenExpiredError) {
+      if (error instanceof jsonwebtoken.TokenExpiredError) {
         res.status(422).end();
         return;
       }

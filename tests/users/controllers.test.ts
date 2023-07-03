@@ -6,7 +6,7 @@ import * as services from "collections/users/services";
 import * as validators from "collections/users/validators";
 import { ApiError } from "shared/errors/classes";
 
-import { user } from "../mock-data";
+import { verifiedUser } from "../mock-data";
 
 jest.mock("collections/users/validators");
 jest.mock("collections/users/services");
@@ -49,10 +49,10 @@ describe("getUser", () => {
   test("should return authenticated user", () => {
     const { res: mockRes } = getMockRes();
 
-    getUser(getMockReq({ authenticatedUser: user }), mockRes);
+    getUser(getMockReq({ authenticatedUser: verifiedUser }), mockRes);
 
     expect(mockRes.json).toBeCalledWith(
-      expect.objectContaining({ id: user.id })
+      expect.objectContaining({ id: verifiedUser.id })
     );
   });
 });

@@ -14,7 +14,12 @@ async function createUser(req: Request, res: Response) {
   }
 
   const userCreationResult = await services.createUser({
-    ...req.body,
+    image: req.body.image,
+    username: req.body.username,
+    password: req.body.password,
+    email: req.body.email,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
     verified: true,
   });
 

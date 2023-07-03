@@ -5,15 +5,7 @@ import { hashText } from "shared/hashing/utils";
 import { saveImage, deleteHostedImage } from "shared/images/utils";
 import { prisma } from "shared/prisma";
 
-async function createUser({
-  image,
-  username,
-  password,
-  email,
-  firstName,
-  lastName,
-  verified,
-}: {
+async function createUser(creationData: {
   image: string;
   username: string;
   password: string;
@@ -23,37 +15,39 @@ async function createUser({
   verified: boolean;
 }) {
   if (
-    (await prisma.user.findUnique({ where: { username } })) ??
-    (await prisma.user.findUnique({ where: { email } }))
+    (await prisma.user.findUnique({
+      where: { username: creationData.username },
+    })) ??
+    (await prisma.user.findUnique({ where: { email: creationData.email } }))
   ) {
     return new ApiError(422);
   }
 
   return await prisma.user.create({
     data: {
-      image: await saveImage(image, "users", username),
-      username,
-      password: hashText(password),
-      email,
-      firstName,
-      lastName,
-      verified,
+      ...creationData,
+      image: await saveImage(
+        creationData.image,
+        "users",
+        creationData.username
+      ),
+      password: hashText(creationData.password),
     },
   });
 }
 
 async function updateUser(
-  filterParameters: Prisma.UserWhereUniqueInput,
-  { verified }: Prisma.UserUpdateInput
+  filterParameters: Prisma.UserUpdateArgs["where"],
+  updateData: { verified: boolean }
 ) {
   if (!(await prisma.user.findUnique({ where: filterParameters }))) {
     return new ApiError(404);
   }
 
-  await prisma.user.update({ where: filterParameters, data: { verified } });
+  await prisma.user.update({ where: filterParameters, data: updateData });
 }
 
-async function deleteUser(filterParameters: Prisma.UserWhereUniqueInput) {
+async function deleteUser(filterParameters: Prisma.UserDeleteArgs["where"]) {
   if (!(await prisma.user.findUnique({ where: filterParameters }))) {
     return new ApiError(404);
   }

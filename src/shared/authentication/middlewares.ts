@@ -1,5 +1,5 @@
 import { type Request, type Response, type NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import jsonwebtoken from "jsonwebtoken";
 
 import { env } from "shared/env";
 import { prisma } from "shared/prisma";
@@ -14,7 +14,7 @@ function authenticateUser(as?: "admin" | "author") {
       return;
     }
 
-    jwt.verify(
+    jsonwebtoken.verify(
       req.headers.authorization.slice(7),
       env.JWT_SECRET_KEY,
       async (error, decodedPayload) => {
