@@ -1,4 +1,4 @@
-import { type User, type Author } from "@prisma/client";
+import { type User, type Author, type Tag } from "@prisma/client";
 
 const unverifiedUser: User = {
   id: 1,
@@ -30,5 +30,9 @@ const author: Author = {
   description: "lala",
   userId: 1,
 };
+const tag: Tag = {
+  id: 1,
+  name: "tag",
+};
 
-export { unverifiedUser, verifiedUser, jwt, author };
+export { unverifiedUser, verifiedUser, jwt, author, tag };
