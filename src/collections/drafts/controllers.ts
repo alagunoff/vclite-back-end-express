@@ -17,8 +17,13 @@ async function createDraft(req: Request, res: Response) {
   }
 
   const draftCreationError = await postServices.createPost({
-    ...req.body,
-    authorId: req.authenticatedAuthor?.id,
+    image: req.body.image,
+    extraImages: req.body.extraImages,
+    title: req.body.title,
+    content: req.body.content,
+    authorId: req.authenticatedAuthor?.id as number,
+    categoryId: req.body.categoryId,
+    tagIds: req.body.tagIds,
     isDraft: true,
   });
 
@@ -72,7 +77,14 @@ async function updateDraft(req: Request, res: Response) {
       authorId: req.authenticatedAuthor?.id,
       isDraft: true,
     },
-    req.body
+    {
+      image: req.body.image,
+      extraImages: req.body.extraImages,
+      title: req.body.title,
+      content: req.body.content,
+      categoryId: req.body.categoryId,
+      tagIds: req.body.tagIds,
+    }
   );
 
   if (draftUpdateError) {

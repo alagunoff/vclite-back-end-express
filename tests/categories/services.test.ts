@@ -43,9 +43,7 @@ describe("getCategories", () => {
 
 describe("updateCategory", () => {
   test("should return error when category does not exist", async () => {
-    expect(await updateCategory({ id: -1 }, { name: "lala" })).toBeInstanceOf(
-      ApiError
-    );
+    expect(await updateCategory({ id: -1 }, {})).toBeInstanceOf(ApiError);
   });
 
   test("should return nothing when category's update successful", async () => {

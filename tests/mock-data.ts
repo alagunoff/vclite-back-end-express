@@ -3,6 +3,7 @@ import {
   type Author,
   type Tag,
   type Category,
+  type Post,
 } from "@prisma/client";
 
 const unverifiedUser: User = {
@@ -44,5 +45,15 @@ const category: Category = {
   name: "category",
   parentCategoryId: null,
 };
+const post: Post = {
+  id: 1,
+  image: "http://localhost:3000/api/static/images/posts/1paop2ps/main.webp",
+  title: "title",
+  content: "content",
+  authorId: 1,
+  categoryId: 1,
+  createdAt: new Date(),
+  isDraft: false,
+};
 
-export { unverifiedUser, verifiedUser, jwt, author, tag, category };
+export { unverifiedUser, verifiedUser, jwt, author, tag, category, post };

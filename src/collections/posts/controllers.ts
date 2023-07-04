@@ -21,8 +21,13 @@ async function createPost(req: Request, res: Response) {
   }
 
   const postCreationError = await services.createPost({
-    ...req.body,
-    authorId: req.authenticatedAuthor?.id,
+    image: req.body.image,
+    extraImages: req.body.extraImages,
+    title: req.body.title,
+    content: req.body.content,
+    authorId: req.authenticatedAuthor?.id as number,
+    categoryId: req.body.categoryId,
+    tagIds: req.body.tagIds,
     isDraft: false,
   });
 
@@ -80,7 +85,14 @@ async function updatePost(req: Request, res: Response) {
 
   const postUpdateError = await services.updatePost(
     { id: Number(req.params.id) },
-    req.body
+    {
+      image: req.body.image,
+      extraImages: req.body.extraImages,
+      title: req.body.title,
+      content: req.body.content,
+      categoryId: req.body.categoryId,
+      tagIds: req.body.tagIds,
+    }
   );
 
   if (postUpdateError) {

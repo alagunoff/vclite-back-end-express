@@ -40,15 +40,13 @@ describe("updateUser", () => {
   test("should return error when user does not exist", async () => {
     mockPrisma.user.findUnique.mockResolvedValue(null);
 
-    expect(await updateUser({ id: -1 }, { verified: true })).toBeInstanceOf(
-      ApiError
-    );
+    expect(await updateUser({ id: -1 }, {})).toBeInstanceOf(ApiError);
   });
 
   test("should return nothing when user's update successful", async () => {
     mockPrisma.user.findUnique.mockResolvedValue(verifiedUser);
 
-    expect(await updateUser({ id: 1 }, { verified: true })).toBeUndefined();
+    expect(await updateUser({ id: 1 }, {})).toBeUndefined();
   });
 });
 

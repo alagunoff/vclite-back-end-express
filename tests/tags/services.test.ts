@@ -41,9 +41,7 @@ describe("getTags", () => {
 
 describe("updateTag", () => {
   test("should return error when tag does not exist", async () => {
-    expect(await updateTag({ id: -1 }, { name: "lala" })).toBeInstanceOf(
-      ApiError
-    );
+    expect(await updateTag({ id: -1 }, {})).toBeInstanceOf(ApiError);
   });
 
   test("should return nothing when tag's update successful", async () => {

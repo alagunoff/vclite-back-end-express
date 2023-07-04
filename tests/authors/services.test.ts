@@ -41,17 +41,13 @@ describe("getAuthors", () => {
 
 describe("updateAuthor", () => {
   test("should return error when author does not exist", async () => {
-    expect(
-      await updateAuthor({ id: -1 }, { description: "lala" })
-    ).toBeInstanceOf(ApiError);
+    expect(await updateAuthor({ id: -1 }, {})).toBeInstanceOf(ApiError);
   });
 
   test("should return nothing when author's update successful", async () => {
     mockPrisma.author.findUnique.mockResolvedValue(author);
 
-    expect(
-      await updateAuthor({ id: 1 }, { description: "lala" })
-    ).toBeUndefined();
+    expect(await updateAuthor({ id: 1 }, {})).toBeUndefined();
   });
 });
 

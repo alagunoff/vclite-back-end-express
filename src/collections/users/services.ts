@@ -25,20 +25,24 @@ async function createUser(creationData: {
 
   return await prisma.user.create({
     data: {
-      ...creationData,
       image: await saveImage(
         creationData.image,
         "users",
         creationData.username
       ),
+      username: creationData.username,
       password: hashText(creationData.password),
+      email: creationData.email,
+      firstName: creationData.firstName,
+      lastName: creationData.lastName,
+      verified: creationData.verified,
     },
   });
 }
 
 async function updateUser(
   filterParameters: Prisma.UserUpdateArgs["where"],
-  updateData: { verified: boolean }
+  updateData: { verified?: boolean }
 ) {
   if (!(await prisma.user.findUnique({ where: filterParameters }))) {
     return new ApiError(404);

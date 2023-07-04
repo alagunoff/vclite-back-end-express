@@ -13,16 +13,7 @@ import { DEFAULT_ORDER_PARAMETERS } from "shared/ordering/constants";
 import { calculatePagesTotalNumber } from "shared/pagination/utils";
 import { prisma } from "shared/prisma";
 
-async function createPost({
-  image,
-  extraImages,
-  title,
-  content,
-  authorId,
-  categoryId,
-  tagIds,
-  isDraft,
-}: {
+async function createPost(creationData: {
   image: string;
   extraImages?: string[];
   title: string;
@@ -32,11 +23,15 @@ async function createPost({
   tagIds: number[];
   isDraft: boolean;
 }) {
-  if (!(await prisma.category.findUnique({ where: { id: categoryId } }))) {
+  if (
+    !(await prisma.category.findUnique({
+      where: { id: creationData.categoryId },
+    }))
+  ) {
     return new ApiError(422, "categoryNotFound");
   }
 
-  for (const tagId of tagIds) {
+  for (const tagId of creationData.tagIds) {
     if (!(await prisma.tag.findUnique({ where: { id: tagId } }))) {
       return new ApiError(422, `tag with id ${tagId} not found`);
     }
@@ -46,12 +41,12 @@ async function createPost({
 
   await prisma.post.create({
     data: {
-      image: await saveImage(image, postImagesFolderName, "main"),
-      extraImages: extraImages
+      image: await saveImage(creationData.image, postImagesFolderName, "main"),
+      extraImages: creationData.extraImages
         ? {
             createMany: {
               data: await Promise.all(
-                extraImages.map(async (extraImage, index) => ({
+                creationData.extraImages.map(async (extraImage, index) => ({
                   image: await saveImage(
                     extraImage,
                     postImagesFolderName,
@@ -62,12 +57,12 @@ async function createPost({
             },
           }
         : undefined,
-      title,
-      content,
-      authorId,
-      categoryId,
-      tags: { connect: tagIds.map((tagId) => ({ id: tagId })) },
-      isDraft,
+      title: creationData.title,
+      content: creationData.content,
+      authorId: creationData.authorId,
+      categoryId: creationData.categoryId,
+      tags: { connect: creationData.tagIds.map((tagId) => ({ id: tagId })) },
+      isDraft: creationData.isDraft,
     },
   });
 }
@@ -110,16 +105,8 @@ async function getPosts({
 }
 
 async function updatePost(
-  filterParameters: Prisma.PostWhereUniqueInput,
-  {
-    image,
-    extraImages,
-    title,
-    content,
-    categoryId,
-    tagIds,
-    isDraft,
-  }: {
+  filterParameters: Prisma.PostUpdateArgs["where"],
+  updateData: {
     image?: string;
     extraImages?: string[];
     title?: string;
@@ -134,14 +121,16 @@ async function updatePost(
   }
 
   if (
-    categoryId &&
-    !(await prisma.category.findUnique({ where: { id: categoryId } }))
+    updateData.categoryId &&
+    !(await prisma.category.findUnique({
+      where: { id: updateData.categoryId },
+    }))
   ) {
     return new ApiError(422, "categoryNotFound");
   }
 
-  if (tagIds) {
-    for (const tagId of tagIds) {
+  if (updateData.tagIds) {
+    for (const tagId of updateData.tagIds) {
       if (!(await prisma.tag.findUnique({ where: { id: tagId } }))) {
         return new ApiError(422, `tag with id ${tagId} not found`);
       }
@@ -151,26 +140,26 @@ async function updatePost(
   const updatedPost = await prisma.post.update({
     where: filterParameters,
     data: {
-      title,
-      content,
-      categoryId,
-      tags: tagIds
-        ? { set: tagIds.map((tagId) => ({ id: tagId })) }
+      title: updateData.title,
+      content: updateData.content,
+      categoryId: updateData.categoryId,
+      tags: updateData.tagIds
+        ? { set: updateData.tagIds.map((tagId) => ({ id: tagId })) }
         : undefined,
-      isDraft,
+      isDraft: updateData.isDraft,
     },
   });
 
-  if (image ?? extraImages) {
+  if (updateData.image ?? updateData.extraImages) {
     const updatedPostImagesFolderName = `posts/${getHostedImageFolderName(
       updatedPost.image
     )}`;
 
-    if (image) {
-      await saveImage(image, updatedPostImagesFolderName, "main");
+    if (updateData.image) {
+      await saveImage(updateData.image, updatedPostImagesFolderName, "main");
     }
 
-    if (extraImages) {
+    if (updateData.extraImages) {
       const updatedPostExtraImages = await prisma.postExtraImage.findMany({
         where: { postId: updatedPost.id },
       });
@@ -189,7 +178,7 @@ async function updatePost(
           extraImages: {
             createMany: {
               data: await Promise.all(
-                extraImages.map(async (extraImage, index) => ({
+                updateData.extraImages.map(async (extraImage, index) => ({
                   image: await saveImage(
                     extraImage,
                     updatedPostImagesFolderName,
@@ -205,7 +194,7 @@ async function updatePost(
   }
 }
 
-async function deletePost(filterParameters: Prisma.PostWhereUniqueInput) {
+async function deletePost(filterParameters: Prisma.PostDeleteArgs["where"]) {
   if (!(await prisma.post.findUnique({ where: filterParameters }))) {
     return new ApiError(404);
   }
