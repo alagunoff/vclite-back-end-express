@@ -4,6 +4,7 @@ import {
   type Tag,
   type Category,
   type Post,
+  type Comment,
 } from "@prisma/client";
 
 const unverifiedUser: User = {
@@ -55,5 +56,19 @@ const post: Post = {
   createdAt: new Date(),
   isDraft: false,
 };
+const comment: Comment = {
+  id: 1,
+  content: "content",
+  postId: 1,
+};
 
-export { unverifiedUser, verifiedUser, jwt, author, tag, category, post };
+export {
+  unverifiedUser,
+  verifiedUser,
+  jwt,
+  author,
+  tag,
+  category,
+  post,
+  comment,
+};

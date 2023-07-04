@@ -6,24 +6,23 @@ import { type PaginationParameters } from "shared/pagination/types";
 import { calculatePagesTotalNumber } from "shared/pagination/utils";
 import { prisma } from "shared/prisma";
 
-async function createComment({
-  content,
-  postId,
-}: {
+async function createComment(creationData: {
   content: string;
   postId: number;
 }) {
   if (
-    !(await prisma.post.findUnique({ where: { id: postId, isDraft: false } }))
+    !(await prisma.post.findUnique({
+      where: { id: creationData.postId, isDraft: false },
+    }))
   ) {
     return new ApiError(422);
   }
 
-  await prisma.comment.create({ data: { content, postId } });
+  await prisma.comment.create({ data: creationData });
 }
 
 async function getComments(
-  filterParameters: Prisma.CommentWhereInput,
+  filterParameters: Prisma.CommentFindManyArgs["where"],
   paginationParameters: PaginationParameters
 ) {
   const comments = await prisma.comment.findMany({
@@ -46,7 +45,9 @@ async function getComments(
   };
 }
 
-async function deleteComments(filterParameters: Prisma.CommentWhereInput) {
+async function deleteComments(
+  filterParameters: Prisma.CommentDeleteManyArgs["where"]
+) {
   await prisma.comment.deleteMany({ where: filterParameters });
 }
 
