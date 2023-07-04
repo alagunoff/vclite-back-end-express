@@ -14,7 +14,10 @@ async function createCategory(req: Request, res: Response) {
     return;
   }
 
-  const categoryCreationError = await services.createCategory(req.body);
+  const categoryCreationError = await services.createCategory({
+    name: req.body.name,
+    parentCategoryId: req.body.parentCategoryId,
+  });
 
   if (categoryCreationError) {
     res.status(categoryCreationError.code).send(categoryCreationError.reason);
@@ -44,9 +47,9 @@ async function updateCategory(req: Request, res: Response) {
     return;
   }
 
-  const categoryUpdateError = await services.updateCategoryById(
-    Number(req.params.id),
-    req.body
+  const categoryUpdateError = await services.updateCategory(
+    { id: Number(req.params.id) },
+    { name: req.body.name, parentCategoryId: req.body.parentCategoryId }
   );
 
   if (categoryUpdateError) {
@@ -63,9 +66,9 @@ async function updateCategory(req: Request, res: Response) {
 }
 
 async function deleteCategory(req: Request, res: Response) {
-  const categoryDeletionError = await services.deleteCategoryById(
-    Number(req.params.id)
-  );
+  const categoryDeletionError = await services.deleteCategory({
+    id: Number(req.params.id),
+  });
 
   if (categoryDeletionError) {
     res.status(categoryDeletionError.code).end();

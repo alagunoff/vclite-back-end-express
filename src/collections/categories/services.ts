@@ -1,3 +1,5 @@
+import { type Prisma } from "@prisma/client";
+
 import { ApiError } from "shared/errors/classes";
 import { DEFAULT_ORDER_PARAMETERS } from "shared/ordering/constants";
 import { type PaginationParameters } from "shared/pagination/types";
@@ -6,32 +8,26 @@ import { prisma } from "shared/prisma";
 
 import { includeSubcategories } from "./utils";
 
-async function createCategory({
-  name,
-  parentCategoryId,
-}: {
+async function createCategory(creationData: {
   name: string;
   parentCategoryId?: number;
 }) {
-  if (await prisma.category.findUnique({ where: { name } })) {
+  if (
+    await prisma.category.findUnique({ where: { name: creationData.name } })
+  ) {
     return new ApiError(422, "categoryAlreadyExists");
   }
 
   if (
-    parentCategoryId &&
-    !(await prisma.category.findUnique({ where: { id: parentCategoryId } }))
+    creationData.parentCategoryId &&
+    !(await prisma.category.findUnique({
+      where: { id: creationData.parentCategoryId },
+    }))
   ) {
     return new ApiError(422, "parentCategoryNotFound");
   }
 
-  await prisma.category.create({
-    data: {
-      name,
-      parentCategory: {
-        connect: parentCategoryId ? { id: parentCategoryId } : undefined,
-      },
-    },
-  });
+  await prisma.category.create({ data: creationData });
 }
 
 async function getCategories(paginationParameters: PaginationParameters) {
@@ -60,45 +56,44 @@ async function getCategories(paginationParameters: PaginationParameters) {
   };
 }
 
-async function updateCategoryById(
-  id: number,
-  {
-    name,
-    parentCategoryId,
-  }: { name?: string; parentCategoryId?: number | null }
+async function updateCategory(
+  filterParameters: Prisma.CategoryUpdateArgs["where"],
+  updateData: { name?: string; parentCategoryId?: number | null }
 ) {
-  if (!(await prisma.category.findUnique({ where: { id } }))) {
+  if (!(await prisma.category.findUnique({ where: filterParameters }))) {
     return new ApiError(404);
   }
 
-  if (name && (await prisma.category.findUnique({ where: { name } }))) {
+  if (
+    updateData.name &&
+    (await prisma.category.findUnique({ where: { name: updateData.name } }))
+  ) {
     return new ApiError(422, "categoryAlreadyExists");
   }
 
   if (
-    parentCategoryId &&
-    !(await prisma.category.findUnique({ where: { id: parentCategoryId } }))
+    updateData.parentCategoryId &&
+    !(await prisma.category.findUnique({
+      where: { id: updateData.parentCategoryId },
+    }))
   ) {
     return new ApiError(422, "parentCategoryNotFound");
   }
 
   await prisma.category.update({
-    where: { id },
-    data: { name, parentCategoryId },
+    where: filterParameters,
+    data: updateData,
   });
 }
 
-async function deleteCategoryById(id: number) {
-  if (!(await prisma.category.findUnique({ where: { id } }))) {
+async function deleteCategory(
+  filterParameters: Prisma.CategoryDeleteArgs["where"]
+) {
+  if (!(await prisma.category.findUnique({ where: filterParameters }))) {
     return new ApiError(404);
   }
 
-  await prisma.category.delete({ where: { id } });
+  await prisma.category.delete({ where: filterParameters });
 }
 
-export {
-  createCategory,
-  getCategories,
-  updateCategoryById,
-  deleteCategoryById,
-};
+export { createCategory, getCategories, updateCategory, deleteCategory };
