@@ -1244,7 +1244,7 @@
         ],
         "responses": {
           "201": {
-            "description": "Post has been created"
+            "description": "Draft has been published"
           },
           "401": {
             "$ref": "#/components/responses/Unauthenticated"

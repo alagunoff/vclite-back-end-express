@@ -99,7 +99,7 @@ async function updateDraft(req: Request, res: Response) {
 }
 
 async function publishDraft(req: Request, res: Response) {
-  const draftUpdateError = await postServices.updatePost(
+  const draftPublishingError = await postServices.updatePost(
     {
       id: Number(req.params.id),
       authorId: req.authenticatedAuthor?.id,
@@ -108,8 +108,8 @@ async function publishDraft(req: Request, res: Response) {
     { isDraft: false }
   );
 
-  if (draftUpdateError) {
-    res.status(draftUpdateError.code).end();
+  if (draftPublishingError) {
+    res.status(draftPublishingError.code).end();
     return;
   }
 
