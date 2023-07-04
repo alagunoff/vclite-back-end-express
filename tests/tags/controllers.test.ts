@@ -2,18 +2,18 @@ import { jest, describe, test, expect } from "@jest/globals";
 import { getMockReq, getMockRes } from "@jest-mock/express";
 
 import {
-  createAuthor,
-  getAuthors,
-  updateAuthor,
-  deleteAuthor,
-} from "collections/authors/controllers";
-import * as services from "collections/authors/services";
-import * as validators from "collections/authors/validators";
+  createTag,
+  getTags,
+  updateTag,
+  deleteTag,
+} from "collections/tags/controllers";
+import * as services from "collections/tags/services";
+import * as validators from "collections/tags/validators";
 import { ApiError } from "shared/errors/classes";
 import { validatePaginationQueryParameters } from "shared/pagination/validator";
 
-jest.mock("collections/authors/validators");
-jest.mock("collections/authors/services");
+jest.mock("collections/tags/validators");
+jest.mock("collections/tags/services");
 jest.mock("shared/pagination/validator");
 
 const mockValidators = jest.mocked(validators);
@@ -22,38 +22,38 @@ const mockPaginationQueryParametersValidator = jest.mocked(
   validatePaginationQueryParameters
 );
 
-describe("createAuthor", () => {
+describe("createTag", () => {
   test("should set response status 400 when there are creation data validation errors", async () => {
-    mockValidators.validateCreationData.mockReturnValue({ userId: "required" });
+    mockValidators.validateCreationData.mockReturnValue({ name: "required" });
 
     const { res: mockRes } = getMockRes();
 
-    await createAuthor(getMockReq(), mockRes);
+    await createTag(getMockReq(), mockRes);
 
     expect(mockRes.status).toBeCalledWith(400);
   });
 
-  test("should set response status to api error code when there is author's creation error", async () => {
+  test("should set response status to api error code when there is tag's creation error", async () => {
     const apiError = new ApiError(422);
-    mockServices.createAuthor.mockResolvedValue(apiError);
+    mockServices.createTag.mockResolvedValue(apiError);
 
     const { res: mockRes } = getMockRes();
 
-    await createAuthor(getMockReq(), mockRes);
+    await createTag(getMockReq(), mockRes);
 
     expect(mockRes.status).toBeCalledWith(apiError.code);
   });
 
-  test("should set response status 201 when author has been created", async () => {
+  test("should set response status 201 when tag has been created", async () => {
     const { res: mockRes } = getMockRes();
 
-    await createAuthor(getMockReq(), mockRes);
+    await createTag(getMockReq(), mockRes);
 
     expect(mockRes.status).toBeCalledWith(201);
   });
 });
 
-describe("getAuthors", () => {
+describe("getTags", () => {
   test("should set response status 400 when there are pagination query parameters validation errors", async () => {
     mockPaginationQueryParametersValidator.mockReturnValue({
       pageNumber: "required",
@@ -61,7 +61,7 @@ describe("getAuthors", () => {
 
     const { res: mockRes } = getMockRes();
 
-    await getAuthors(getMockReq(), mockRes);
+    await getTags(getMockReq(), mockRes);
 
     expect(mockRes.status).toBeCalledWith(400);
   });
@@ -69,61 +69,61 @@ describe("getAuthors", () => {
   test("should call json method on response when there are no errors", async () => {
     const { res: mockRes } = getMockRes();
 
-    await getAuthors(getMockReq(), mockRes);
+    await getTags(getMockReq(), mockRes);
 
     expect(mockRes.json).toBeCalled();
   });
 });
 
-describe("updateAuthor", () => {
+describe("updateTag", () => {
   test("should set response status 400 when there are update data validation errors", async () => {
     mockValidators.validateUpdateData.mockReturnValue({
-      description: "required",
+      name: "required",
     });
 
     const { res: mockRes } = getMockRes();
 
-    await updateAuthor(getMockReq(), mockRes);
+    await updateTag(getMockReq(), mockRes);
 
     expect(mockRes.status).toBeCalledWith(400);
   });
 
-  test("should set response status to api error code when there is author's update error", async () => {
+  test("should set response status to api error code when there is tag's update error", async () => {
     const apiError = new ApiError(422);
-    mockServices.updateAuthor.mockResolvedValue(apiError);
+    mockServices.updateTag.mockResolvedValue(apiError);
 
     const { res: mockRes } = getMockRes();
 
-    await updateAuthor(getMockReq(), mockRes);
+    await updateTag(getMockReq(), mockRes);
 
     expect(mockRes.status).toBeCalledWith(apiError.code);
   });
 
-  test("should set response status 201 when author has been updated", async () => {
+  test("should set response status 201 when tag has been updated", async () => {
     const { res: mockRes } = getMockRes();
 
-    await updateAuthor(getMockReq(), mockRes);
+    await updateTag(getMockReq(), mockRes);
 
     expect(mockRes.status).toBeCalledWith(204);
   });
 });
 
-describe("deleteAuthor", () => {
-  test("should set response status to api error code when there is author's deletion error", async () => {
+describe("deleteTag", () => {
+  test("should set response status to api error code when there is tag's deletion error", async () => {
     const apiError = new ApiError(422);
-    mockServices.deleteAuthor.mockResolvedValue(apiError);
+    mockServices.deleteTag.mockResolvedValue(apiError);
 
     const { res: mockRes } = getMockRes();
 
-    await deleteAuthor(getMockReq(), mockRes);
+    await deleteTag(getMockReq(), mockRes);
 
     expect(mockRes.status).toBeCalledWith(apiError.code);
   });
 
-  test("should set response status 204 when author has been deleted", async () => {
+  test("should set response status 204 when tag has been deleted", async () => {
     const { res: mockRes } = getMockRes();
 
-    await deleteAuthor(getMockReq(), mockRes);
+    await deleteTag(getMockReq(), mockRes);
 
     expect(mockRes.status).toBeCalledWith(204);
   });
