@@ -8,14 +8,5 @@ services:
       - .env.dev
     volumes:
       - db:/var/lib/postgresql/data
-  pgadmin:
-    extends:
-      file: docker-compose.yml
-      service: pgadmin
-    env_file:
-      - .env.dev
-    volumes:
-      - pgadmin:/var/lib/pgadmin
 volumes:
   db:
-  pgadmin:

@@ -12,9 +12,3 @@ services:
       service: db
     env_file:
       - .env.prod
-  pgadmin:
-    extends:
-      file: docker-compose.yml
-      service: pgadmin
-    env_file:
-      - .env.prod
