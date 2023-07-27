@@ -1,6 +1,6 @@
 # Back end for VClite
 
-> Back end is powered by [Express](https://expressjs.com/). API is documented using [Swagger](https://swagger.io/).
+Back end is powered by [Express](https://expressjs.com/). API is documented using [Swagger](https://swagger.io/).
 
 ## Installation
 
