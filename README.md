@@ -1,6 +1,6 @@
-# Back end for VClite
+VCLite is a fictional project, which is a lightweight version of [vc.ru](https://vc.ru/).
 
-Back end is powered by [Express](https://expressjs.com/). API is documented using [Swagger](https://swagger.io/).
+***
 
 ## Installation
 
