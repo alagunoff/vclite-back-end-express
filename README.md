@@ -1,4 +1,4 @@
-VCLite is a fictional project, which is a lightweight version of [vc.ru](https://vc.ru/).
+VClite is a fictional project, which is a lightweight version of [vc.ru](https://vc.ru/).
 
 ***
 
